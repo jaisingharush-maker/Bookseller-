@@ -1,152 +1,207 @@
-        
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Book Hub | Pro Market</title>
+    <title>Student Pro Hub</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --blue: #007bff; --green: #28a745; --bg: #f4f7f6; --text: #333; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; color: var(--text); }
-        header { background: #fff; padding: 20px; text-align: center; border-bottom: 2px solid var(--blue); position: sticky; top: 0; z-index: 100; }
+        :root { --blue: #007bff; --bg: #f2f4f7; --card: #ffffff; --green: #28a745; --yellow: #ffc107; --red: #dc3545; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding-bottom: 70px; }
+        
+        .navbar { position: fixed; bottom: 0; width: 100%; background: #fff; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #ddd; z-index: 1000; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
+        .nav-item { border: none; background: none; font-weight: bold; color: #888; cursor: pointer; display: flex; flex-direction: column; align-items: center; font-size: 0.8rem; }
+        .nav-item.active { color: var(--blue); }
+
         .container { max-width: 500px; margin: auto; padding: 15px; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
 
-        /* Search & Filter */
-        .search-box { background: #fff; padding: 10px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .search-box input { width: 100%; border: none; padding: 10px; font-size: 1rem; outline: none; box-sizing: border-box; }
+        /* MARKET TAB */
+        .post-card { background: var(--card); padding: 20px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; background: #fff; }
+        .btn-blue { background: var(--blue); color: white; border: none; padding: 14px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .upload-link { display: inline-block; background: #e7f3ff; color: var(--blue); padding: 10px; border-radius: 8px; text-decoration: none; font-size: 0.8rem; margin: 10px 0; border: 1px dashed var(--blue); width: 100%; text-align: center; box-sizing: border-box; }
 
-        /* Post Card */
-        .card { background: #fff; padding: 20px; border-radius: 15px; margin-bottom: 25px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); }
-        h2 { margin-top: 0; font-size: 1.2rem; color: var(--blue); }
-        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        
-        .upload-tip { background: #e7f3ff; padding: 10px; border-radius: 8px; font-size: 0.8rem; margin: 10px 0; border: 1px dashed var(--blue); }
-        .upload-tip a { color: var(--blue); font-weight: bold; text-decoration: none; }
+        .book-card { background: var(--card); border-radius: 12px; margin-bottom: 15px; overflow: hidden; display: flex; position: relative; border: 1px solid #eee; }
+        .book-card img { width: 110px; height: 140px; object-fit: cover; }
+        .details { padding: 12px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        .price { color: var(--green); font-size: 1.2rem; font-weight: 800; }
+        .btn-wa { background: #25D366; color: white; padding: 6px 15px; border-radius: 6px; text-decoration: none; font-size: 0.85rem; font-weight: bold; }
 
-        .btn-post { width: 100%; padding: 14px; background: var(--blue); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1.1rem; }
+        /* STUDY TAB */
+        .timer-box { background: #333; color: #fff; padding: 20px; border-radius: 15px; text-align: center; margin-bottom: 20px; }
+        #timerDisplay { font-size: 3.5rem; font-weight: bold; margin: 10px 0; font-family: monospace; color: var(--yellow); }
+        .timer-controls { display: flex; gap: 10px; justify-content: center; }
+        .t-btn { border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; color: white; }
         
-        /* Book List Item */
-        .book-card { background: #fff; border-radius: 12px; margin-bottom: 20px; display: flex; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .book-card img { width: 130px; height: 160px; object-fit: cover; background: #eee; }
-        .details { padding: 15px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
-        .details h3 { margin: 0; font-size: 1.1rem; color: #111; }
-        .price { color: var(--green); font-size: 1.3rem; font-weight: 800; margin: 5px 0; }
-        .meta { font-size: 0.8rem; color: #666; }
-        
-        .btn-wa { background: #25D366; color: white; text-align: center; padding: 8px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.9rem; display: inline-block; }
+        .goal-item { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 5px solid var(--green); }
+        .done { text-decoration: line-through; color: #888; }
+        canvas { background: white; border-radius: 10px; padding: 10px; margin-top: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
     </style>
 </head>
 <body>
 
-<header>
-    <h1 style="margin:0; font-size:1.4rem;">📚 Student Hub Market</h1>
-</header>
-
 <div class="container">
-    <div class="search-box">
-        <input type="text" id="search" placeholder="🔍 Search books (e.g. Physics, Novel...)" onkeyup="filter()">
-    </div>
-
-    <div class="card">
-        <h2>Post Your Book</h2>
-        <input type="text" id="bName" placeholder="Book ka Naam">
-        
-        <div class="upload-tip">
-            📸 Photo dalne ke liye: <br> 
-            1. <a href="https://postimages.org/" target="_blank">Yahan click karke upload karein</a> <br>
-            2. 'Direct Link' copy karke niche paste karein.
+    <div id="marketTab" class="tab-content active">
+        <h2 style="color:var(--blue)">🛒 Book Market</h2>
+        <div class="post-card">
+            <input type="text" id="bName" placeholder="Book Title">
+            <a href="https://postimages.org/" target="_blank" class="upload-link">📸 Click here to Upload Photo & Paste Link Below</a>
+            <input type="text" id="bImg" placeholder="Paste 'Direct Link' here">
+            <input type="number" id="bPrice" placeholder="Price (₹)">
+            <input type="text" id="bPhone" placeholder="WhatsApp No">
+            <input type="password" id="bPin" placeholder="4-Digit PIN" maxlength="4">
+            <button class="btn-blue" onclick="postAd()">Listing Live Karein!</button>
         </div>
-        <input type="text" id="bImg" placeholder="Image ka Direct Link (Optional)">
-        
-        <input type="number" id="bPrice" placeholder="Price (₹)">
-        <input type="text" id="bLoc" placeholder="College / Area">
-        <input type="text" id="bPhone" placeholder="WhatsApp Number">
-        <input type="password" id="bPin" placeholder="4-digit PIN to delete" maxlength="4">
-        
-        <button class="btn-post" onclick="postAd()">Listing Live Karein!</button>
+        <div id="marketList">Loading...</div>
     </div>
 
-    <div id="bookList"></div>
+    <div id="studyTab" class="tab-content">
+        <h2 style="color:var(--green)">🔐 Study Assistant</h2>
+        <div id="pinScreen" style="text-align:center; padding:50px 0;">
+            <p>Enter PIN to Unlock Tracker</p>
+            <input type="password" id="userPin" placeholder="PIN" style="width:100px; text-align:center;">
+            <button class="btn-blue" onclick="unlock()" style="margin-top:10px;">Unlock</button>
+        </div>
+
+        <div id="trackerData" style="display:none;">
+            <div class="timer-box">
+                <h3>Focus Timer</h3>
+                <input type="number" id="timerInput" placeholder="Mins" style="width:80px; text-align:center; margin-bottom:10px;">
+                <div id="timerDisplay">00:00</div>
+                <div class="timer-controls">
+                    <button id="startBtn" class="t-btn" style="background:var(--green);" onclick="startTimer()">Start</button>
+                    <button id="pauseBtn" class="t-btn" style="background:var(--yellow); color:#333; display:none;" onclick="pauseTimer()">Pause</button>
+                    <button class="t-btn" style="background:var(--red);" onclick="resetTimer()">Reset</button>
+                </div>
+            </div>
+
+            <div class="post-card">
+                <h3>Goals Analysis</h3>
+                <canvas id="studyChart"></canvas>
+            </div>
+
+            <div class="post-card">
+                <h3>Daily Goals</h3>
+                <input type="text" id="goalInput" placeholder="New Goal...">
+                <button class="btn-blue" onclick="addGoal()">Add Goal</button>
+            </div>
+            <div id="goalList"></div>
+            <button onclick="lock()" style="background:#888; color:white; border:none; padding:10px; border-radius:8px; width:100%;">🔒 Lock Private Tab</button>
+        </div>
+    </div>
+</div>
+
+<div class="navbar">
+    <div class="nav-item active" onclick="switchTab('marketTab', this)"><span>🛒</span>Market</div>
+    <div class="nav-item" onclick="switchTab('studyTab', this)"><span>📖</span>Study</div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyCrFbBhfWT6WlYAH_ZmopTfzrf47GEQe1k",
-        authDomain: "book-swap-104b7.firebaseapp.com",
-        projectId: "book-swap-104b7",
-        storageBucket: "book-swap-104b7.firebasestorage.app",
-        messagingSenderId: "259299080234",
-        appId: "1:259299080234:web:56a031e02a70d39e37eb53"
-    };
-
+    const firebaseConfig = { apiKey: "AIzaSyCrFbBhfWT6WlYAH_ZmopTfzrf47GEQe1k", authDomain: "book-swap-104b7.firebaseapp.com", projectId: "book-swap-104b7", storageBucket: "book-swap-104b7.firebasestorage.app", messagingSenderId: "259299080234", appId: "1:259299080234:web:56a031e02a70d39e37eb53" };
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const col = collection(db, "pro_market");
-    let allBooks = [];
 
+    window.switchTab = (id, el) => {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        document.getElementById(id).classList.add('active'); el.classList.add('active');
+        if(id === 'studyTab') lock();
+    };
+
+    // MARKET
     window.postAd = async () => {
-        const name = document.getElementById('bName').value;
-        const price = document.getElementById('bPrice').value;
-        const phone = document.getElementById('bPhone').value;
+        const title = document.getElementById('bName').value;
         const pin = document.getElementById('bPin').value;
-        
-        // Default image if link is empty
-        const img = document.getElementById('bImg').value || "https://cdn-icons-png.flaticon.com/512/330/330731.png";
-
-        if(name && price && phone && pin) {
-            await addDoc(col, {
-                title: name,
-                img: img,
-                price: price,
-                loc: document.getElementById('bLoc').value,
-                phone: phone,
-                pin: pin,
-                ts: Date.now()
-            });
-            alert("Book Listed Successfully! 🎉");
+        if(title && pin) {
+            await addDoc(col, { title, price: document.getElementById('bPrice').value, img: document.getElementById('bImg').value || "https://cdn-icons-png.flaticon.com/512/330/330731.png", phone: document.getElementById('bPhone').value, pin, isSold: false, ts: Date.now() });
             location.reload();
-        } else { alert("Bhai, saari details bharna zaroori hai!"); }
+        }
     };
 
     onSnapshot(col, snap => {
-        allBooks = snap.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b) => b.ts - a.ts);
-        render(allBooks);
+        const data = snap.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b) => b.ts - a.ts);
+        document.getElementById('marketList').innerHTML = data.map(b => `<div class="book-card"><img src="${b.img}"><div class="details"><h3>${b.title}</h3><p class="price">₹${b.price}</p><div style="display:flex; gap:10px;"><a href="https://wa.me/91${b.phone}" class="btn-wa">Chat</a><span onclick="del('${b.id}','${b.pin}')" style="color:red; cursor:pointer; font-size:0.7rem;">Delete</span></div></div></div>`).join('');
     });
 
-    function render(data) {
-        document.getElementById('bookList').innerHTML = data.map(b => `
-            <div class="book-card">
-                <img src="${b.img}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/330/330731.png'">
-                <div class="details">
-                    <div>
-                        <h3>${b.title}</h3>
-                        <p class="meta">📍 ${b.loc}</p>
-                        <p class="price">₹${b.price}</p>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <a href="https://wa.me/91${b.phone.replace(/\D/g,'')}" class="btn-wa">WhatsApp</a>
-                        <span onclick="del('${b.id}','${b.pin}')" style="color:red; font-size:0.7rem; cursor:pointer;">Delete</span>
-                    </div>
-                </div>
-            </div>
-        `).join('');
+    window.del = async (id, pin) => { if(prompt("Enter PIN:") === pin) await deleteDoc(doc(db,"pro_market",id)); };
+
+    // --- STUDY TIMER LOGIC ---
+    let timerInterval;
+    let timeLeft;
+    let isPaused = false;
+    const MY_PIN = "1234";
+
+    window.unlock = () => { if(document.getElementById('userPin').value === MY_PIN) { document.getElementById('pinScreen').style.display='none'; document.getElementById('trackerData').style.display='block'; updateChart(); loadGoals(); } else alert("Wrong PIN!"); };
+    window.lock = () => { document.getElementById('pinScreen').style.display='block'; document.getElementById('trackerData').style.display='none'; clearInterval(timerInterval); };
+
+    window.startTimer = () => {
+        if (!isPaused) {
+            let mins = parseInt(document.getElementById('timerInput').value) || 25;
+            timeLeft = mins * 60;
+        }
+        isPaused = false;
+        document.getElementById('startBtn').style.display = 'none';
+        document.getElementById('pauseBtn').style.display = 'inline-block';
+
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            if (timeLeft <= 0) { clearInterval(timerInterval); alert("Focus complete!"); resetTimer(); return; }
+            timeLeft--; updateTimerDisplay();
+        }, 1000);
+    };
+
+    window.pauseTimer = () => {
+        clearInterval(timerInterval); isPaused = true;
+        document.getElementById('startBtn').innerText = "Resume";
+        document.getElementById('startBtn').style.display = 'inline-block';
+        document.getElementById('pauseBtn').style.display = 'none';
+    };
+
+    window.resetTimer = () => {
+        clearInterval(timerInterval); timeLeft = 0; isPaused = false;
+        document.getElementById('timerDisplay').innerText = "00:00";
+        document.getElementById('startBtn').innerText = "Start";
+        document.getElementById('startBtn').style.display = 'inline-block';
+        document.getElementById('pauseBtn').style.display = 'none';
+    };
+
+    function updateTimerDisplay() {
+        let m = Math.floor(timeLeft / 60); let s = timeLeft % 60;
+        document.getElementById('timerDisplay').innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
     }
 
-    window.filter = () => {
-        const val = document.getElementById('search').value.toLowerCase();
-        render(allBooks.filter(b => b.title.toLowerCase().includes(val)));
+    // GOALS & CHART
+    window.addGoal = () => {
+        let g = JSON.parse(localStorage.getItem('goals') || "[]");
+        g.push({t: document.getElementById('goalInput').value, d: false});
+        localStorage.setItem('goals', JSON.stringify(g));
+        document.getElementById('goalInput').value=""; loadGoals(); updateChart();
     };
 
-    window.del = async (id, pin) => {
-        const p = prompt("Enter 4-digit PIN to delete:");
-        if(p === pin) {
-            await deleteDoc(doc(db, "pro_market", id));
-            alert("Deleted!");
-        } else if(p !== null) { alert("Galat PIN hai bhai!"); }
+    window.loadGoals = () => {
+        let g = JSON.parse(localStorage.getItem('goals') || "[]");
+        document.getElementById('goalList').innerHTML = g.map((x,i) => `<div class="goal-item ${x.d?'done':''}" onclick="toggle(${i})">${x.t} <span>${x.d?'✅':'⭕'}</span></div>`).join('');
     };
+
+    window.toggle = (i) => {
+        let g = JSON.parse(localStorage.getItem('goals') || "[]");
+        g[i].d = !g[i].d; localStorage.setItem('goals', JSON.stringify(g)); loadGoals(); updateChart();
+    };
+
+    function updateChart() {
+        let g = JSON.parse(localStorage.getItem('goals') || "[]");
+        let done = g.filter(x => x.d).length;
+        let pending = g.length - done;
+        const ctx = document.getElementById('studyChart').getContext('2d');
+        if(window.myChart) window.myChart.destroy();
+        window.myChart = new Chart(ctx, { type: 'doughnut', data: { labels: ['Done', 'Pending'], datasets: [{ data: [done, pending], backgroundColor: ['#28a745', '#ffc107'] }] }, options: { responsive: true } });
+    }
 </script>
 </body>
 </html>
