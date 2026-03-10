@@ -1,72 +1,72 @@
 
-<!DOCTYPE html>
+        <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Hub | Pro Market</title>
+    <title>Student Book Hub | Pro Market</title>
     <style>
-        :root { --p: #2c3e50; --s: #27ae60; --bg: #f0f2f5; --w: #ffffff; --d: #e74c3c; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding-bottom: 30px; }
-        header { background: var(--p); color: white; padding: 15px; text-align: center; font-size: 1.4rem; font-weight: bold; position: sticky; top: 0; z-index: 100; }
-        .container { max-width: 600px; margin: auto; padding: 10px; }
+        :root { --blue: #007bff; --green: #28a745; --bg: #f4f7f6; --text: #333; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; color: var(--text); }
+        header { background: #fff; padding: 20px; text-align: center; border-bottom: 2px solid var(--blue); position: sticky; top: 0; z-index: 100; }
+        .container { max-width: 500px; margin: auto; padding: 15px; }
+
+        /* Search & Filter */
+        .search-box { background: #fff; padding: 10px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .search-box input { width: 100%; border: none; padding: 10px; font-size: 1rem; outline: none; box-sizing: border-box; }
+
+        /* Post Card */
+        .card { background: #fff; padding: 20px; border-radius: 15px; margin-bottom: 25px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); }
+        h2 { margin-top: 0; font-size: 1.2rem; color: var(--blue); }
+        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
         
-        /* Search Bar Style */
-        .search-box { background: var(--w); padding: 15px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .upload-tip { background: #e7f3ff; padding: 10px; border-radius: 8px; font-size: 0.8rem; margin: 10px 0; border: 1px dashed var(--blue); }
+        .upload-tip a { color: var(--blue); font-weight: bold; text-decoration: none; }
+
+        .btn-post { width: 100%; padding: 14px; background: var(--blue); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1.1rem; }
         
-        .card { background: var(--w); padding: 20px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
+        /* Book List Item */
+        .book-card { background: #fff; border-radius: 12px; margin-bottom: 20px; display: flex; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .book-card img { width: 130px; height: 160px; object-fit: cover; background: #eee; }
+        .details { padding: 15px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        .details h3 { margin: 0; font-size: 1.1rem; color: #111; }
+        .price { color: var(--green); font-size: 1.3rem; font-weight: 800; margin: 5px 0; }
+        .meta { font-size: 0.8rem; color: #666; }
         
-        .btn-post { width: 100%; padding: 14px; background: var(--s); color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; }
-        
-        /* Book Item Card */
-        .book-item { background: var(--w); padding: 15px; border-radius: 12px; margin-bottom: 15px; border-top: 5px solid var(--s); box-shadow: 0 2px 8px rgba(0,0,0,0.05); position: relative; }
-        .tag { display: inline-block; background: #e8f5e9; color: #2e7d32; padding: 4px 8px; border-radius: 5px; font-size: 0.75rem; font-weight: bold; margin-bottom: 8px; text-transform: uppercase; }
-        .price-tag { color: var(--s); font-size: 1.3rem; font-weight: 800; margin: 5px 0; }
-        .loc-info { font-size: 0.85rem; color: #666; display: flex; align-items: center; gap: 5px; margin-bottom: 10px; }
-        
-        .wa-btn { display: block; background: #25D366; color: white; text-align: center; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 10px; }
-        .del-link { color: var(--d); font-size: 0.8rem; cursor: pointer; text-decoration: underline; margin-top: 10px; display: inline-block; }
+        .btn-wa { background: #25D366; color: white; text-align: center; padding: 8px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.9rem; display: inline-block; }
     </style>
 </head>
 <body>
 
-<header>🎓 Student Book Market Pro</header>
+<header>
+    <h1 style="margin:0; font-size:1.4rem;">📚 Student Hub Market</h1>
+</header>
 
 <div class="container">
     <div class="search-box">
-        <input type="text" id="searchInp" placeholder="🔍 Search books (e.g. Physics, Novel...)" onkeyup="filterBooks()">
+        <input type="text" id="search" placeholder="🔍 Search books (e.g. Physics, Novel...)" onkeyup="filter()">
     </div>
 
     <div class="card">
-        <h2 style="margin-top:0;">Sell a Book</h2>
-        <input type="text" id="sName" placeholder="Your Name">
-        <input type="text" id="bName" placeholder="Book Name">
-        <input type="text" id="bLoc" placeholder="Your College/Area Name">
-        <div style="display: flex; gap: 10px;">
-            <select id="cat">
-                <option value="Others">Category</option>
-                <option value="NCERT">NCERT</option>
-                <option value="Engineering">Engineering</option>
-                <option value="Novel">Novel</option>
-                <option value="Exam Guide">Exam Guide</option>
-            </select>
-            <select id="cond">
-                <option value="Used">Used</option>
-                <option value="Like New">Like New</option>
-                <option value="New">New</option>
-            </select>
+        <h2>Post Your Book</h2>
+        <input type="text" id="bName" placeholder="Book ka Naam">
+        
+        <div class="upload-tip">
+            📸 Photo dalne ke liye: <br> 
+            1. <a href="https://postimages.org/" target="_blank">Yahan click karke upload karein</a> <br>
+            2. 'Direct Link' copy karke niche paste karein.
         </div>
+        <input type="text" id="bImg" placeholder="Image ka Direct Link (Optional)">
+        
         <input type="number" id="bPrice" placeholder="Price (₹)">
-        <input type="text" id="bContact" placeholder="WhatsApp No.">
-        <input type="password" id="bPin" placeholder="Set 4-Digit Delete PIN" maxlength="4">
-        <button class="btn-post" onclick="postAd()">Post My Ad</button>
+        <input type="text" id="bLoc" placeholder="College / Area">
+        <input type="text" id="bPhone" placeholder="WhatsApp Number">
+        <input type="password" id="bPin" placeholder="4-digit PIN to delete" maxlength="4">
+        
+        <button class="btn-post" onclick="postAd()">Listing Live Karein!</button>
     </div>
 
-    <h2 id="listTitle">Available Books</h2>
-    <div id="marketContainer">
-        <p style="text-align:center;">Loading Market...</p>
-    </div>
+    <div id="bookList"></div>
 </div>
 
 <script type="module">
@@ -84,64 +84,69 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const colRef = collection(db, "pro_market");
+    const col = collection(db, "pro_market");
     let allBooks = [];
 
     window.postAd = async () => {
-        const data = {
-            seller: document.getElementById('sName').value,
-            title: document.getElementById('bName').value,
-            loc: document.getElementById('bLoc').value,
-            category: document.getElementById('cat').value,
-            condition: document.getElementById('cond').value,
-            price: document.getElementById('bPrice').value,
-            phone: document.getElementById('bContact').value,
-            pin: document.getElementById('bPin').value,
-            ts: Date.now()
-        };
+        const name = document.getElementById('bName').value;
+        const price = document.getElementById('bPrice').value;
+        const phone = document.getElementById('bPhone').value;
+        const pin = document.getElementById('bPin').value;
+        
+        // Default image if link is empty
+        const img = document.getElementById('bImg').value || "https://cdn-icons-png.flaticon.com/512/330/330731.png";
 
-        if(data.seller && data.title && data.price && data.phone && data.pin) {
-            await addDoc(colRef, data);
-            alert("Post Successful!");
+        if(name && price && phone && pin) {
+            await addDoc(col, {
+                title: name,
+                img: img,
+                price: price,
+                loc: document.getElementById('bLoc').value,
+                phone: phone,
+                pin: pin,
+                ts: Date.now()
+            });
+            alert("Book Listed Successfully! 🎉");
             location.reload();
-        } else { alert("Please fill all fields!"); }
+        } else { alert("Bhai, saari details bharna zaroori hai!"); }
     };
 
-    onSnapshot(colRef, (snap) => {
+    onSnapshot(col, snap => {
         allBooks = snap.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b) => b.ts - a.ts);
         render(allBooks);
     });
 
     function render(data) {
-        const cont = document.getElementById('marketContainer');
-        cont.innerHTML = data.map(b => `
-            <div class="book-item">
-                <div style="display:flex; justify-content:space-between;">
-                    <span class="tag">${b.category}</span>
-                    <span class="tag" style="background:#fff3e0; color:#e65100;">${b.condition}</span>
+        document.getElementById('bookList').innerHTML = data.map(b => `
+            <div class="book-card">
+                <img src="${b.img}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/330/330731.png'">
+                <div class="details">
+                    <div>
+                        <h3>${b.title}</h3>
+                        <p class="meta">📍 ${b.loc}</p>
+                        <p class="price">₹${b.price}</p>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <a href="https://wa.me/91${b.phone.replace(/\D/g,'')}" class="btn-wa">WhatsApp</a>
+                        <span onclick="del('${b.id}','${b.pin}')" style="color:red; font-size:0.7rem; cursor:pointer;">Delete</span>
+                    </div>
                 </div>
-                <h3 style="margin:5px 0;">${b.title}</h3>
-                <div class="loc-info">📍 ${b.loc} | 👤 ${b.seller}</div>
-                <div class="price-tag">₹${b.price}</div>
-                <a href="https://wa.me/${b.phone.replace(/\D/g,'')}" class="wa-btn" target="_blank">Chat with Seller</a>
-                <span class="del-link" onclick="deleteAd('${b.id}', '${b.pin}')">Remove Ad</span>
             </div>
         `).join('');
     }
 
-    window.filterBooks = () => {
-        const term = document.getElementById('searchInp').value.toLowerCase();
-        const filtered = allBooks.filter(b => b.title.toLowerCase().includes(term) || b.category.toLowerCase().includes(term));
-        render(filtered);
+    window.filter = () => {
+        const val = document.getElementById('search').value.toLowerCase();
+        render(allBooks.filter(b => b.title.toLowerCase().includes(val)));
     };
 
-    window.deleteAd = async (id, pin) => {
-        const p = prompt("Enter PIN to delete:");
+    window.del = async (id, pin) => {
+        const p = prompt("Enter 4-digit PIN to delete:");
         if(p === pin) {
             await deleteDoc(doc(db, "pro_market", id));
             alert("Deleted!");
-        } else if(p) { alert("Wrong PIN!"); }
+        } else if(p !== null) { alert("Galat PIN hai bhai!"); }
     };
 </script>
 </body>
-</htm
+</html>
