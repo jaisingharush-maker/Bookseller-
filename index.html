@@ -1,38 +1,72 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Book Market | Safe Delete</title>
+    <title>Student Hub | Pro Market</title>
     <style>
-        :root { --primary: #2c3e50; --secondary: #27ae60; --bg: #f4f7f6; --white: #ffffff; --danger: #e74c3c; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); margin: 0; padding: 0; }
-        header { background: var(--primary); color: white; padding: 20px; text-align: center; font-size: 1.5rem; font-weight: bold; }
-        .container { max-width: 600px; margin: 20px auto; padding: 10px; }
-        .card { background: var(--white); padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 25px; }
-        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: var(--secondary); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .book-item { background: var(--white); padding: 15px; border-radius: 10px; margin-bottom: 15px; border-left: 5px solid var(--secondary); position: relative; }
-        .wa-link { display: block; background: #25D366; color: white; padding: 10px; border-radius: 5px; text-decoration: none; font-weight: bold; text-align: center; margin-top: 10px; }
-        .del-btn { background: none; color: var(--danger); border: 1px solid var(--danger); font-size: 0.8rem; margin-top: 10px; padding: 5px; width: auto; float: right; }
+        :root { --p: #2c3e50; --s: #27ae60; --bg: #f0f2f5; --w: #ffffff; --d: #e74c3c; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding-bottom: 30px; }
+        header { background: var(--p); color: white; padding: 15px; text-align: center; font-size: 1.4rem; font-weight: bold; position: sticky; top: 0; z-index: 100; }
+        .container { max-width: 600px; margin: auto; padding: 10px; }
+        
+        /* Search Bar Style */
+        .search-box { background: var(--w); padding: 15px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        
+        .card { background: var(--w); padding: 20px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
+        
+        .btn-post { width: 100%; padding: 14px; background: var(--s); color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; }
+        
+        /* Book Item Card */
+        .book-item { background: var(--w); padding: 15px; border-radius: 12px; margin-bottom: 15px; border-top: 5px solid var(--s); box-shadow: 0 2px 8px rgba(0,0,0,0.05); position: relative; }
+        .tag { display: inline-block; background: #e8f5e9; color: #2e7d32; padding: 4px 8px; border-radius: 5px; font-size: 0.75rem; font-weight: bold; margin-bottom: 8px; text-transform: uppercase; }
+        .price-tag { color: var(--s); font-size: 1.3rem; font-weight: 800; margin: 5px 0; }
+        .loc-info { font-size: 0.85rem; color: #666; display: flex; align-items: center; gap: 5px; margin-bottom: 10px; }
+        
+        .wa-btn { display: block; background: #25D366; color: white; text-align: center; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 10px; }
+        .del-link { color: var(--d); font-size: 0.8rem; cursor: pointer; text-decoration: underline; margin-top: 10px; display: inline-block; }
     </style>
 </head>
 <body>
 
-<header>📚 Student Book Market</header>
+<header>🎓 Student Book Market Pro</header>
 
 <div class="container">
-    <div class="card">
-        <h2>Sell Your Book</h2>
-        <input type="text" id="bookName" placeholder="Book Name (e.g. Physics Class 12)">
-        <input type="number" id="bookPrice" placeholder="Price (₹)">
-        <input type="text" id="contact" placeholder="WhatsApp Number">
-        <input type="password" id="delPin" placeholder="Set a 4-Digit Delete PIN" maxlength="4">
-        <button onclick="uploadBook()">Post Ad Now</button>
+    <div class="search-box">
+        <input type="text" id="searchInp" placeholder="🔍 Search books (e.g. Physics, Novel...)" onkeyup="filterBooks()">
     </div>
 
-    <h2>Available Books</h2>
-    <div id="marketList"></div>
+    <div class="card">
+        <h2 style="margin-top:0;">Sell a Book</h2>
+        <input type="text" id="sName" placeholder="Your Name">
+        <input type="text" id="bName" placeholder="Book Name">
+        <input type="text" id="bLoc" placeholder="Your College/Area Name">
+        <div style="display: flex; gap: 10px;">
+            <select id="cat">
+                <option value="Others">Category</option>
+                <option value="NCERT">NCERT</option>
+                <option value="Engineering">Engineering</option>
+                <option value="Novel">Novel</option>
+                <option value="Exam Guide">Exam Guide</option>
+            </select>
+            <select id="cond">
+                <option value="Used">Used</option>
+                <option value="Like New">Like New</option>
+                <option value="New">New</option>
+            </select>
+        </div>
+        <input type="number" id="bPrice" placeholder="Price (₹)">
+        <input type="text" id="bContact" placeholder="WhatsApp No.">
+        <input type="password" id="bPin" placeholder="Set 4-Digit Delete PIN" maxlength="4">
+        <button class="btn-post" onclick="postAd()">Post My Ad</button>
+    </div>
+
+    <h2 id="listTitle">Available Books</h2>
+    <div id="marketContainer">
+        <p style="text-align:center;">Loading Market...</p>
+    </div>
 </div>
 
 <script type="module">
@@ -50,50 +84,64 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const bookCol = collection(db, "market_books");
+    const colRef = collection(db, "pro_market");
+    let allBooks = [];
 
-    window.uploadBook = async () => {
-        const name = document.getElementById("bookName").value;
-        const price = document.getElementById("bookPrice").value;
-        const phone = document.getElementById("contact").value;
-        const pin = document.getElementById("delPin").value;
+    window.postAd = async () => {
+        const data = {
+            seller: document.getElementById('sName').value,
+            title: document.getElementById('bName').value,
+            loc: document.getElementById('bLoc').value,
+            category: document.getElementById('cat').value,
+            condition: document.getElementById('cond').value,
+            price: document.getElementById('bPrice').value,
+            phone: document.getElementById('bContact').value,
+            pin: document.getElementById('bPin').value,
+            ts: Date.now()
+        };
 
-        if(name && price && phone && pin) {
-            await addDoc(bookCol, { title: name, price: price, contact: phone, pin: pin, ts: Date.now() });
-            alert("Book Posted! Remember your PIN to delete it later.");
-            ["bookName", "bookPrice", "contact", "delPin"].forEach(id => document.getElementById(id).value = "");
-        } else { alert("Please fill all details including PIN!"); }
+        if(data.seller && data.title && data.price && data.phone && data.pin) {
+            await addDoc(colRef, data);
+            alert("Post Successful!");
+            location.reload();
+        } else { alert("Please fill all fields!"); }
     };
 
-    onSnapshot(bookCol, (snap) => {
-        const listDiv = document.getElementById("marketList");
-        const sorted = snap.docs.sort((a,b) => b.data().ts - a.data().ts);
-        listDiv.innerHTML = sorted.map(d => {
-            const b = d.data();
-            return `
-                <div class="book-item">
-                    <h3>${b.title}</h3>
-                    <p>Price: ₹${b.price}</p>
-                    <a href="https://wa.me/${b.contact.replace(/\D/g,'')}" class="wa-link" target="_blank">WhatsApp Seller</a>
-                    <button class="del-btn" onclick="askDelete('${d.id}', '${b.pin}')">Remove Ad</button>
-                    <div style="clear:both;"></div>
-                </div>
-            `;
-        }).join('');
+    onSnapshot(colRef, (snap) => {
+        allBooks = snap.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b) => b.ts - a.ts);
+        render(allBooks);
     });
 
-    window.askDelete = async (id, correctPin) => {
-        const userPin = prompt("Enter the 4-digit PIN to delete this ad:");
-        if (userPin === correctPin) {
-            if(confirm("Are you sure you want to delete this?")) {
-                await deleteDoc(doc(db, "market_books", id));
-                alert("Deleted successfully!");
-            }
-        } else if (userPin !== null) {
-            alert("Wrong PIN! You cannot delete this book.");
-        }
+    function render(data) {
+        const cont = document.getElementById('marketContainer');
+        cont.innerHTML = data.map(b => `
+            <div class="book-item">
+                <div style="display:flex; justify-content:space-between;">
+                    <span class="tag">${b.category}</span>
+                    <span class="tag" style="background:#fff3e0; color:#e65100;">${b.condition}</span>
+                </div>
+                <h3 style="margin:5px 0;">${b.title}</h3>
+                <div class="loc-info">📍 ${b.loc} | 👤 ${b.seller}</div>
+                <div class="price-tag">₹${b.price}</div>
+                <a href="https://wa.me/${b.phone.replace(/\D/g,'')}" class="wa-btn" target="_blank">Chat with Seller</a>
+                <span class="del-link" onclick="deleteAd('${b.id}', '${b.pin}')">Remove Ad</span>
+            </div>
+        `).join('');
+    }
+
+    window.filterBooks = () => {
+        const term = document.getElementById('searchInp').value.toLowerCase();
+        const filtered = allBooks.filter(b => b.title.toLowerCase().includes(term) || b.category.toLowerCase().includes(term));
+        render(filtered);
+    };
+
+    window.deleteAd = async (id, pin) => {
+        const p = prompt("Enter PIN to delete:");
+        if(p === pin) {
+            await deleteDoc(doc(db, "pro_market", id));
+            alert("Deleted!");
+        } else if(p) { alert("Wrong PIN!"); }
     };
 </script>
-
 </body>
-</html>
+</htm
