@@ -3,205 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Pro Hub</title>
+    <title>Student Pro | AI & Social Master</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --blue: #007bff; --bg: #f2f4f7; --card: #ffffff; --green: #28a745; --yellow: #ffc107; --red: #dc3545; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding-bottom: 70px; }
-        
-        .navbar { position: fixed; bottom: 0; width: 100%; background: #fff; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #ddd; z-index: 1000; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
-        .nav-item { border: none; background: none; font-weight: bold; color: #888; cursor: pointer; display: flex; flex-direction: column; align-items: center; font-size: 0.8rem; }
-        .nav-item.active { color: var(--blue); }
-
+        :root { --p: #007bff; --bg: #f0f2f5; --card: #ffffff; --g: #28a745; --y: #ffc107; --r: #dc3545; --dark: #1a1a1a; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding-bottom: 80px; }
+        .navbar { position: fixed; bottom: 0; width: 100%; background: #fff; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #ddd; z-index: 1000; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); }
+        .nav-item { border: none; background: none; font-weight: bold; color: #888; cursor: pointer; display: flex; flex-direction: column; align-items: center; font-size: 0.7rem; }
+        .nav-item.active { color: var(--p); }
         .container { max-width: 500px; margin: auto; padding: 15px; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-
-        /* MARKET TAB */
-        .post-card { background: var(--card); padding: 20px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; background: #fff; }
-        .btn-blue { background: var(--blue); color: white; border: none; padding: 14px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .upload-link { display: inline-block; background: #e7f3ff; color: var(--blue); padding: 10px; border-radius: 8px; text-decoration: none; font-size: 0.8rem; margin: 10px 0; border: 1px dashed var(--blue); width: 100%; text-align: center; box-sizing: border-box; }
-
-        .book-card { background: var(--card); border-radius: 12px; margin-bottom: 15px; overflow: hidden; display: flex; position: relative; border: 1px solid #eee; }
-        .book-card img { width: 110px; height: 140px; object-fit: cover; }
-        .details { padding: 12px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
-        .price { color: var(--green); font-size: 1.2rem; font-weight: 800; }
-        .btn-wa { background: #25D366; color: white; padding: 6px 15px; border-radius: 6px; text-decoration: none; font-size: 0.85rem; font-weight: bold; }
-
-        /* STUDY TAB */
-        .timer-box { background: #333; color: #fff; padding: 20px; border-radius: 15px; text-align: center; margin-bottom: 20px; }
-        #timerDisplay { font-size: 3.5rem; font-weight: bold; margin: 10px 0; font-family: monospace; color: var(--yellow); }
-        .timer-controls { display: flex; gap: 10px; justify-content: center; }
-        .t-btn { border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; color: white; }
-        
-        .goal-item { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 5px solid var(--green); }
-        .done { text-decoration: line-through; color: #888; }
-        canvas { background: white; border-radius: 10px; padding: 10px; margin-top: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .card { background: var(--card); padding: 15px; border-radius: 15px; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .chat-box { height: 300px; overflow-y: auto; background: #f9f9f9; padding: 10px; border-radius: 10px; border: 1px solid #eee; display: flex; flex-direction: column; gap: 8px; }
+        .msg { padding: 8px 12px; border-radius: 12px; max-width: 80%; font-size: 0.9rem; line-height: 1.4; }
+        .msg.user { align-self: flex-end; background: var(--p); color: white; }
+        .msg.bot { align-self: flex-start; background: #e9e9eb; color: #333; }
+        .msg.group { align-self: flex-start; background: #fff; border: 1px solid #ddd; }
+        input { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .btn { background: var(--p); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; }
+        .book-card { background: #fff; border-radius: 12px; margin-bottom: 12px; overflow: hidden; display: flex; border: 1px solid #eee; }
+        .book-card img { width: 80px; height: 110px; object-fit: cover; }
+        .streak-tag { background: linear-gradient(45deg, #ff416c, #ff4b2b); color: white; padding: 10px; border-radius: 10px; text-align: center; font-weight: bold; margin-bottom: 15px; }
+        .timer-display { font-size: 2.5rem; font-weight: bold; color: var(--y); font-family: monospace; }
+        .sound-btn { background: #444; color: white; border: none; padding: 5px; border-radius: 5px; font-size: 0.7rem; flex: 1; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div id="marketTab" class="tab-content active">
-        <h2 style="color:var(--blue)">🛒 Book Market</h2>
-        <div class="post-card">
-            <input type="text" id="bName" placeholder="Book Title">
-            <a href="https://postimages.org/" target="_blank" class="upload-link">📸 Click here to Upload Photo & Paste Link Below</a>
-            <input type="text" id="bImg" placeholder="Paste 'Direct Link' here">
+        <h2 style="color:var(--p)">🛒 Market <span id="mCount"></span></h2>
+        <div class="card">
+            <input type="text" id="bTitle" placeholder="Book Name">
+            <input type="text" id="bImg" placeholder="Image Link">
             <input type="number" id="bPrice" placeholder="Price (₹)">
             <input type="text" id="bPhone" placeholder="WhatsApp No">
-            <input type="password" id="bPin" placeholder="4-Digit PIN" maxlength="4">
-            <button class="btn-blue" onclick="postAd()">Listing Live Karein!</button>
+            <input type="password" id="bPin" placeholder="Delete PIN" maxlength="4">
+            <button class="btn" onclick="postBook()">List Book</button>
         </div>
-        <div id="marketList">Loading...</div>
+        <div id="marketList"></div>
+    </div>
+
+    <div id="groupTab" class="tab-content">
+        <h2 style="color:var(--p)">💬 Group Room</h2>
+        <div class="card">
+            <div id="groupChatBox" class="chat-box"></div>
+            <div style="display:flex; gap:5px; margin-top:10px;">
+                <input type="text" id="groupMsgInput" placeholder="Sawal pucho...">
+                <button onclick="sendGroupMsg()" style="background:var(--p); color:white; border:none; border-radius:8px; padding:0 15px;">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="aiTab" class="tab-content">
+        <h2 style="color:var(--g)">🤖 AI Study Buddy</h2>
+        <div class="card">
+            <div id="aiChatBox" class="chat-box">
+                <div class="msg bot">Bhai, main tayar hoon! Kuch bhi pucho, math ho ya history. 📚</div>
+            </div>
+            <div style="display:flex; gap:5px; margin-top:10px;">
+                <input type="text" id="aiMsgInput" placeholder="Ask anything...">
+                <button onclick="askAI()" style="background:var(--g); color:white; border:none; border-radius:8px; padding:0 15px;">Ask</button>
+            </div>
+        </div>
     </div>
 
     <div id="studyTab" class="tab-content">
-        <h2 style="color:var(--green)">🔐 Study Assistant</h2>
-        <div id="pinScreen" style="text-align:center; padding:50px 0;">
-            <p>Enter PIN to Unlock Tracker</p>
-            <input type="password" id="userPin" placeholder="PIN" style="width:100px; text-align:center;">
-            <button class="btn-blue" onclick="unlock()" style="margin-top:10px;">Unlock</button>
+        <h2 style="color:var(--g)">🧘 Private Space</h2>
+        <div id="lockScreen" style="text-align:center; padding:30px 0;">
+            <input type="password" id="uPin" placeholder="Enter PIN" maxlength="4" style="width:100px; text-align:center;">
+            <button class="btn" onclick="checkPin()" style="margin-top:10px; width:120px;">Unlock</button>
         </div>
-
-        <div id="trackerData" style="display:none;">
-            <div class="timer-box">
-                <h3>Focus Timer</h3>
-                <input type="number" id="timerInput" placeholder="Mins" style="width:80px; text-align:center; margin-bottom:10px;">
-                <div id="timerDisplay">00:00</div>
-                <div class="timer-controls">
-                    <button id="startBtn" class="t-btn" style="background:var(--green);" onclick="startTimer()">Start</button>
-                    <button id="pauseBtn" class="t-btn" style="background:var(--yellow); color:#333; display:none;" onclick="pauseTimer()">Pause</button>
-                    <button class="t-btn" style="background:var(--red);" onclick="resetTimer()">Reset</button>
+        <div id="studyDash" style="display:none;">
+            <div class="streak-tag" id="streakLabel">🔥 Streak: 0 Days</div>
+            <div class="card" style="background:var(--dark); color:white; text-align:center;">
+                <div class="timer-display" id="tDisp">00:00</div>
+                <input type="number" id="tMin" placeholder="Mins" style="width:60px; background:#333; color:white; border:none; text-align:center;">
+                <div style="display:flex; gap:5px; margin-top:10px;">
+                    <button onclick="startT()" style="background:var(--g); border:none; color:white; padding:8px; border-radius:5px; flex:1;">Start</button>
+                    <button onclick="resetT()" style="background:var(--r); border:none; color:white; padding:8px; border-radius:5px; flex:1;">Reset</button>
                 </div>
+                <div style="display:flex; gap:5px; margin-top:10px;">
+                    <button class="sound-btn" onclick="sound('rain')">🌧️ Rain</button>
+                    <button class="sound-btn" onclick="sound('stop')">🔇 Off</button>
+                </div>
+                <audio id="bgAudio" loop></audio>
             </div>
-
-            <div class="post-card">
-                <h3>Goals Analysis</h3>
-                <canvas id="studyChart"></canvas>
-            </div>
-
-            <div class="post-card">
-                <h3>Daily Goals</h3>
-                <input type="text" id="goalInput" placeholder="New Goal...">
-                <button class="btn-blue" onclick="addGoal()">Add Goal</button>
-            </div>
-            <div id="goalList"></div>
-            <button onclick="lock()" style="background:#888; color:white; border:none; padding:10px; border-radius:8px; width:100%;">🔒 Lock Private Tab</button>
+            <div id="gList"></div>
+            <button onclick="location.reload()" style="background:#666; color:white; border:none; padding:10px; border-radius:8px; width:100%; margin-top:10px;">🔒 Lock</button>
         </div>
     </div>
 </div>
 
 <div class="navbar">
-    <div class="nav-item active" onclick="switchTab('marketTab', this)"><span>🛒</span>Market</div>
-    <div class="nav-item" onclick="switchTab('studyTab', this)"><span>📖</span>Study</div>
+    <div class="nav-item active" onclick="tab('marketTab', this)"><span>🛒</span>Market</div>
+    <div class="nav-item" onclick="tab('groupTab', this)"><span>💬</span>Group</div>
+    <div class="nav-item" onclick="tab('aiTab', this)"><span>🤖</span>AI</div>
+    <div class="nav-item" onclick="tab('studyTab', this)"><span>🧘</span>Study</div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, limit, serverTimestamp, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = { apiKey: "AIzaSyCrFbBhfWT6WlYAH_ZmopTfzrf47GEQe1k", authDomain: "book-swap-104b7.firebaseapp.com", projectId: "book-swap-104b7", storageBucket: "book-swap-104b7.firebasestorage.app", messagingSenderId: "259299080234", appId: "1:259299080234:web:56a031e02a70d39e37eb53" };
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const col = collection(db, "pro_market");
 
-    window.switchTab = (id, el) => {
+    // --- NAVIGATION ---
+    window.tab = (id, el) => {
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
         document.getElementById(id).classList.add('active'); el.classList.add('active');
-        if(id === 'studyTab') lock();
     };
 
-    // MARKET
-    window.postAd = async () => {
-        const title = document.getElementById('bName').value;
-        const pin = document.getElementById('bPin').value;
-        if(title && pin) {
-            await addDoc(col, { title, price: document.getElementById('bPrice').value, img: document.getElementById('bImg').value || "https://cdn-icons-png.flaticon.com/512/330/330731.png", phone: document.getElementById('bPhone').value, pin, isSold: false, ts: Date.now() });
-            location.reload();
-        }
+    // --- MARKET ---
+    const mCol = collection(db, "pro_market");
+    window.postBook = async () => {
+        const t = document.getElementById('bTitle').value, p = document.getElementById('bPin').value;
+        if(t && p) { await addDoc(mCol, { title: t, price: document.getElementById('bPrice').value, img: document.getElementById('bImg').value || "https://cdn-icons-png.flaticon.com/512/330/330731.png", phone: document.getElementById('bPhone').value, pin: p, ts: Date.now() }); location.reload(); }
     };
-
-    onSnapshot(col, snap => {
+    onSnapshot(mCol, snap => {
         const data = snap.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b) => b.ts - a.ts);
-        document.getElementById('marketList').innerHTML = data.map(b => `<div class="book-card"><img src="${b.img}"><div class="details"><h3>${b.title}</h3><p class="price">₹${b.price}</p><div style="display:flex; gap:10px;"><a href="https://wa.me/91${b.phone}" class="btn-wa">Chat</a><span onclick="del('${b.id}','${b.pin}')" style="color:red; cursor:pointer; font-size:0.7rem;">Delete</span></div></div></div>`).join('');
+        document.getElementById('mCount').innerText = `(${data.length})`;
+        document.getElementById('marketList').innerHTML = data.map(b => `<div class="book-card"><img src="${b.img}"><div style="padding:10px"><b>${b.title}</b><br><small>₹${b.price}</small><br><a href="https://wa.me/91${b.phone}" style="font-size:0.7rem; color:var(--p)">WhatsApp</a> | <span onclick="del('${b.id}','${b.pin}')" style="color:red; cursor:pointer; font-size:0.7rem;">Del</span></div></div>`).join('');
+    });
+    window.del = async (id, pin) => { if(prompt("PIN?") === pin) await deleteDoc(doc(db,"pro_market",id)); };
+
+    // --- GROUP CHAT ---
+    const gCol = collection(db, "group_chat");
+    const gQuery = query(gCol, orderBy("ts", "asc"), limit(30));
+    window.sendGroupMsg = async () => {
+        const m = document.getElementById('groupMsgInput').value;
+        if(m) { await addDoc(gCol, { text: m, ts: serverTimestamp() }); document.getElementById('groupMsgInput').value = ""; }
+    };
+    onSnapshot(gQuery, snap => {
+        document.getElementById('groupChatBox').innerHTML = snap.docs.map(d => `<div class="msg group"><b>Student:</b> ${d.data().text}</div>`).join('');
+        const b = document.getElementById('groupChatBox'); b.scrollTop = b.scrollHeight;
     });
 
-    window.del = async (id, pin) => { if(prompt("Enter PIN:") === pin) await deleteDoc(doc(db,"pro_market",id)); };
+    // --- AI BUDDY (Groq Integration) ---
+    window.askAI = async () => {
+        const input = document.getElementById('aiMsgInput');
+        const box = document.getElementById('aiChatBox');
+        const userText = input.value.trim();
+        if(!userText) return;
 
-    // --- STUDY TIMER LOGIC ---
-    let timerInterval;
-    let timeLeft;
-    let isPaused = false;
-    const MY_PIN = "1234";
+        box.innerHTML += `<div class="msg user">${userText}</div>`;
+        input.value = "";
+        box.scrollTop = box.scrollHeight;
 
-    window.unlock = () => { if(document.getElementById('userPin').value === MY_PIN) { document.getElementById('pinScreen').style.display='none'; document.getElementById('trackerData').style.display='block'; updateChart(); loadGoals(); } else alert("Wrong PIN!"); };
-    window.lock = () => { document.getElementById('pinScreen').style.display='block'; document.getElementById('trackerData').style.display='none'; clearInterval(timerInterval); };
-
-    window.startTimer = () => {
-        if (!isPaused) {
-            let mins = parseInt(document.getElementById('timerInput').value) || 25;
-            timeLeft = mins * 60;
+        const tId = "t-" + Date.now();
+        box.innerHTML += `<div class="msg bot" id="${tId}">Thinking... 🧠</div>`;
+        
+        try {
+            const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Authorization": "Bearer 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",
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    model: "llama-3.3-70b-versatile",
+                    messages: [{ role: "system", content: "You are a helpful student assistant. Answer in Hinglish like a friendly mentor." }, { role: "user", content: userText }]
+                })
+            });
+            const data = await response.json();
+            document.getElementById(tId).innerHTML = data.choices[0].message.content.replace(/\n/g, '<br>');
+        } catch (e) {
+            document.getElementById(tId).innerText = "Bhai, error aa gaya. Check connection! ⚠️";
         }
-        isPaused = false;
-        document.getElementById('startBtn').style.display = 'none';
-        document.getElementById('pauseBtn').style.display = 'inline-block';
-
-        clearInterval(timerInterval);
-        timerInterval = setInterval(() => {
-            if (timeLeft <= 0) { clearInterval(timerInterval); alert("Focus complete!"); resetTimer(); return; }
-            timeLeft--; updateTimerDisplay();
-        }, 1000);
+        box.scrollTop = box.scrollHeight;
     };
 
-    window.pauseTimer = () => {
-        clearInterval(timerInterval); isPaused = true;
-        document.getElementById('startBtn').innerText = "Resume";
-        document.getElementById('startBtn').style.display = 'inline-block';
-        document.getElementById('pauseBtn').style.display = 'none';
+    // --- STUDY LOGIC ---
+    let timer, timeLeft;
+    const au = document.getElementById('bgAudio');
+    window.checkPin = () => {
+        let s = localStorage.getItem('studyPin'), i = document.getElementById('uPin').value;
+        if(!s) { if(i.length===4){ localStorage.setItem('studyPin',i); unlock(); } }
+        else { if(i===s) unlock(); else alert("Wrong PIN"); }
     };
-
-    window.resetTimer = () => {
-        clearInterval(timerInterval); timeLeft = 0; isPaused = false;
-        document.getElementById('timerDisplay').innerText = "00:00";
-        document.getElementById('startBtn').innerText = "Start";
-        document.getElementById('startBtn').style.display = 'inline-block';
-        document.getElementById('pauseBtn').style.display = 'none';
-    };
-
-    function updateTimerDisplay() {
-        let m = Math.floor(timeLeft / 60); let s = timeLeft % 60;
-        document.getElementById('timerDisplay').innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
-    }
-
-    // GOALS & CHART
-    window.addGoal = () => {
-        let g = JSON.parse(localStorage.getItem('goals') || "[]");
-        g.push({t: document.getElementById('goalInput').value, d: false});
-        localStorage.setItem('goals', JSON.stringify(g));
-        document.getElementById('goalInput').value=""; loadGoals(); updateChart();
-    };
-
-    window.loadGoals = () => {
-        let g = JSON.parse(localStorage.getItem('goals') || "[]");
-        document.getElementById('goalList').innerHTML = g.map((x,i) => `<div class="goal-item ${x.d?'done':''}" onclick="toggle(${i})">${x.t} <span>${x.d?'✅':'⭕'}</span></div>`).join('');
-    };
-
-    window.toggle = (i) => {
-        let g = JSON.parse(localStorage.getItem('goals') || "[]");
-        g[i].d = !g[i].d; localStorage.setItem('goals', JSON.stringify(g)); loadGoals(); updateChart();
-    };
-
-    function updateChart() {
-        let g = JSON.parse(localStorage.getItem('goals') || "[]");
-        let done = g.filter(x => x.d).length;
-        let pending = g.length - done;
-        const ctx = document.getElementById('studyChart').getContext('2d');
-        if(window.myChart) window.myChart.destroy();
-        window.myChart = new Chart(ctx, { type: 'doughnut', data: { labels: ['Done', 'Pending'], datasets: [{ data: [done, pending], backgroundColor: ['#28a745', '#ffc107'] }] }, options: { responsive: true } });
-    }
+    function unlock() { document.getElementById('lockScreen').style.display='none'; document.getElementById('studyDash').style.display='block'; loadG(); }
+    window.sound = (t) => { if(t==='stop') au.pause(); else { au.src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3"; au.play(); } };
+    window.startT = () => { timeLeft=(parseInt(document.getElementById('tMin').value)||25)*60; clearInterval(timer); timer=setInterval(()=>{ if(timeLeft<=0){clearInterval(timer);alert("Done!");return;} timeLeft--; let m=Math.floor(timeLeft/60), s=timeLeft%60; document.getElementById('tDisp').innerText=`${m<10?'0':''}${m}:${s<10?'0':''}${s}`; },1000); };
+    window.resetT = () => { clearInterval(timer); document.getElementById('tDisp').innerText="00:00"; au.pause(); };
+    function loadG() { document.getElementById('streakLabel').innerText=`🔥 Streak: ${localStorage.getItem('sK')||0} Days`; }
 </script>
 </body>
 </html>
