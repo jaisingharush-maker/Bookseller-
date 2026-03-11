@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Pro | All-in-One Hub</title>
+    <title>Student Pro | Final Fix</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --p: #007bff; --bg: #f0f2f5; --card: #ffffff; --g: #28a745; --y: #ffc107; --r: #dc3545; --dark: #1a1a1a; }
@@ -16,48 +16,47 @@
         .tab-content.active { display: block; }
         .card { background: var(--card); padding: 15px; border-radius: 15px; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         
-        /* Chat & List Styles */
-        .chat-box { height: 300px; overflow-y: auto; background: #e5ddd5; padding: 10px; border-radius: 10px; display: flex; flex-direction: column; gap: 8px; border: 1px solid #ccc; }
-        .msg { padding: 8px 12px; border-radius: 12px; max-width: 85%; font-size: 0.9rem; }
+        /* Market & Chat UI */
+        .chat-box { height: 350px; overflow-y: auto; background: #e5ddd5; padding: 10px; border-radius: 12px; display: flex; flex-direction: column; gap: 6px; border: 1px solid #bbb; }
+        .msg { padding: 8px 12px; border-radius: 12px; max-width: 80%; font-size: 0.9rem; position: relative; }
         .msg.mine { align-self: flex-end; background: #dcf8c6; }
         .msg.others { align-self: flex-start; background: #fff; }
-        .msg.private { align-self: center; background: #fff3cd; border: 1px solid #ffeeba; font-weight: bold; text-align: center; width: 90%; }
+        .m-meta { font-size: 0.6rem; display: flex; justify-content: flex-end; margin-top: 4px; gap: 4px; }
+        .seen { color: #34b7f1; font-weight: bold; }
         
-        input { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        .btn { background: var(--p); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; }
-        
-        /* Focus & Todo */
-        .timer-display { font-size: 2.5rem; font-weight: bold; color: var(--y); font-family: monospace; }
-        .todo-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #f8f9fa; margin-top: 5px; border-radius: 8px; border-left: 4px solid var(--g); }
-        .todo-item.done { text-decoration: line-through; opacity: 0.6; border-left-color: #ccc; }
-        .book-card { background: #fff; border-radius: 12px; margin-bottom: 12px; overflow: hidden; display: flex; border: 1px solid #eee; }
-        .book-card img { width: 80px; height: 110px; object-fit: cover; }
+        .book-card { background: #fff; border-radius: 12px; margin-bottom: 12px; overflow: hidden; display: flex; border: 1px solid #eee; height: 110px; }
+        .book-card img { width: 80px; height: 100%; object-fit: cover; }
+        .timer-display { font-size: 2.5rem; font-weight: bold; color: var(--y); font-family: monospace; text-align: center; }
+        .todo-item { display: flex; justify-content: space-between; padding: 10px; background: #f8f9fa; margin-top: 5px; border-radius: 8px; cursor: pointer; border-left: 4px solid var(--p); }
+        .todo-item.done { text-decoration: line-through; opacity: 0.5; border-left-color: #ccc; }
+        input, .btn { width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
+        .btn { background: var(--p); color: white; border: none; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div id="marketTab" class="tab-content active">
-        <h2 style="color:var(--p)">🛒 Market</h2>
+        <h2 style="color:var(--p)">🛒 Book Market</h2>
         <div class="card">
-            <input type="text" id="bTitle" placeholder="Book Name">
-            <input type="text" id="bImg" placeholder="Image URL">
+            <input type="text" id="bTitle" placeholder="Book Title">
             <input type="number" id="bPrice" placeholder="Price (₹)">
-            <input type="text" id="bPhone" placeholder="WhatsApp No">
-            <input type="password" id="bPin" placeholder="PIN to Delete" maxlength="4">
-            <button class="btn" onclick="postBook()">List My Book</button>
+            <input type="text" id="bPhone" placeholder="WhatsApp Number">
+            <input type="file" id="bFile" accept="image/*" style="padding: 5px;">
+            <input type="password" id="bPin" placeholder="Delete PIN" maxlength="4">
+            <button class="btn" onclick="uploadAndPost()">Post My Book</button>
         </div>
         <div id="marketList"></div>
     </div>
 
     <div id="groupTab" class="tab-content">
-        <h2 style="color:var(--p)">💬 Study Group</h2>
+        <h2 style="color:var(--p)">💬 Live Chat</h2>
         <div class="card">
-            <input type="text" id="userName" placeholder="Set Your Name" onchange="localStorage.setItem('uName', this.value)">
+            <input type="text" id="userName" placeholder="Your Name" onchange="localStorage.setItem('uName', this.value)">
             <div id="groupChatBox" class="chat-box"></div>
             <div style="display:flex; gap:5px; margin-top:10px;">
-                <input type="text" id="groupMsgInput" placeholder="Msg or @Name...">
-                <button onclick="sendGroupMsg()" style="background:var(--p); color:white; border:none; border-radius:8px; padding:0 15px;">Send</button>
+                <input type="text" id="groupMsgInput" placeholder="Type...">
+                <button onclick="sendGroupMsg()" style="background:var(--p); color:white; border:none; border-radius:10px; padding:0 15px;">➤</button>
             </div>
         </div>
     </div>
@@ -66,60 +65,58 @@
         <h2 style="color:var(--g)">🤖 AI Buddy</h2>
         <div class="card">
             <div id="aiChatBox" class="chat-box" style="background:#f4f4f4; height:250px;"></div>
-            <div style="display:flex; gap:5px; margin-top:10px;">
-                <input type="text" id="aiMsgInput" placeholder="Ask anything...">
-                <button onclick="askAI()" style="background:var(--g); color:white; border:none; border-radius:8px; padding:0 15px;">Ask</button>
-            </div>
+            <input type="text" id="aiMsgInput" placeholder="Ask anything...">
+            <button onclick="askAI()" class="btn" style="background:var(--g)">Ask AI</button>
         </div>
     </div>
 
     <div id="studyTab" class="tab-content">
-        <h2 style="color:var(--g)">🧘 Focus Mode</h2>
-        <div id="lockScreen" style="text-align:center; padding:30px 0;">
-            <input type="password" id="uPin" placeholder="PIN" maxlength="4" style="width:100px; text-align:center;">
-            <button class="btn" onclick="checkPin()" style="margin-top:10px; width:120px;">Unlock</button>
+        <h2 style="color:var(--g)">🧘 Study Hub</h2>
+        <div id="lockScreen" style="text-align:center;">
+            <input type="password" id="uPin" placeholder="PIN" style="width:100px; text-align:center;">
+            <button class="btn" onclick="checkPin()">Unlock</button>
         </div>
         <div id="studyDash" style="display:none;">
-            <div class="card" style="text-align:center; background:var(--dark); color:white;">
+            <div class="card" style="background:var(--dark); color:white;">
                 <div class="timer-display" id="tDisp">00:00</div>
-                <input type="number" id="tMin" placeholder="Set Mins" style="width:80px; background:#333; color:white; border:none; text-align:center; padding:5px;">
-                <div style="display:flex; gap:5px; margin-top:10px;">
-                    <button onclick="startT()" style="background:var(--g); border:none; color:white; padding:10px; border-radius:5px; flex:1;">Start</button>
-                    <button onclick="resetT()" style="background:var(--r); border:none; color:white; padding:10px; border-radius:5px; flex:1;">Reset</button>
-                </div>
-            </div>
-
-            <div class="card">
-                <h4 style="margin-top:0;">📝 To-Do List</h4>
+                <input type="number" id="tMin" placeholder="Mins" style="width:80px; text-align:center; display:block; margin:10px auto;">
                 <div style="display:flex; gap:5px;">
-                    <input type="text" id="todoInput" placeholder="Add a task...">
-                    <button onclick="addTodo()" style="background:var(--p); border:none; color:white; border-radius:8px; padding:0 15px;">+</button>
+                    <button onclick="startT()" style="background:var(--g); border:none; color:white; padding:10px; border-radius:8px; flex:1;">Start</button>
+                    <button onclick="resetT()" style="background:var(--r); border:none; color:white; padding:10px; border-radius:8px; flex:1;">Reset</button>
                 </div>
-                <div id="todoList" style="margin-top:10px;"></div>
             </div>
-
+            <div class="card">
+                <h4>📝 Goals</h4>
+                <div style="display:flex; gap:5px;">
+                    <input type="text" id="todoIn" placeholder="New Task...">
+                    <button onclick="addT()" style="background:var(--p); color:white; border:none; border-radius:8px; padding:0 15px;">+</button>
+                </div>
+                <div id="tList" style="margin-top:10px;"></div>
+            </div>
             <div class="card" style="display:flex; justify-content:center;">
-                <div style="width:150px;"><canvas id="myChart"></canvas></div>
+                <div style="width:140px;"><canvas id="myChart"></canvas></div>
             </div>
-            <button onclick="location.reload()" class="btn" style="background:#666">Lock Dashboard</button>
         </div>
     </div>
 </div>
 
 <div class="navbar">
     <div class="nav-item active" onclick="tab('marketTab', this)"><span>🛒</span>Market</div>
-    <div class="nav-item" onclick="tab('groupTab', this)"><span>💬</span>Group</div>
+    <div class="nav-item" onclick="tab('groupTab', this)"><span>💬</span>Chat</div>
     <div class="nav-item" onclick="tab('aiTab', this)"><span>🤖</span>AI</div>
     <div class="nav-item" onclick="tab('studyTab', this)"><span>🧘</span>Focus</div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, limit, serverTimestamp, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, limit, serverTimestamp, updateDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
     const firebaseConfig = { apiKey: "AIzaSyCrFbBhfWT6WlYAH_ZmopTfzrf47GEQe1k", authDomain: "book-swap-104b7.firebaseapp.com", projectId: "book-swap-104b7", storageBucket: "book-swap-104b7.firebasestorage.app", messagingSenderId: "259299080234", appId: "1:259299080234:web:56a031e02a70d39e37eb53" };
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    const storage = getStorage(app);
+    const uName = () => localStorage.getItem('uName') || "Anonymous";
 
     window.tab = (id, el) => {
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
@@ -127,100 +124,93 @@
         document.getElementById(id).classList.add('active'); el.classList.add('active');
     };
 
-    // --- MARKET ---
-    const mCol = collection(db, "v4_market");
-    window.postBook = async () => {
-        const t = document.getElementById('bTitle').value, p = document.getElementById('bPin').value;
-        if(t && p) { await addDoc(mCol, { title: t, price: document.getElementById('bPrice').value, img: document.getElementById('bImg').value || "https://cdn-icons-png.flaticon.com/512/330/330731.png", phone: document.getElementById('bPhone').value, pin: p, ts: Date.now() }); location.reload(); }
+    // --- MARKET LOGIC (IMAGE FIX) ---
+    const mCol = collection(db, "vfinal_market");
+    window.uploadAndPost = async () => {
+        const file = document.getElementById('bFile').files[0];
+        const title = document.getElementById('bTitle').value;
+        const pin = document.getElementById('bPin').value;
+        if(!file || !title || !pin) return alert("Select Photo, Title and Set PIN!");
+
+        const btn = document.querySelector('button[onclick="uploadAndPost()"]');
+        btn.innerText = "Uploading..."; btn.disabled = true;
+
+        try {
+            const sRef = ref(storage, 'books/' + Date.now() + file.name);
+            await uploadBytes(sRef, file);
+            const url = await getDownloadURL(sRef);
+            await addDoc(mCol, { title, price: document.getElementById('bPrice').value, phone: document.getElementById('bPhone').value, img: url, pin, ts: Date.now() });
+            location.reload();
+        } catch(e) { alert("Upload Failed!"); btn.innerText = "Post Book"; btn.disabled = false; }
     };
+
     onSnapshot(mCol, snap => {
         document.getElementById('marketList').innerHTML = snap.docs.map(d => {
             const b = d.data();
-            return `<div class="book-card"><img src="${b.img}"><div style="padding:10px"><b>${b.title}</b><br>₹${b.price}<br><a href="https://wa.me/91${b.phone}">Chat</a> | <span onclick="delBook('${d.id}','${b.pin}')" style="color:red; cursor:pointer;">Del</span></div></div>`;
+            return `<div class="book-card"><img src="${b.img || ''}"><div style="padding:10px"><b>${b.title}</b><br>₹${b.price}<br><a href="https://wa.me/91${b.phone}">WhatsApp</a> | <span onclick="delBook('${d.id}','${b.pin}')" style="color:red;cursor:pointer">Del</span></div></div>`;
         }).join('');
     });
-    window.delBook = async (id, pin) => { if(prompt("Enter Delete PIN") === pin) await deleteDoc(doc(db,"v4_market",id)); };
+    window.delBook = async (id, pin) => { if(prompt("Enter PIN")===pin) await deleteDoc(doc(db,"vfinal_market",id)); };
 
-    // --- SECURE CHAT ---
-    const gCol = collection(db, "v4_chat");
+    // --- CHAT LOGIC ---
+    const gCol = collection(db, "vfinal_chat");
     window.sendGroupMsg = async () => {
-        const m = document.getElementById('groupMsgInput').value, u = localStorage.getItem('uName') || "Anonymous";
-        if(!m) return;
-        let target = m.startsWith('@') ? m.split(' ')[0].replace('@', '') : null;
-        await addDoc(gCol, { sender: u, text: m, target: target, ts: serverTimestamp() });
-        document.getElementById('groupMsgInput').value = "";
+        const inp = document.getElementById('groupMsgInput');
+        if(!inp.value.trim()) return;
+        const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        await addDoc(gCol, { sender: uName(), text: inp.value, seen: false, time, ts: serverTimestamp() });
+        inp.value = "";
     };
     onSnapshot(query(gCol, orderBy("ts", "asc"), limit(50)), snap => {
-        const my = localStorage.getItem('uName'), box = document.getElementById('groupChatBox');
+        const box = document.getElementById('groupChatBox');
         box.innerHTML = snap.docs.map(d => {
-            const data = d.data();
-            if(data.target && data.target !== my && data.sender !== my) return '';
-            const cls = data.target ? 'private' : (data.sender === my ? 'mine' : 'others');
-            return `<div class="msg ${cls}"><b>${data.sender}:</b> ${data.text}</div>`;
+            const data = d.data(), isMine = data.sender === uName();
+            if(!isMine && !data.seen) updateDoc(doc(db, "vfinal_chat", d.id), { seen: true });
+            return `<div class="msg ${isMine ? 'mine' : 'others'}">
+                ${!isMine ? `<small><b>${data.sender}</b></small><br>` : ''}
+                ${data.text}
+                <div class="m-meta">${data.time} ${isMine ? `<span class="${data.seen?'seen':''}">✓✓</span>` : ''}</div>
+            </div>`;
         }).join('');
         box.scrollTop = box.scrollHeight;
     });
 
-    // --- AI BUDDY ---
+    // --- AI ---
     window.askAI = async () => {
         const i = document.getElementById('aiMsgInput'), b = document.getElementById('aiChatBox');
         if(!i.value) return;
         b.innerHTML += `<div class="msg mine">${i.value}</div>`;
-        const tId = "t-"+Date.now(); b.innerHTML += `<div class="msg others" id="${tId}">Thinking...</div>`;
-        try {
-            const r = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-                method: "POST",
-                headers: { "Authorization": "Bearer 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", "Content-Type": "application/json" },
-                body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: [{role:"user", content:i.value}] })
-            });
-            const d = await r.json(); document.getElementById(tId).innerText = d.choices[0].message.content;
-        } catch(e) { document.getElementById(tId).innerText = "Error!"; }
+        const tid = "t"+Date.now(); b.innerHTML += `<div class="msg others" id="${tid}">...</div>`;
+        const r = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+            method: "POST",
+            headers: { "Authorization": "Bearer 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", "Content-Type": "application/json" },
+            body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: [{role:"user", content:i.value}] })
+        });
+        const d = await r.json(); document.getElementById(tid).innerText = d.choices[0].message.content;
         i.value = ""; b.scrollTop = b.scrollHeight;
     };
 
-    // --- FOCUS, TIMER & TO-DO (FIXED) ---
-    let timer, timeLeft;
-    window.checkPin = () => { if(document.getElementById('uPin').value === localStorage.getItem('studyPin')) { document.getElementById('lockScreen').style.display='none'; document.getElementById('studyDash').style.display='block'; loadTodo(); } };
+    // --- FOCUS & TODO ---
+    let timer;
+    window.checkPin = () => { if(document.getElementById('uPin').value === localStorage.getItem('studyPin')) { document.getElementById('lockScreen').style.display='none'; document.getElementById('studyDash').style.display='block'; loadT(); } };
     window.startT = () => { 
-        timeLeft=(parseInt(document.getElementById('tMin').value)||25)*60; 
+        let sec = (parseInt(document.getElementById('tMin').value)||25)*60; 
         clearInterval(timer); 
-        timer=setInterval(()=>{ 
-            if(timeLeft<=0){clearInterval(timer);alert("Time Up!");return;} 
-            timeLeft--; 
-            let m=Math.floor(timeLeft/60), s=timeLeft%60; 
-            document.getElementById('tDisp').innerText=`${m<10?'0':''}${m}:${s<10?'0':''}${s}`; 
+        timer = setInterval(()=>{ 
+            if(sec<=0){clearInterval(timer); return;} 
+            sec--; 
+            document.getElementById('tDisp').innerText = Math.floor(sec/60)+":"+(sec%60<10?'0':'')+(sec%60); 
         },1000); 
     };
     window.resetT = () => { clearInterval(timer); document.getElementById('tDisp').innerText="00:00"; };
-
-    window.addTodo = () => {
-        const input = document.getElementById('todoInput');
-        if(!input.value) return;
-        let list = JSON.parse(localStorage.getItem('myTodos') || "[]");
-        list.push({ text: input.value, done: false });
-        localStorage.setItem('myTodos', JSON.stringify(list));
-        input.value = "";
-        loadTodo();
-    };
-    window.toggleTodo = (index) => {
-        let list = JSON.parse(localStorage.getItem('myTodos'));
-        list[index].done = !list[index].done;
-        localStorage.setItem('myTodos', JSON.stringify(list));
-        loadTodo();
-    };
-    function loadTodo() {
-        let list = JSON.parse(localStorage.getItem('myTodos') || "[]");
-        document.getElementById('todoList').innerHTML = list.map((item, i) => `
-            <div class="todo-item ${item.done ? 'done' : ''}" onclick="toggleTodo(${i})">
-                ${item.text} <span>${item.done ? '✅' : '⭕'}</span>
-            </div>
-        `).join('');
-        
-        // Update Chart
-        const done = list.filter(t => t.done).length, left = list.length - done;
+    window.addT = () => { let l = JSON.parse(localStorage.getItem('t6')||"[]"); l.push({t:document.getElementById('todoIn').value, d:false}); localStorage.setItem('t6', JSON.stringify(l)); document.getElementById('todoIn').value=""; loadT(); };
+    window.togT = (i) => { let l = JSON.parse(localStorage.getItem('t6')); l[i].d = !l[i].d; localStorage.setItem('t6', JSON.stringify(l)); loadT(); };
+    function loadT() {
+        let l = JSON.parse(localStorage.getItem('t6')||"[]");
+        document.getElementById('tList').innerHTML = l.map((x,i)=>`<div class="todo-item ${x.d?'done':''}" onclick="togT(${i})">${x.t} <span>${x.d?'✅':'⭕'}</span></div>`).join('');
         const ctx = document.getElementById('myChart').getContext('2d');
         if(window.ch) window.ch.destroy();
-        window.ch = new Chart(ctx, { type:'doughnut', data:{ labels:['Done','Left'], datasets:[{data:[done||1, left||(done?0:1)], backgroundColor:['#28a745','#ffc107']}] }, options:{plugins:{legend:{display:false}}} });
+        window.ch = new Chart(ctx, { type:'doughnut', data:{ datasets:[{data:[l.filter(x=>x.d).length||1, l.filter(x=>!x.d).length||1], backgroundColor:['#28a745','#ffc107']}] }, options:{plugins:{legend:{display:false}}} });
     }
 </script>
 </body>
