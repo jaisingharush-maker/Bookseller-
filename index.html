@@ -15,7 +15,14 @@
         .tab-content.active { display: block; }
         .card { background: var(--card); padding: 18px; border-radius: 20px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         
+        /* Book Styles & Search */
         .book-card { background: #fff; padding: 15px; border-radius: 15px; margin-bottom: 12px; border: 1px solid #ddd; }
+        .desc-text { font-size: 0.85rem; color: #666; margin: 8px 0; line-height: 1.4; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+        .desc-text.expanded { display: block; -webkit-line-clamp: unset; }
+        .read-more-btn { color: #007bff; font-size: 0.75rem; font-weight: bold; cursor: pointer; display: block; margin-bottom: 10px; }
+        
+        .search-box { width: 100%; padding: 10px 15px; border-radius: 12px; border: 1px solid #ddd; margin-bottom: 15px; outline: none; box-sizing: border-box; }
+        
         .btn-view { background: #007bff; color: white; padding: 12px; border-radius: 10px; text-align: center; cursor: pointer; font-weight: bold; border:none; width:100%; margin-top:10px; }
         .btn-wa { background: var(--g); color: white; padding: 10px; border-radius: 10px; text-align: center; cursor: pointer; font-weight: bold; border:none; width:100%; margin-top:8px; text-decoration: none; display: block; box-sizing: border-box; font-size: 0.9rem; }
         .btn-locked { background: #eee; color: #888; cursor: not-allowed; }
@@ -26,7 +33,7 @@
         iframe { width: 100%; height: 100%; border: none; }
         .close-btn { position: absolute; top: 20px; right: 20px; background: var(--r); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; font-weight: bold; cursor: pointer; z-index: 2100; }
 
-        input, .btn { width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
+        input, textarea, .btn { width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-family: inherit; }
         .btn { background: #007bff; color: white; border: none; font-weight: bold; }
         
         .chat-box { height: 250px; overflow-y: auto; background: #efe7dd; padding: 10px; border-radius: 15px; display: flex; flex-direction: column; gap: 8px; border: 1px solid #ddd; }
@@ -48,13 +55,17 @@
             <h2 style="color:#007bff">🛒 Store</h2>
             <span onclick="adminLogin()" id="adminIndicator" style="font-size: 0.7rem; color: #aaa; cursor:pointer;">Seller Login</span>
         </div>
+
+        <input type="text" id="searchInput" class="search-box" onkeyup="filterBooks()" placeholder="🔍 Search book name or topics...">
+
         <div id="sellerForm" class="card" style="display:none; border: 2px solid #007bff;">
             <h4 id="formTitle">Post New E-Book</h4>
             <input type="hidden" id="editId">
             <input type="text" id="ebTitle" placeholder="Book Name">
             <input type="text" id="ebLink" placeholder="Google Drive Link">
+            <textarea id="ebDesc" placeholder="Description (Topics covered, chapter list...)" rows="3"></textarea>
             <input type="text" id="ebPrice" placeholder="Price (₹)">
-            <input type="text" id="ebWa" placeholder="WhatsApp Number (With Country Code, e.g. 919876543210)">
+            <input type="text" id="ebWa" placeholder="WhatsApp Number (With 91...)">
             <input type="text" id="ebUser" placeholder="Access IDs (Comma separated) or ALL">
             <button class="btn" id="submitBtn" onclick="postEbook()">Publish Now</button>
             <button onclick="cancelEdit()" style="background:none; border:none; color:red; cursor:pointer; width:100%; margin-top:5px;">Cancel</button>
@@ -66,10 +77,12 @@
         <h2 style="color:#007bff">💬 Chat</h2>
         <div class="card"><input type="text" id="roomIn" placeholder="Room ID" onchange="loadRoom()"><div id="cBox" class="chat-box"></div><div style="display:flex;gap:5px;margin-top:10px;"><input type="text" id="mIn" placeholder="Msg..."><button onclick="sendMsg()" class="btn" style="width:60px;margin:0">➤</button></div></div>
     </div>
+
     <div id="aiTab" class="tab-content">
         <h2 style="color:#28a745">🤖 AI Buddy</h2>
         <div class="card"><div id="aiBox" class="chat-box" style="height:200px"></div><input type="text" id="aiIn" placeholder="Ask AI..."><button onclick="askAI()" class="btn" style="background:#28a745">Ask AI</button></div>
     </div>
+
     <div id="studyTab" class="tab-content">
         <h2 style="color:#28a745">🧘 Focus</h2>
         <div id="focusLock" class="card" style="text-align:center;"><p>Enter PIN (1234)</p><input type="password" id="focusPin" style="text-align:center;"><button onclick="unlockFocus()" class="btn">Unlock</button></div>
@@ -118,39 +131,85 @@
     window.adminLogin = () => { if(prompt("Seller Password?") === "jaishree") { isAdmin = true; document.getElementById('sellerForm').style.display='block'; document.getElementById('adminIndicator').innerText="Admin Mode ✅"; loadBooks(); } };
 
     window.postEbook = async () => {
-        const t = document.getElementById('ebTitle').value, l = document.getElementById('ebLink').value, a = document.getElementById('ebUser').value || "ALL", p = document.getElementById('ebPrice').value, w = document.getElementById('ebWa').value, id = document.getElementById('editId').value;
-        if(id) await updateDoc(doc(db, "secure_ebooks", id), {title:t, link:l, authorized:a, price:p, whatsapp:w});
-        else await addDoc(ebCol, {title:t, link:l, authorized:a, price:p, whatsapp:w, ts:serverTimestamp()});
+        const t = document.getElementById('ebTitle').value, 
+              l = document.getElementById('ebLink').value, 
+              d = document.getElementById('ebDesc').value,
+              a = document.getElementById('ebUser').value || "ALL", 
+              p = document.getElementById('ebPrice').value, 
+              w = document.getElementById('ebWa').value, 
+              id = document.getElementById('editId').value;
+        
+        const data = {title:t, link:l, description:d, authorized:a, price:p, whatsapp:w, ts:serverTimestamp()};
+        
+        if(id) await updateDoc(doc(db, "secure_ebooks", id), data);
+        else await addDoc(ebCol, data);
         cancelEdit(); alert("Done!");
     };
 
-    window.editBook = (id, t, l, a, p, w) => {
+    window.editBook = (id, t, l, a, p, w, d) => {
         document.getElementById('sellerForm').style.display='block';
         document.getElementById('editId').value = id;
-        document.getElementById('ebTitle').value = t; document.getElementById('ebLink').value = l; document.getElementById('ebUser').value = a; document.getElementById('ebPrice').value = p; document.getElementById('ebWa').value = w || "";
+        document.getElementById('ebTitle').value = t; 
+        document.getElementById('ebLink').value = l; 
+        document.getElementById('ebDesc').value = d || "";
+        document.getElementById('ebUser').value = a; 
+        document.getElementById('ebPrice').value = p; 
+        document.getElementById('ebWa').value = w || "";
         window.scrollTo(0,0);
     };
 
     window.deleteBook = async (id) => { if(confirm("Delete?")) await deleteDoc(doc(db, "secure_ebooks", id)); };
-    window.cancelEdit = () => { document.getElementById('editId').value=""; document.getElementById('sellerForm').style.display='none'; };
+    
+    window.cancelEdit = () => { 
+        document.getElementById('editId').value=""; 
+        document.getElementById('ebTitle').value=""; document.getElementById('ebLink').value=""; 
+        document.getElementById('ebDesc').value=""; document.getElementById('ebPrice').value="";
+        document.getElementById('ebWa').value=""; document.getElementById('ebUser').value="";
+        document.getElementById('sellerForm').style.display='none'; 
+    };
+
+    window.toggleDesc = (btn) => {
+        const p = btn.previousElementSibling;
+        if (p.classList.contains('expanded')) {
+            p.classList.remove('expanded');
+            btn.innerText = "Read More...";
+        } else {
+            p.classList.add('expanded');
+            btn.innerText = "Show Less";
+        }
+    };
+
+    window.filterBooks = () => {
+        const q = document.getElementById('searchInput').value.toLowerCase();
+        document.querySelectorAll('.book-card').forEach(card => {
+            const text = card.innerText.toLowerCase();
+            card.style.display = text.includes(q) ? "block" : "none";
+        });
+    };
 
     function loadBooks() {
         onSnapshot(query(ebCol, orderBy("ts", "desc")), snap => {
-            document.getElementById('marketList').innerHTML = snap.docs.map(d => {
-                const b = d.data(); const hasAccess = (b.authorized.includes(myID) || b.authorized === "ALL" || isAdmin);
-                const waLink = `https://wa.me/${b.whatsapp}?text=Hello,%20I%20want%20to%20buy%20${encodeURIComponent(b.title)}.%20My%20ID:%20${myID}`;
+            document.getElementById('marketList').innerHTML = snap.docs.map(docSnap => {
+                const b = docSnap.data(); 
+                const hasAccess = (b.authorized.includes(myID) || b.authorized === "ALL" || isAdmin);
+                const waLink = `https://wa.me/${b.whatsapp}?text=I%20want%20to%20buy%20${encodeURIComponent(b.title)}.%20ID:%20${myID}`;
+                
                 return `<div class="book-card">
-                    <strong>${b.title}</strong><br><small style="color:#28a745">Price: ₹${b.price}</small>
+                    <strong>${b.title}</strong>
+                    <div class="desc-text">${b.description || 'No description available.'}</div>
+                    ${b.description && b.description.length > 50 ? `<span class="read-more-btn" onclick="toggleDesc(this)">Read More...</span>` : ''}
+                    <small style="color:#28a745; font-weight:bold;">Price: ₹${b.price}</small>
                     ${hasAccess ? `<button class="btn-view" onclick="openViewer('${b.link}')">📖 Open Book</button>` : `
-                        <button class="btn-view btn-locked" onclick="alert('Buy to unlock this book! Your ID: ${myID}')">🔒 Locked</button>
+                        <button class="btn-view btn-locked" onclick="alert('Buy to unlock! Your ID: ${myID}')">🔒 Locked</button>
                         ${b.whatsapp ? `<a href="${waLink}" target="_blank" class="btn-wa">💬 Chat with Seller</a>` : ''}
                     `}
-                    ${isAdmin ? `<div class="admin-btns"><button class="adm-btn" style="background:var(--y)" onclick="editBook('${d.id}','${b.title}','${b.link}','${b.authorized}','${b.price}','${b.whatsapp}')">Edit</button><button class="adm-btn" style="background:var(--r);color:white" onclick="deleteBook('${d.id}')">Delete</button></div>` : ''}
+                    ${isAdmin ? `<div class="admin-btns"><button class="adm-btn" style="background:var(--y)" onclick="editBook('${docSnap.id}','${b.title}','${b.link}','${b.authorized}','${b.price}','${b.whatsapp}','${b.description?.replace(/'/g, "\\'")}')">Edit</button><button class="adm-btn" style="background:var(--r);color:white" onclick="deleteBook('${docSnap.id}')">Delete</button></div>` : ''}
                 </div>`;
             }).join('');
         });
     }
 
+    // Baki functions (AI, Chat, Focus)
     window.unlockFocus = () => { if(document.getElementById('focusPin').value === "1234") { document.getElementById('focusLock').style.display='none'; document.getElementById('focusContent').style.display='block'; } else { alert("Wrong!"); } };
     window.loadRoom = () => { onSnapshot(query(chatCol, where("room", "==", document.getElementById('roomIn').value)), snap => {
         let msgs = snap.docs.map(d => d.data()).sort((a,b) => (a.ts?.seconds||0)-(b.ts?.seconds||0));
