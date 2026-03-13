@@ -8,49 +8,44 @@
         :root { --p: #007bff; --bg: #f8f9fa; --card: #ffffff; --g: #25d366; --y: #ffc107; --r: #dc3545; --dark: #1a1a1a; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding-bottom: 80px; user-select: none; }
         
-        /* Brand Header */
-        .main-header { text-align: center; padding: 15px 0; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 10px; }
+        .main-header { text-align: center; padding: 15px 0; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         .brand-name { font-size: 1.4rem; font-weight: 800; color: var(--dark); letter-spacing: 1px; }
         .brand-sub { font-size: 0.7rem; color: var(--p); display: block; }
+
+        /* Notice Board */
+        .notice-board { background: var(--y); color: #000; padding: 5px 0; font-size: 0.8rem; font-weight: bold; overflow: hidden; white-space: nowrap; }
+        .notice-text { display: inline-block; animation: scroll 15s linear infinite; }
+        @keyframes scroll { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 
         .navbar { position: fixed; bottom: 0; width: 100%; background: #fff; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #eee; z-index: 1000; }
         .nav-item { border: none; background: none; font-weight: 600; color: #aaa; cursor: pointer; display: flex; flex-direction: column; align-items: center; font-size: 0.75rem; }
         .nav-item.active { color: #007bff; }
-        .container { max-width: 500px; margin: auto; padding: 0 15px; }
+        .container { max-width: 500px; margin: auto; padding: 0 15px; margin-top: 10px; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         .card { background: var(--card); padding: 18px; border-radius: 20px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         
-        /* Library UI */
         .book-card { background: #fff; padding: 15px; border-radius: 15px; margin-bottom: 12px; border: 1px solid #ddd; }
-        .desc-text { font-size: 0.85rem; color: #666; margin: 8px 0; line-height: 1.4; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-        .desc-text.expanded { display: block; -webkit-line-clamp: unset; }
-        .read-more-btn { color: #007bff; font-size: 0.75rem; font-weight: bold; cursor: pointer; display: block; margin-bottom: 10px; }
-        .search-box { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #ddd; margin-bottom: 15px; outline: none; box-sizing: border-box; }
+        .user-row { font-size: 0.8rem; padding: 8px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; }
         
+        input, textarea, .btn { width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
+        .btn { background: #007bff; color: white; border: none; font-weight: bold; cursor: pointer; }
         .btn-view { background: #007bff; color: white; padding: 12px; border-radius: 10px; text-align: center; cursor: pointer; font-weight: bold; border:none; width:100%; margin-top:10px; }
-        .btn-wa { background: var(--g); color: white; padding: 10px; border-radius: 10px; text-align: center; font-weight: bold; text-decoration: none; display: block; margin-top: 8px; font-size: 0.9rem; }
-        .admin-btns { display: flex; gap: 5px; margin-top: 10px; border-top: 1px dashed #eee; padding-top: 10px; }
-        .adm-btn { flex: 1; padding: 8px; border-radius: 8px; border: none; font-size: 0.75rem; cursor: pointer; font-weight: bold; color: white; }
-
+        
         #secureViewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 2000; }
         iframe { width: 100%; height: 100%; border: none; }
-        .close-btn { position: absolute; top: 20px; right: 20px; background: var(--r); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; font-weight: bold; cursor: pointer; z-index: 2100; }
-
-        input, textarea, .btn { width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
-        .btn { background: #007bff; color: white; border: none; font-weight: bold; }
-        
-        .chat-box { height: 250px; overflow-y: auto; background: #efe7dd; padding: 10px; border-radius: 15px; display: flex; flex-direction: column; gap: 8px; border: 1px solid #ddd; }
-        .msg { padding: 8px 12px; border-radius: 12px; max-width: 85%; font-size: 0.9rem; word-wrap: break-word; }
-        .msg.mine { align-self: flex-end; background: #dcf8c6; }
-        .msg.others { align-self: flex-start; background: #fff; }
+        .close-btn { position: absolute; top: 20px; right: 20px; background: var(--r); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; font-weight: bold; cursor: pointer; }
     </style>
 </head>
-<body oncontextmenu="return false;">
+<body>
 
 <div class="main-header">
     <div class="brand-name">AARRV_TECH_HUB</div>
     <span class="brand-sub">Empowering Students</span>
+</div>
+
+<div class="notice-board">
+    <div class="notice-text">🔥 Welcome to AARRV Tech Hub Library! New Semester Notes Uploaded. Subscribe for Premium Access! 🔥</div>
 </div>
 
 <div id="secureViewer">
@@ -62,39 +57,29 @@
     <div id="marketTab" class="tab-content active">
         <div style="display:flex; justify-content:space-between; align-items:center;">
             <h2 style="color:#007bff">📚 Library</h2>
-            <span id="adminIndicator" style="font-size: 0.7rem; color: #007bff; cursor:pointer; font-weight:bold;">Login with Google</span>
+            <span id="adminIndicator" style="font-size: 0.7rem; color: #007bff; cursor:pointer; font-weight:bold;">Login</span>
         </div>
-
-        <input type="text" id="searchInput" class="search-box" onkeyup="filterBooks()" placeholder="🔍 Search in Library...">
 
         <div id="sellerForm" class="card" style="display:none; border: 2px solid #007bff;">
-            <h4 id="formTitle">Manage Library (Admin)</h4>
-            <input type="hidden" id="editId">
+            <h4>Add New Book (Admin)</h4>
             <input type="text" id="ebTitle" placeholder="Book Name">
-            <input type="text" id="ebLink" placeholder="Google Drive Link">
-            <textarea id="ebDesc" placeholder="Book Description..." rows="3"></textarea>
-            <input type="text" id="ebPrice" placeholder="Price (₹)">
+            <input type="text" id="ebLink" placeholder="Drive Link">
+            <input type="text" id="ebPrice" placeholder="Price">
             <input type="text" id="ebWa" placeholder="WhatsApp Number">
-            <input type="text" id="ebUser" placeholder="Access IDs (STU1234) or ALL">
+            <input type="text" id="ebUser" placeholder="Access IDs or ALL">
             <button class="btn" onclick="postEbook()">Update Library</button>
-            <button onclick="cancelEdit()" style="background:none; border:none; color:red; cursor:pointer; width:100%; margin-top:5px;">Cancel</button>
         </div>
+
         <div id="marketList"></div>
-    </div>
 
-    <div id="groupTab" class="tab-content">
-        <h2 style="color:#007bff">💬 Chat Room</h2>
-        <div class="card"><input type="text" id="roomIn" placeholder="Room ID"><div id="cBox" class="chat-box"></div><div style="display:flex;gap:5px;margin-top:10px;"><input type="text" id="mIn" placeholder="Type msg..."><button onclick="sendMsg()" class="btn" style="width:60px;margin:0">➤</button></div></div>
-    </div>
-
-    <div id="aiTab" class="tab-content">
-        <h2 style="color:#28a745">🤖 AI Tutor</h2>
-        <div class="card">
-            <div id="aiBox" class="chat-box" style="height:220px; margin-bottom:10px;"></div>
-            <input type="text" id="aiIn" placeholder="Ask anything about studies...">
-            <button onclick="askAI()" class="btn" style="background:#28a745">Ask AI</button>
+        <div id="adminUserPanel" class="card" style="display:none; margin-top: 20px; border-top: 3px solid var(--g);">
+            <h4>👥 Registered Users</h4>
+            <div id="userListDisplay">Loading users...</div>
         </div>
     </div>
+
+    <div id="groupTab" class="tab-content"><h2>💬 Chat</h2><div class="card" id="chatPlaceholder">Login to Chat</div></div>
+    <div id="aiTab" class="tab-content"><h2>🤖 AI Tutor</h2><div class="card" id="aiPlaceholder">Ask AI anything...</div></div>
 </div>
 
 <div class="navbar">
@@ -105,7 +90,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, onSnapshot, query, where, orderBy, serverTimestamp, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     const firebaseConfig = { apiKey: "AIzaSyCrFbBhfWT6WlYAH_ZmopTfzrf47GEQe1k", authDomain: "book-swap-104b7.firebaseapp.com", projectId: "book-swap-104b7", storageBucket: "book-swap-104b7.firebasestorage.app", messagingSenderId: "259299080234", appId: "1:259299080234:web:56a031e02a70d39e37eb53" };
@@ -114,25 +99,33 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
-    const ebCol = collection(db, "secure_ebooks");
-    const chatCol = collection(db, "group_messages");
 
+    const adminEmail = "mihirjaisingh@gmail.com";
     let isAdmin = false;
-    const adminEmail = "mihirjaisingh@gmail.com"; // ✅ Updated Email
-    const myID = localStorage.getItem('my_id') || "STU" + Math.floor(Math.random()*9000+1000);
-    localStorage.setItem('my_id', myID);
 
-    window.login = () => signInWithPopup(auth, provider).catch(e => alert(e.message));
+    // LOGIN & USER TRACKING
+    window.login = () => signInWithPopup(auth, provider);
     window.logout = () => signOut(auth).then(() => location.reload());
 
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
         const ind = document.getElementById('adminIndicator');
         if (user) {
             ind.innerText = "Hi, " + user.displayName.split(' ')[0] + " (Logout)";
             ind.onclick = logout;
+
+            // Save User Data to Firestore
+            await setDoc(doc(db, "users", user.uid), {
+                name: user.displayName,
+                email: user.email,
+                lastLogin: serverTimestamp(),
+                photo: user.photoURL
+            }, { merge: true });
+
             if (user.email === adminEmail) {
                 isAdmin = true;
                 document.getElementById('sellerForm').style.display = 'block';
+                document.getElementById('adminUserPanel').style.display = 'block';
+                loadUserList();
             }
         } else {
             ind.innerText = "Login with Google";
@@ -141,6 +134,22 @@
         loadBooks();
     });
 
+    // Function to see who logged in (Admin Only)
+    function loadUserList() {
+        onSnapshot(collection(db, "users"), snap => {
+            const container = document.getElementById('userListDisplay');
+            container.innerHTML = "";
+            snap.forEach(doc => {
+                const u = doc.data();
+                container.innerHTML += `<div class="user-row">
+                    <span><strong>${u.name}</strong><br><small>${u.email}</small></span>
+                    <span style="color:#aaa; font-size:10px;">ID: ${doc.id.substring(0,6)}</span>
+                </div>`;
+            });
+        });
+    }
+
+    // Standard Library Functions
     window.tab = (id, el) => {
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
@@ -148,64 +157,27 @@
     };
 
     window.postEbook = async () => {
-        const t = document.getElementById('ebTitle').value, l = document.getElementById('ebLink').value, d = document.getElementById('ebDesc').value, a = document.getElementById('ebUser').value || "ALL", p = document.getElementById('ebPrice').value, w = document.getElementById('ebWa').value, id = document.getElementById('editId').value;
-        const data = {title:t, link:l, description:d, authorized:a, price:p, whatsapp:w, ts:serverTimestamp()};
-        if(id) await updateDoc(doc(db, "secure_ebooks", id), data); else await addDoc(ebCol, data);
-        cancelEdit();
+        const t = document.getElementById('ebTitle').value, l = document.getElementById('ebLink').value, a = document.getElementById('ebUser').value || "ALL", p = document.getElementById('ebPrice').value, w = document.getElementById('ebWa').value;
+        await addDoc(collection(db, "secure_ebooks"), {title:t, link:l, authorized:a, price:p, whatsapp:w, ts:serverTimestamp()});
+        alert("Book Added!");
     };
 
-    window.cancelEdit = () => { document.getElementById('editId').value=""; document.querySelectorAll('#sellerForm input, #sellerForm textarea').forEach(i => i.value=""); };
-
     function loadBooks() {
-        onSnapshot(query(ebCol, orderBy("ts", "desc")), snap => {
+        onSnapshot(query(collection(db, "secure_ebooks"), orderBy("ts", "desc")), snap => {
             const list = document.getElementById('marketList');
             list.innerHTML = "";
-            snap.docs.forEach(docSnap => {
-                const b = docSnap.data(), id = docSnap.id;
-                const hasAccess = (b.authorized.includes(myID) || b.authorized === "ALL" || isAdmin);
-                const card = document.createElement('div'); card.className = "book-card";
-                card.innerHTML = `
-                    <strong>${b.title}</strong>
-                    <div class="desc-text">${b.description || 'No description.'}</div>
-                    ${b.description?.length > 50 ? `<span class="read-more-btn">Read More...</span>` : ''}
-                    <small style="color:#28a745; font-weight:bold;">Price: ₹${b.price}</small>
-                    ${hasAccess ? `<button class="btn-view" id="view-${id}">📖 Open</button>` : `<button class="btn-view" style="background:#eee;color:#888" onclick="alert('Your ID: ${myID}')">🔒 Locked</button><a href="https://wa.me/${b.whatsapp}" class="btn-wa" target="_blank">💬 Buy Now</a>`}
-                    ${isAdmin ? `<div class="admin-btns"><button class="adm-btn" id="edit-${id}" style="background:var(--y)">Edit</button><button class="adm-btn" id="del-${id}" style="background:var(--r)">Delete</button></div>` : ''}
-                `;
-                list.appendChild(card);
-                if(b.description?.length > 50) card.querySelector('.read-more-btn').onclick = (e) => { e.target.previousElementSibling.classList.toggle('expanded'); e.target.innerText = e.target.innerText === "Read More..." ? "Show Less" : "Read More..."; };
-                if(hasAccess) document.getElementById(`view-${id}`).onclick = () => openViewer(b.link);
-                if(isAdmin) {
-                    document.getElementById(`edit-${id}`).onclick = () => {
-                        document.getElementById('editId').value = id; document.getElementById('ebTitle').value = b.title;
-                        document.getElementById('ebLink').value = b.link; document.getElementById('ebDesc').value = b.description || "";
-                        document.getElementById('ebPrice').value = b.price; document.getElementById('ebWa').value = b.whatsapp;
-                        document.getElementById('ebUser').value = b.authorized; window.scrollTo(0,0);
-                    };
-                    document.getElementById(`del-${id}`).onclick = () => confirm("Delete this book?") && deleteDoc(doc(db, "secure_ebooks", id));
-                }
+            snap.forEach(docSnap => {
+                const b = docSnap.data();
+                list.innerHTML += `<div class="book-card">
+                    <strong>${b.title}</strong><br><small>Price: ₹${b.price}</small>
+                    <button class="btn-view" onclick="window.openViewer('${b.link}')">📖 Open Book</button>
+                </div>`;
             });
         });
     }
 
-    window.askAI = async () => {
-        const i = document.getElementById('aiIn'), b = document.getElementById('aiBox'); if(!i.value) return;
-        const msg = i.value; b.innerHTML += `<div class="msg mine">${msg}</div>`; i.value = "";
-        const r = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-            method: "POST", headers: { "Authorization": "Bearer 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", "Content-Type": "application/json" },
-            body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: [{role:"user", content:msg}] })
-        });
-        const d = await r.json(); b.innerHTML += `<div class="msg others">${d.choices[0].message.content.replace(/\n/g, '<br>')}</div>`;
-        b.scrollTop = b.scrollHeight;
-    };
-
     window.openViewer = (l) => { document.getElementById('pdfFrame').src = l.replace('/view', '/preview'); document.getElementById('secureViewer').style.display='block'; };
     window.closeViewer = () => { document.getElementById('pdfFrame').src = ""; document.getElementById('secureViewer').style.display='none'; };
-    window.filterBooks = () => {
-        const q = document.getElementById('searchInput').value.toLowerCase();
-        document.querySelectorAll('.book-card').forEach(c => c.style.display = c.innerText.toLowerCase().includes(q) ? "block" : "none");
-    };
-    window.sendMsg = async () => { if(auth.currentUser) await addDoc(chatCol, {room: document.getElementById('roomIn').value, text: document.getElementById('mIn').value, sender: myID, ts: serverTimestamp()}); else alert("Please login first!"); document.getElementById('mIn').value=""; };
 </script>
 </body>
 </html>
