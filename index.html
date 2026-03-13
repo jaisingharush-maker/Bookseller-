@@ -256,7 +256,10 @@ function loadLibrary() {
             d.onclick = () => { document.getElementById('bookFrame').src = b.link.replace('/view', '/preview'); document.getElementById('readerView').style.display = 'block'; };
             grid.appendChild(d);
         });
-    documentindow.askAI = async () => {
+    });
+}
+
+window.askAI = async () => {
     const q = document.getElementById("aiQ").value; if(!q) return;
     document.getElementById("aiBtn").innerText = "Thinking...";
     const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
