@@ -17,7 +17,6 @@
 
         .container { max-width: 500px; margin: 10px auto; padding: 0 15px; display: none; }
         
-        /* Logout Button Header */
         .logout-chip { background: var(--card); padding: 5px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: 800; color: #dc3545; border: 1px solid rgba(220, 53, 69, 0.2); cursor: pointer; transition: 0.3s; }
         .logout-chip:hover { background: #dc3545; color: white; }
 
@@ -67,14 +66,12 @@
         <div class="search-box">
             <input type="text" id="searchInput" placeholder="Search books..." oninput="filterBooks()" style="margin:0;">
         </div>
-        
         <div class="category-scroll">
             <div class="cat-chip active" onclick="setCategory('ALL', this)">All</div>
             <div class="cat-chip" onclick="setCategory('Notes', this)">Notes</div>
             <div class="cat-chip" onclick="setCategory('Books', this)">Books</div>
             <div class="cat-chip" onclick="setCategory('PYQs', this)">PYQs</div>
         </div>
-
         <div id="adminPanel" style="display:none;" class="book-card">
             <h3>🛠️ Admin Publisher</h3>
             <input type="hidden" id="editId">
@@ -90,9 +87,7 @@
                 <input type="text" id="authID" placeholder="Access (ALL/ID)">
             </div>
             <button class="btn-main" onclick="saveData()">Save Content</button>
-            <button onclick="logoutApp()" style="background:none; border:none; color:red; width:100%; margin-top:10px; cursor:pointer; font-weight:bold;">Switch Account (Logout)</button>
         </div>
-
         <div id="bookGrid"></div>
     </div>
 
@@ -104,11 +99,19 @@
             <div id="aiResponse">Awaiting question...</div>
         </div>
     </div>
+
+    <div id="usersSection" style="display:none;">
+        <div class="book-card">
+            <h3>👥 Registered Users</h3>
+            <div id="userList">Loading...</div>
+        </div>
+    </div>
 </div>
 
 <div class="nav" id="bottomNav" style="display:none;">
     <div class="nav-item active" onclick="tab('lib', this)"><i class="fas fa-book-reader"></i><span>Library</span></div>
     <div class="nav-item" onclick="tab('ai', this)"><i class="fas fa-brain"></i><span>AI Tutor</span></div>
+    <div class="nav-item" id="adminTab" style="display:none;" onclick="tab('users', this)"><i class="fas fa-users-cog"></i><span>Users</span></div>
 </div>
 
 <div id="readerView">
@@ -118,7 +121,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, doc, updateDoc, deleteDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     const cfg = { apiKey: "AIzaSyCrFbBhfWT6WlYAH_ZmopTfzrf47GEQe1k", authDomain: "book-swap-104b7.firebaseapp.com", projectId: "book-swap-104b7", storageBucket: "book-swap-104b7.firebasestorage.app", messagingSenderId: "259299080234", appId: "1:259299080234:web:56a031e02a70d39e37eb53" };
@@ -141,6 +144,8 @@
         el.classList.add('active');
         document.getElementById('libSection').style.display = t === 'lib' ? 'block' : 'none';
         document.getElementById('aiSection').style.display = t === 'ai' ? 'block' : 'none';
+        document.getElementById('usersSection').style.display = t === 'users' ? 'block' : 'none';
+        if(t === 'users') loadUsers();
     };
 
     onAuthStateChanged(auth, u => {
@@ -151,7 +156,14 @@
             document.getElementById('authBtn').style.display = 'none';
             document.getElementById('userInfo').style.display = 'flex';
             document.getElementById('userName').innerText = u.displayName.split(' ')[0];
-            if(u.email === "mihirjaisingh@gmail.com") document.getElementById('adminPanel').style.display = 'block';
+            
+            // ADMIN UI CONTROL
+            if(u.email === "mihirjaisingh@gmail.com") {
+                document.getElementById('adminPanel').style.display = 'block';
+                document.getElementById('adminTab').style.display = 'flex';
+            }
+            
+            saveUser(u);
             loadData();
         } else {
             document.getElementById('loginSection').style.display = 'block';
@@ -159,8 +171,27 @@
             document.getElementById('bottomNav').style.display = 'none';
             document.getElementById('userInfo').style.display = 'none';
             document.getElementById('authBtn').style.display = 'block';
+            document.getElementById('adminTab').style.display = 'none';
         }
     });
+
+    async function saveUser(u) {
+        await setDoc(doc(db, "users", u.uid), { name: u.displayName, email: u.email, lastSeen: serverTimestamp() }, { merge: true });
+    }
+
+    window.loadUsers = () => {
+        const list = document.getElementById('userList');
+        onSnapshot(collection(db, "users"), snap => {
+            list.innerHTML = "";
+            snap.forEach(s => {
+                const ud = s.data();
+                list.innerHTML += `<div style="padding:10px; border-bottom:1px solid rgba(0,0,0,0.05);">
+                    <div style="font-weight:bold;">${ud.name}</div>
+                    <div style="font-size:0.7rem; opacity:0.6;">${ud.email}</div>
+                </div>`;
+            });
+        });
+    };
 
     window.login = () => signInWithPopup(auth, prov);
 
@@ -176,11 +207,9 @@
             authorized: document.getElementById('authID').value || "ALL",
             ts: serverTimestamp()
         };
-        try {
-            if(id) await updateDoc(doc(db, "secure_ebooks", id), data);
-            else await addDoc(collection(db, "secure_ebooks"), data);
-            resetForm(); alert("Success!");
-        } catch(e) { console.error(e); }
+        if(id) await updateDoc(doc(db, "secure_ebooks", id), data);
+        else await addDoc(collection(db, "secure_ebooks"), data);
+        resetForm(); alert("Done!");
     };
 
     window.resetForm = () => {
@@ -243,7 +272,7 @@
         window.scrollTo(0,0);
     };
 
-    window.deleteBook = async (id) => { if(confirm("Delete book?")) await deleteDoc(doc(db, "secure_ebooks", id)); };
+    window.deleteBook = async (id) => { if(confirm("Delete?")) await deleteDoc(doc(db, "secure_ebooks", id)); };
     window.read = (url) => { document.getElementById('frame').src = url.replace('/view', '/preview'); document.getElementById('readerView').style.display = 'block'; };
     window.closeReader = () => { document.getElementById('readerView').style.display = 'none'; document.getElementById('frame').src = ""; };
 
