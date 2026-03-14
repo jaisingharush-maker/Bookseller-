@@ -3,7 +3,7 @@
 <head>  
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Aarav Elite | Pro Suite</title>
+<title>AARAV TECH-HUB</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
@@ -24,130 +24,125 @@
   .loading-dots:after { content: '...'; animation: dots 1.5s infinite;}
   @keyframes dots { 0%, 20% { content: '.'; } 40% { content: '..'; } 60% { content: '...'; } }
   nav { z-index: 1000; box-shadow: 0 -5px 25px rgba(0,0,0,0.05); }
+  
+  /* SECURE PDF STYLES */
+  .pdf-protection { position: absolute; top: 0; right: 0; width: 100%; height: 55px; background: transparent; z-index: 20; }
+  #pdf-frame { width: 100%; height: 100%; border: none; transform-origin: 0 0; }
+  .pdf-ui-hidden { transform: translateY(-100%); transition: 0.3s; }
+  .pdf-header { transition: 0.3s; z-index: 100; }
+
   #security-lock { display:none; position:fixed; inset:0; background:white; z-index:9999; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:30px; }
-  #zoom-container { transition: transform 0.2s ease-out; transform-origin: top left; width: 100%; height: 100%; }
-  .hide-ui { display: none !important; }
 </style>
 </head>
 
-<body>
+<body oncontextmenu="return false;">
 
-<div id="pdf-modal" class="fixed inset-0 bg-black z-[3000] hidden flex flex-col">
-    <div id="pdf-header" class="flex justify-between items-center p-4 text-white bg-black/50">
-        <div class="flex flex-col"><h3 id="modal-title" class="font-bold text-sm truncate pr-4 italic">Viewer</h3><span class="text-[8px] text-white/50 uppercase">Secure Reading</span></div>
-        <div class="flex gap-3">
-            <button onclick="toggleFocus()" class="bg-indigo-600 w-10 h-10 rounded-full flex items-center justify-center"><i class="fas fa-expand"></i></button>
-            <button onclick="closePDF()" class="bg-white/20 w-10 h-10 rounded-full flex items-center justify-center"><i class="fas fa-times"></i></button>
+<div id="pdf-modal" class="fixed inset-0 bg-white z-[5000] hidden flex flex-col">
+    <div id="pdf-nav" class="pdf-header flex justify-between items-center p-4 bg-slate-900 text-white shadow-xl">
+        <div class="flex flex-col">
+            <span class="text-[9px] font-black text-red-400 uppercase">Protected View</span>
+            <h3 id="pdf-title" class="font-bold text-xs truncate w-40">Loading...</h3>
+        </div>
+        <div class="flex items-center gap-4">
+            <span class="text-[8px] bg-white/10 px-2 py-1 rounded">Tap to Fullscreen</span>
+            <button onclick="closePDF()" class="bg-red-500 w-8 h-8 rounded-full flex items-center justify-center text-white"><i class="fas fa-times"></i></button>
         </div>
     </div>
-    <div class="flex-1 relative overflow-auto bg-white" id="pdf-wrapper">
-        <div id="zoom-container">
-            <div class="absolute inset-0 z-10 pointer-events-none"></div> 
-            <iframe id="pdf-frame" class="w-full h-full border-none" src="" allow="autoplay"></iframe>
+    
+    <div class="flex-1 bg-slate-200 relative overflow-hidden" onclick="togglePDFUI()">
+        <div class="pdf-protection"></div>
+        <div id="pdf-loader" class="absolute inset-0 flex items-center justify-center bg-white z-10">
+            <div class="text-center"><i class="fas fa-circle-notch fa-spin text-indigo-600 text-2xl mb-2"></i><p class="text-[9px] font-bold text-slate-400">LOADING SECURE NOTES</p></div>
         </div>
+        <iframe id="pdf-frame" src="" allow="autoplay"></iframe>
     </div>
-    <button id="exit-focus" onclick="toggleFocus()" class="fixed bottom-10 right-10 bg-indigo-600 text-white w-14 h-14 rounded-full shadow-2xl hidden z-[4000] flex items-center justify-center opacity-70"><i class="fas fa-compress text-xl"></i></button>
-    <div id="pdf-controls" class="flex justify-center items-center gap-6 p-4 bg-black/50 border-t border-white/10">
-        <button onclick="changeZoom(-0.2)" class="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center text-white"><i class="fas fa-minus"></i></button>
-        <span id="zoom-val" class="text-white text-xs font-bold w-12 text-center">100%</span>
-        <button onclick="changeZoom(0.2)" class="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center text-white"><i class="fas fa-plus"></i></button>
+</div>
+
+<div id="erp-modal" class="fixed inset-0 bg-white z-[4000] hidden flex flex-col">
+    <div class="flex justify-between items-center p-4 bg-slate-900 text-white">
+        <div class="flex flex-col"><span class="text-[9px] font-black text-indigo-400 uppercase">Secure Dashboard</span><h3 class="font-bold text-sm">ERP System</h3></div>
+        <button onclick="closeERP()" class="bg-white/10 w-10 h-10 rounded-full flex items-center justify-center"><i class="fas fa-times"></i></button>
     </div>
+    <div class="flex-1 bg-slate-100 relative">
+        <div id="erp-loader" class="absolute inset-0 flex items-center justify-center bg-white z-10"><i class="fas fa-spinner fa-spin text-indigo-600 text-2xl"></i></div>
+        <iframe id="erp-frame" class="w-full h-full border-none" src=""></iframe>
+    </div>
+</div>
+
+<div id="security-lock">
+    <div class="w-20 h-20 bg-red-100 text-red-600 rounded-full flex items-center justify-center text-3xl mb-4"><i class="fas fa-mobile-alt"></i></div>
+    <h1 class="text-xl font-bold mb-2">DEVICE LOCKED</h1>
+    <button onclick="logout()" class="bg-slate-900 text-white px-8 py-3 rounded-xl font-bold">Logout</button>
 </div>
 
 <div id="login-screen" class="fixed inset-0 bg-slate-50 z-[2000] flex items-center justify-center p-6">
   <div class="glass w-full max-w-sm text-center space-y-6">
-    <div class="w-20 h-20 bg-indigo-600 rounded-[2.5rem] mx-auto flex items-center justify-center shadow-xl"><i class="fas fa-crown text-white text-3xl"></i></div>
-    <h1 class="text-2xl font-black text-slate-900 italic uppercase">Aarav Elite</h1>
-    <button onclick="login()" class="w-full bg-white border-2 py-4 rounded-2xl font-bold flex items-center justify-center gap-3">
+    <h1 class="text-2xl font-black italic uppercase text-indigo-600">AARAV TECH-HUB </h1>
+    <button onclick="login()" class="w-full bg-white border-2 py-4 rounded-2xl font-bold flex items-center justify-center gap-3 active:scale-95 transition">
       <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="22"> Sign in with Google
     </button>
   </div>
 </div>
 
 <div id="app" class="max-w-md mx-auto space-y-4 hidden">
-  <div class="flex justify-between items-center bg-white p-4 rounded-[2rem] shadow-sm border border-slate-50">
+  <div class="flex justify-between items-center bg-white p-4 rounded-[2rem] shadow-sm">
     <div class="flex items-center gap-3">
-        <div id="user-initial" class="w-10 h-10 bg-indigo-600 rounded-2xl flex items-center justify-center text-white font-bold">A</div>
-        <div class="flex flex-col"><p id="user-display" class="font-bold text-slate-800 text-sm italic">User</p><span id="expiry-tag" class="text-[9px] text-indigo-500 font-bold uppercase">...</span></div>
+        <div id="user-initial" class="w-10 h-10 bg-indigo-600 rounded-2xl flex items-center justify-center text-white font-bold">U</div>
+        <div class="flex flex-col"><p id="user-display" class="font-bold text-sm">User</p><span id="expiry-tag" class="text-[9px] text-indigo-500 font-bold uppercase">...</span></div>
     </div>
-    <button onclick="logout()" class="text-red-500 bg-red-50 p-2 px-4 rounded-xl text-[10px] font-black uppercase">Logout</button>
+    <button onclick="logout()" class="text-red-500 text-[10px] font-bold">LOGOUT</button>
   </div>
 
-  <div id="tab-library" class="tab-content active space-y-4"><div id="bookGrid" class="grid gap-4"></div></div>
+  <div id="tab-library" class="tab-content active"><div id="bookGrid" class="grid gap-4"></div></div>
 
   <div id="tab-ai" class="tab-content space-y-4">
-    <div class="glass space-y-4">
-        <div id="chat-box"><div class="msg bot">Namaste! Main Elite AI Tutor hoon.</div></div>
+    <div class="glass">
+        <div id="chat-box" class="mb-4"><div class="msg bot">Hello! Ask me anything about your notes.</div></div>
         <div class="flex gap-2 bg-slate-50 p-2 rounded-2xl border">
-            <input id="ai-input" class="bg-transparent flex-1 p-2 outline-none text-sm" placeholder="Ask anything...">
-            <button onclick="askAI()" class="bg-indigo-600 text-white w-10 h-10 rounded-xl flex items-center justify-center"><i class="fas fa-paper-plane"></i></button>
+            <input id="ai-input" class="bg-transparent flex-1 p-2 outline-none text-sm" placeholder="Type here...">
+            <button onclick="window.askAI()" class="bg-indigo-600 text-white w-10 h-10 rounded-xl"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
   </div>
 
-  <div id="tab-erp" class="tab-content space-y-4">
-    <div id="erp-locked" class="glass text-center py-12 hidden border-2 border-dashed">
-        <h3 class="text-xl font-bold">🔐 ERP Locked</h3>
-        <p id="erp-price-tag" class="text-indigo-600 font-bold my-2"></p>
-        <button onclick="buyERP()" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold mt-4 shadow-lg uppercase text-[10px]">Unlock Now on WhatsApp</button>
+  <div id="tab-erp" class="tab-content">
+    <div id="erp-locked" class="glass text-center py-12 hidden">
+        <p id="erp-price-tag" class="text-indigo-600 font-black mb-6 text-sm italic">Unlock for ₹0</p>
+        <button onclick="buyERP()" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold text-[10px]">GET ACCESS ON WHATSAPP</button>
     </div>
-    <div id="erp-unlocked" class="glass text-center py-10 hidden"><button onclick="openERP()" class="w-full bg-indigo-600 text-white py-5 rounded-2xl font-black shadow-lg">LAUNCH ERP</button></div>
+    <div id="erp-unlocked" class="glass text-center py-10 hidden"><button onclick="openERP()" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold shadow-lg">LAUNCH ERP PANEL</button></div>
   </div>
 
   <div id="tab-admin" class="tab-content space-y-4">
-    <div class="flex justify-center gap-2 bg-white p-2 rounded-2xl shadow-sm sticky top-0 z-50">
+    <div class="flex justify-center gap-2 bg-white p-2 rounded-2xl shadow-sm">
         <div onclick="showAdminSection('publisher')" id="sub-btn-publisher" class="admin-sub-tab active">PUBLISHER</div>
         <div onclick="showAdminSection('manage')" id="sub-btn-manage" class="admin-sub-tab">MANAGE</div>
         <div onclick="showAdminSection('users')" id="sub-btn-users" class="admin-sub-tab">USERS</div>
     </div>
-
-    <div id="sec-publisher" class="admin-section space-y-6">
-        <div class="glass space-y-4">
-            <input id="edit-id" type="hidden">
-            <input id="book-title" class="publisher-input" placeholder="Title">
-            <textarea id="book-desc" class="publisher-input h-24" placeholder="Desc"></textarea>
-            <input id="book-link" class="publisher-input" placeholder="Drive Link">
-            <div class="grid grid-cols-2 gap-3"><input id="book-price" class="publisher-input" placeholder="Price"><input id="book-wa" class="publisher-input" placeholder="WA Number"><input id="book-cat" class="publisher-input" placeholder="Category"><input id="book-access" class="publisher-input" placeholder="Access Emails"></div>
-            <button onclick="saveBook()" id="saveBtn" class="save-btn">Save Content</button>
+    <div id="sec-publisher" class="admin-section space-y-4">
+        <div class="glass space-y-3">
+            <input id="edit-id" type="hidden"><input id="book-title" class="publisher-input" placeholder="Note Title">
+            <input id="book-link" class="publisher-input" placeholder="Google Drive Link">
+            <div class="grid grid-cols-2 gap-2"><input id="book-price" class="publisher-input" placeholder="Price"><input id="book-wa" class="publisher-input" placeholder="WA"><input id="book-cat" class="publisher-input" placeholder="Cat"><input id="book-access" class="publisher-input" placeholder="Emails"></div>
+            <button onclick="saveBook()" id="saveBtn" class="save-btn">Save Note</button>
         </div>
-        <div class="glass p-6 border-l-4 border-indigo-500 mb-20">
-            <input id="admin-erp-link" class="publisher-input mb-2" placeholder="ERP Link">
-            <div class="grid grid-cols-2 gap-2 mb-4"><input id="admin-wa-global" class="publisher-input" placeholder="Admin WA"><input id="admin-erp-price" class="publisher-input" placeholder="Price"></div>
-            <button onclick="saveSettings()" class="w-full bg-slate-900 text-white py-4 rounded-xl font-black text-xs">UPDATE SETTINGS</button>
-        </div>
+        <div class="glass p-4"><input id="admin-erp-link" class="publisher-input mb-2" placeholder="ERP Link"><input id="admin-erp-price" class="publisher-input mb-2" placeholder="ERP Price"><button onclick="saveSettings()" class="w-full bg-indigo-600 text-white py-3 rounded-xl text-xs font-bold">Update Global Settings</button></div>
     </div>
-
-    <div id="sec-users" class="admin-section hidden space-y-4 pb-40">
-        <div class="glass p-4 space-y-3">
-            <div class="relative">
-                <i class="fas fa-search absolute left-4 top-4 text-slate-400"></i>
-                <input type="text" id="userSearch" oninput="filterUsers()" class="publisher-input pl-11" placeholder="Search by name or email...">
-            </div>
-            <div class="flex justify-between items-center px-2">
-                <span id="user-count" class="text-[10px] font-black text-slate-400 uppercase">0 Users</span>
-                <div class="flex items-center gap-2">
-                    <input type="checkbox" id="activeOnly" onchange="filterUsers()">
-                    <label class="text-[10px] font-bold text-green-600">ONLY ACTIVE</label>
-                </div>
-            </div>
-        </div>
-        <div id="adminUserList" class="space-y-3"></div>
-    </div>
-
     <div id="sec-manage" class="admin-section hidden pb-40"><div id="manageGrid" class="space-y-3"></div></div>
+    <div id="sec-users" class="admin-section hidden pb-40"><div class="glass mb-4"><input type="text" id="userSearch" oninput="window.filterUsers()" class="publisher-input" placeholder="Search users..."></div><div id="adminUserList" class="space-y-3"></div></div>
   </div>
 
-  <nav class="fixed bottom-0 left-0 right-0 bg-white/95 border-t flex justify-around p-3 pb-8">
-    <button onclick="switchTab('library')" id="btn-library" class="nav-btn flex flex-col items-center gap-1 text-[10px] text-slate-400 nav-active"><i class="fas fa-book-open text-xl"></i><span>LIB</span></button>
-    <button onclick="switchTab('ai')" id="btn-ai" class="nav-btn flex flex-col items-center gap-1 text-[10px] text-slate-400"><i class="fas fa-brain text-xl"></i><span>AI</span></button>
-    <button onclick="switchTab('erp')" id="btn-erp" class="nav-btn flex flex-col items-center gap-1 text-[10px] text-slate-400"><i class="fas fa-wallet text-xl"></i><span>ERP</span></button>
-    <button onclick="switchTab('admin')" id="btn-admin" class="nav-btn flex flex-col items-center gap-1 text-[10px] text-slate-400 hidden"><i class="fas fa-user-shield text-xl"></i><span>ADM</span></button>
+  <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around p-3 pb-8">
+    <button onclick="switchTab('library')" id="btn-library" class="nav-btn text-[10px] nav-active"><i class="fas fa-book text-xl"></i><br>LIB</button>
+    <button onclick="switchTab('ai')" id="btn-ai" class="nav-btn text-[10px]"><i class="fas fa-brain text-xl"></i><br>AI</button>
+    <button onclick="switchTab('erp')" id="btn-erp" class="nav-btn text-[10px]"><i class="fas fa-wallet text-xl"></i><br>ERP</button>
+    <button onclick="switchTab('admin')" id="btn-admin" class="nav-btn text-[10px] hidden"><i class="fas fa-user-shield text-xl"></i><br>ADM</button>
   </nav>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, onSnapshot, doc, getDoc, setDoc, updateDoc, deleteDoc, Timestamp, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, onSnapshot, doc, getDoc, setDoc, updateDoc, deleteDoc, Timestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const fbCfg = { apiKey: "AIzaSyCrFbBhfWT6WlYAH_ZmopTfzrf47GEQe1k", authDomain: "book-swap-104b7.firebaseapp.com", projectId: "book-swap-104b7" };
@@ -159,210 +154,166 @@ const prov = new GoogleAuthProvider();
 const adminEmail = "mihirjaisingh@gmail.com";
 const GROQ_KEY = "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";
 let appSettings = {};
-let currentUserData = {};
 let allUsers = [];
-let currentZoom = 1;
-let isFocusMode = false;
 
-const getFingerprint = () => navigator.userAgent + (navigator.hardwareConcurrency || "8") + screen.width;
+const getFingerprint = () => btoa(navigator.userAgent + screen.width);
 
 onAuthStateChanged(auth, async user => {
     if (user) {
-        currentUserData = { uid: user.uid, name: user.displayName, email: user.email };
         const uRef = doc(db, "users", user.uid);
         const uSnap = await getDoc(uRef);
-        const deviceID = getFingerprint();
-
+        const did = getFingerprint();
         if (uSnap.exists()) {
-            const data = uSnap.data();
-            if (!data.deviceID) await updateDoc(uRef, { deviceID: deviceID });
+            if (uSnap.data().deviceID && uSnap.data().deviceID !== did && user.email !== adminEmail) {
+                document.getElementById("security-lock").style.display = "flex"; return;
+            }
+            if (!uSnap.data().deviceID) await updateDoc(uRef, { deviceID: did });
         } else {
-            await setDoc(uRef, { name: user.displayName, email: user.email, deviceID: deviceID, aiCount: 0, lastLogin: Timestamp.now() });
+            await setDoc(uRef, { name: user.displayName, email: user.email, deviceID: did });
         }
-
         document.getElementById("login-screen").classList.add("hidden");
         document.getElementById("app").classList.remove("hidden");
-        document.getElementById("user-display").textContent = user.displayName;
-        document.getElementById("user-initial").textContent = user.displayName[0];
+        document.getElementById("user-display").innerText = user.displayName;
         if(user.email === adminEmail) { document.getElementById("btn-admin").classList.remove("hidden"); loadAdminData(); }
         loadSettings(); checkERPStatus(user.uid); loadBooks(user.email);
     }
 });
 
-// UPGRADED ADMIN DATA LOAD
-function loadAdminData() {
-    onSnapshot(collection(db, "users"), snap => {
-        allUsers = [];
-        snap.forEach(doc => allUsers.push({id: doc.id, ...doc.data()}));
-        renderUserList(allUsers);
+// PDF UI CONTROLS
+window.togglePDFUI = () => {
+    document.getElementById('pdf-nav').classList.toggle('pdf-ui-hidden');
+};
+
+window.openPDF = (link, title) => {
+    let secureLink = link.replace('/view', '/preview').replace('?usp=sharing', '');
+    document.getElementById('pdf-title').innerText = title;
+    document.getElementById('pdf-loader').style.display = 'flex';
+    document.getElementById('pdf-frame').src = secureLink;
+    document.getElementById('pdf-modal').classList.remove('hidden');
+};
+
+window.closePDF = () => {
+    document.getElementById('pdf-frame').src = "";
+    document.getElementById('pdf-modal').classList.add('hidden');
+    document.getElementById('pdf-nav').classList.remove('pdf-ui-hidden');
+};
+
+document.getElementById('pdf-frame').onload = () => { 
+    document.getElementById('pdf-loader').style.display = 'none'; 
+};
+
+// AI ENGINE
+window.askAI = async () => {
+    const input = document.getElementById('ai-input');
+    const box = document.getElementById('chat-box');
+    if(!input.value.trim()) return;
+    box.innerHTML += `<div class="msg user">${input.value}</div>`;
+    const tid = "ai-"+Date.now();
+    box.innerHTML += `<div id="${tid}" class="msg bot loading-dots">Thinking</div>`;
+    try {
+        const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+            method: "POST", headers: { "Authorization": `Bearer ${GROQ_KEY}`, "Content-Type": "application/json" },
+            body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: [{ role: "user", content: input.value }] })
+        });
+        const d = await res.json();
+        document.getElementById(tid).classList.remove('loading-dots');
+        document.getElementById(tid).innerText = d.choices[0].message.content;
+    } catch (e) { document.getElementById(tid).innerText = "Limit reached."; }
+    input.value = ""; box.scrollTop = box.scrollHeight;
+};
+
+// ERP & SETTINGS
+window.openERP = () => {
+    document.getElementById('erp-loader').style.display = 'flex';
+    document.getElementById('erp-frame').src = appSettings.erpLink;
+    document.getElementById('erp-modal').classList.remove('hidden');
+};
+window.closeERP = () => { document.getElementById('erp-frame').src = ""; document.getElementById('erp-modal').classList.add('hidden'); };
+document.getElementById('erp-frame').onload = () => { document.getElementById('erp-loader').style.display = 'none'; };
+
+async function loadSettings() {
+    const s = await getDoc(doc(db, "settings", "app"));
+    if(s.exists()) { 
+        appSettings = s.data(); 
+        document.getElementById('admin-erp-link').value = s.data().erpLink || "";
+        document.getElementById('admin-erp-price').value = s.data().erpPrice || "";
+    }
+}
+
+window.saveSettings = async () => { 
+    await setDoc(doc(db, "settings", "app"), { erpLink: document.getElementById('admin-erp-link').value, erpPrice: document.getElementById('admin-erp-price').value }, { merge: true }); 
+    alert("Updated!"); loadSettings();
+};
+
+// DATA RENDERING
+function loadBooks(email) {
+    onSnapshot(collection(db, "secure_ebooks"), snap => {
+        const g = document.getElementById("bookGrid"); g.innerHTML = "";
+        snap.forEach(d => {
+            const b = d.data(); const ok = b.access === 'ALL' || (b.access && b.access.includes(email));
+            g.innerHTML += `<div class="glass"><div class="flex justify-between mb-2"><span class="text-[9px] font-bold text-indigo-500 bg-indigo-50 px-2 py-1 rounded">${b.cat}</span><span class="text-xs font-bold">₹${b.price}</span></div><h3 class="font-bold text-sm mb-4">${b.title}</h3><button onclick="${ok ? `window.openPDF('${b.link}', '${b.title}')` : `window.open('https://wa.me/${b.wa}')`}" class="w-full ${ok?'bg-indigo-600':'bg-slate-900'} text-white py-2.5 rounded-xl text-[10px] font-bold">${ok?'READ NOW':'BUY NOW'}</button></div>`;
+        });
     });
+}
+
+async function checkERPStatus(uid) {
+    onSnapshot(doc(db, "users", uid), async snap => {
+        const setSnap = await getDoc(doc(db, "settings", "app"));
+        if(snap.exists() && setSnap.exists()){
+            const u = snap.data(); const s = setSnap.data();
+            const active = u.erpExpiry && u.erpExpiry.toDate() > new Date();
+            document.getElementById("erp-unlocked").classList.toggle("hidden", !active);
+            document.getElementById("erp-locked").classList.toggle("hidden", active);
+            if(!active) document.getElementById("erp-price-tag").innerText = `Pay ₹${s.erpPrice || '0'} for 28 Days`;
+            document.getElementById("expiry-tag").innerText = u.erpExpiry ? "Exp: " + u.erpExpiry.toDate().toLocaleDateString() : "No Access";
+        }
+    });
+}
+
+// ADMIN CORE
+function loadAdminData() {
+    onSnapshot(collection(db, "users"), snap => { allUsers = []; snap.forEach(d => allUsers.push({id: d.id, ...d.data()})); renderUserList(allUsers); });
     onSnapshot(collection(db, "secure_ebooks"), snap => {
         const grid = document.getElementById("manageGrid"); grid.innerHTML = "";
         snap.forEach(d => {
             const b = d.data();
-            grid.innerHTML += `<div class="glass p-4 flex justify-between items-center"><div class="text-xs"><b>${b.title}</b></div><div class="flex gap-2"><button onclick="editBook('${d.id}')" class="text-blue-600 font-bold text-[10px]">EDIT</button><button onclick="deleteBook('${d.id}')" class="text-red-600 font-bold text-[10px]">DEL</button></div></div>`;
+            grid.innerHTML += `<div class="glass p-4 flex justify-between items-center"><b class="text-xs">${b.title}</b><div class="flex gap-2"><button onclick="editBook('${d.id}')" class="text-blue-600 font-bold text-[10px]">EDIT</button><button onclick="deleteBook('${d.id}')" class="text-red-600 font-bold text-[10px]">DEL</button></div></div>`;
         });
     });
 }
 
-// USER LIST RENDERING WITH SEARCH & ACCESS STATUS
-window.renderUserList = (users) => {
-    const list = document.getElementById("adminUserList");
-    const countTag = document.getElementById("user-count");
-    list.innerHTML = "";
-    countTag.innerText = `${users.length} Users`;
-
+function renderUserList(users) {
+    const list = document.getElementById("adminUserList"); list.innerHTML = "";
     users.forEach(u => {
-        const hasAccess = u.erpExpiry && u.erpExpiry.toDate() > new Date();
-        const expiryStr = u.erpExpiry ? u.erpExpiry.toDate().toLocaleDateString('en-GB') : "No Access";
-        
-        list.innerHTML += `
-            <div class="glass p-5 transition-all">
-                <div class="flex justify-between items-start">
-                    <div class="flex-1">
-                        <div class="flex items-center gap-2 mb-1">
-                            <span class="font-black text-slate-800 text-sm italic uppercase">${u.name}</span>
-                            <span class="px-2 py-0.5 rounded-full text-[8px] font-black uppercase ${hasAccess ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}">
-                                ${hasAccess ? 'Active' : 'Expired'}
-                            </span>
-                        </div>
-                        <p class="text-[10px] text-slate-400 font-medium">${u.email}</p>
-                    </div>
-                    <div class="text-right">
-                        <span class="text-[9px] font-black text-indigo-600 bg-indigo-50 px-2 py-1 rounded-lg">AI: ${u.aiCount || 0}</span>
-                    </div>
-                </div>
-                
-                <div class="mt-4 flex items-center justify-between border-t pt-3 border-slate-50">
-                    <div class="flex flex-col">
-                        <span class="text-[8px] text-slate-400 font-bold uppercase">ERP Expiry</span>
-                        <span class="text-[10px] font-black ${hasAccess ? 'text-green-600' : 'text-red-500'}">${expiryStr}</span>
-                    </div>
-                    <div class="flex gap-2">
-                        <button onclick="grantAccess('${u.id}')" class="bg-indigo-600 text-white text-[9px] px-4 py-2 rounded-xl font-black">GRANT</button>
-                        <button onclick="resetDevice('${u.id}')" class="bg-slate-900 text-white text-[9px] px-3 py-2 rounded-xl font-black"><i class="fas fa-mobile-alt"></i></button>
-                    </div>
-                </div>
-            </div>
-        `;
+        const active = u.erpExpiry && u.erpExpiry.toDate() > new Date();
+        list.innerHTML += `<div class="glass p-4 mb-2 border-l-4 ${active?'border-green-500':'border-red-500'}"><div class="flex justify-between items-center"><div><b class="text-xs uppercase">${u.name}</b><br><small class="text-slate-400 italic">${u.email}</small><br><span class="text-[8px] font-bold text-indigo-600 uppercase">EXP: ${u.erpExpiry ? u.erpExpiry.toDate().toLocaleDateString() : 'N/A'}</span></div><div class="flex flex-col gap-1"><button onclick="grantAccess('${u.id}')" class="bg-indigo-600 text-white px-3 py-1 rounded text-[8px] font-bold">GRANT</button><button onclick="resetDevice('${u.id}')" class="bg-slate-900 text-white px-3 py-1 rounded text-[8px] font-bold">RESET</button></div></div></div>`;
     });
-};
-
-// LIVE FILTER FUNCTION
-window.filterUsers = () => {
-    const search = document.getElementById("userSearch").value.toLowerCase();
-    const activeOnly = document.getElementById("activeOnly").checked;
-    
-    const filtered = allUsers.filter(u => {
-        const matchesSearch = u.name.toLowerCase().includes(search) || u.email.toLowerCase().includes(search);
-        const hasAccess = u.erpExpiry && u.erpExpiry.toDate() > new Date();
-        
-        if (activeOnly) return matchesSearch && hasAccess;
-        return matchesSearch;
-    });
-    renderUserList(filtered);
-};
-
-// ... ALL OTHER OLD FEATURES (PDF, AI, ERP, LOGIN) ...
-window.openPDF = (link, title) => {
-    let secureLink = link.includes('view') ? link.replace(/\/view.*$/, '/preview') : link;
-    document.getElementById('modal-title').innerText = title;
-    document.getElementById('pdf-frame').src = secureLink;
-    document.getElementById('pdf-modal').classList.remove('hidden');
-    resetZoom();
-};
-
-window.toggleFocus = () => {
-    isFocusMode = !isFocusMode;
-    document.getElementById('pdf-header').classList.toggle('hide-ui', isFocusMode);
-    document.getElementById('pdf-controls').classList.toggle('hide-ui', isFocusMode);
-    document.getElementById('exit-focus').classList.toggle('hidden', !isFocusMode);
-};
-
-window.changeZoom = (val) => {
-    currentZoom = Math.min(Math.max(currentZoom + val, 0.6), 3);
-    const container = document.getElementById('zoom-container');
-    container.style.transform = `scale(${currentZoom})`;
-    container.style.width = (100 / currentZoom) + "%";
-    container.style.height = (100 / currentZoom) + "%";
-    document.getElementById('zoom-val').innerText = Math.round(currentZoom * 100) + "%";
-};
-
-window.resetZoom = () => { currentZoom = 1; document.getElementById('zoom-container').style.transform = `scale(1)`; document.getElementById('zoom-val').innerText = "100%"; };
-window.closePDF = () => { document.getElementById('pdf-frame').src = ""; document.getElementById('pdf-modal').classList.add('hidden'); };
-
-window.askAI = async () => {
-    const input = document.getElementById('ai-input');
-    const text = input.value.trim();
-    if(!text) return;
-    const box = document.getElementById('chat-box');
-    box.innerHTML += `<div class="msg user">${text}</div>`;
-    input.value = "";
-    const tid = "t-" + Date.now();
-    box.innerHTML += `<div id="${tid}" class="msg bot loading-dots">Thinking...</div>`;
-    try {
-        const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-            method: "POST",
-            headers: { "Authorization": `Bearer ${GROQ_KEY}`, "Content-Type": "application/json" },
-            body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: [{ role: "user", content: text }] })
-        });
-        const data = await res.json();
-        document.getElementById(tid).remove();
-        box.innerHTML += `<div class="msg bot">${data.choices[0].message.content}</div>`;
-        await updateDoc(doc(db, "users", currentUserData.uid), { aiCount: increment(1) });
-    } catch (e) { document.getElementById(tid).innerText = "Limit Reached."; }
-    box.scrollTop = box.scrollHeight;
-};
+}
 
 window.saveBook = async () => {
     const id = document.getElementById('edit-id').value || Date.now().toString();
     await setDoc(doc(db, "secure_ebooks", id), { title: document.getElementById('book-title').value, link: document.getElementById('book-link').value, price: document.getElementById('book-price').value, wa: document.getElementById('book-wa').value, cat: document.getElementById('book-cat').value, access: document.getElementById('book-access').value }, { merge: true });
-    alert("Saved!");
-    document.getElementById('edit-id').value = "";
+    alert("Saved!"); document.getElementById('edit-id').value = "";
 };
 
 window.editBook = async (id) => {
     const b = (await getDoc(doc(db, "secure_ebooks", id))).data();
-    document.getElementById('edit-id').value = id;
-    document.getElementById('book-title').value = b.title;
-    document.getElementById('book-link').value = b.link;
-    document.getElementById('book-price').value = b.price;
-    document.getElementById('book-wa').value = b.wa;
-    document.getElementById('book-cat').value = b.cat;
-    document.getElementById('book-access').value = b.access;
-    showAdminSection('publisher');
+    document.getElementById('edit-id').value = id; document.getElementById('book-title').value = b.title; document.getElementById('book-link').value = b.link;
+    document.getElementById('book-price').value = b.price; document.getElementById('book-wa').value = b.wa; document.getElementById('book-cat').value = b.cat;
+    document.getElementById('book-access').value = b.access; showAdminSection('publisher');
 };
 
-window.grantAccess = async (uid) => { const exp = new Date(); exp.setDate(exp.getDate() + 28); await updateDoc(doc(db, "users", uid), { erpExpiry: Timestamp.fromDate(exp) }); alert("Access Granted!"); };
-window.resetDevice = async (uid) => { await updateDoc(doc(db, "users", uid), { deviceID: null }); alert("Device Reset!"); };
-window.saveSettings = async () => { await setDoc(doc(db, "settings", "app"), { erpLink: document.getElementById('admin-erp-link').value, wa: document.getElementById('admin-wa-global').value, erpPrice: document.getElementById('admin-erp-price').value }, { merge: true }); alert("Updated!"); };
-async function loadSettings() { const s = await getDoc(doc(db, "settings", "app")); if(s.exists()) appSettings = s.data(); }
-function loadBooks(email) {
-    onSnapshot(collection(db, "secure_ebooks"), snap => {
-        const grid = document.getElementById("bookGrid"); grid.innerHTML = "";
-        snap.forEach(d => {
-            const b = d.data();
-            const allowed = (b.access === 'ALL' || (b.access && b.access.split(',').map(e => e.trim()).includes(email)));
-            grid.innerHTML += `<div class="glass"><div class="flex justify-between items-start"><span class="text-[9px] bg-indigo-50 text-indigo-500 px-2 py-1 rounded-lg font-bold">${b.cat}</span><span class="text-[10px] font-black text-slate-400 italic">₹${b.price || '0'}</span></div><h3 class="font-bold text-slate-800 mt-2">${b.title}</h3><div class="flex gap-2 mt-4">${allowed ? `<button onclick="openPDF('${b.link}', '${b.title}')" class="flex-1 bg-indigo-600 text-white py-2 rounded-xl text-xs italic">READ NOW</button>` : `<button onclick="window.open('https://wa.me/${b.wa}')" class="flex-1 bg-slate-900 text-white py-2 rounded-xl text-xs">BUY NOW</button>`}</div></div>`;
-        });
-    });
-}
-async function checkERPStatus(uid) {
-    const snap = await getDoc(doc(db, "users", uid));
-    if(snap.exists()){
-        const u = snap.data();
-        const active = u.erpExpiry && u.erpExpiry.toDate() > new Date();
-        document.getElementById(active ? "erp-unlocked" : "erp-locked").classList.remove("hidden");
-        document.getElementById(active ? "erp-locked" : "erp-unlocked").classList.add("hidden");
-        document.getElementById("expiry-tag").innerText = u.erpExpiry ? "Exp: " + u.erpExpiry.toDate().toLocaleDateString() : "No Access";
-    }
-}
+window.deleteBook = async (id) => { if(confirm("Delete?")) await deleteDoc(doc(db, "secure_ebooks", id)); };
+window.grantAccess = async (id) => { const exp = new Date(); exp.setDate(exp.getDate() + 28); await updateDoc(doc(db, "users", id), { erpExpiry: Timestamp.fromDate(exp) }); };
+window.resetDevice = async (id) => { await updateDoc(doc(db, "users", id), { deviceID: null }); alert("Reset Success!"); };
+window.filterUsers = () => { const s = document.getElementById("userSearch").value.toLowerCase(); renderUserList(allUsers.filter(u => u.name.toLowerCase().includes(s) || u.email.toLowerCase().includes(s))); };
+
+// TABBING
 window.login = () => signInWithPopup(auth, prov);
 window.logout = () => signOut(auth).then(() => location.reload());
-window.switchTab = (t) => { document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active')); document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('nav-active')); document.getElementById('tab-'+t).classList.add('active'); document.getElementById('btn-'+t).classList.add('nav-active'); };
-window.showAdminSection = (sec) => { document.querySelectorAll('.admin-section').forEach(el => el.classList.add('hidden')); document.querySelectorAll('.admin-sub-tab').forEach(el => el.classList.remove('active')); document.getElementById('sec-' + sec).classList.remove('hidden'); document.getElementById('sub-btn-' + sec).classList.add('active'); };
-window.buyERP = () => { window.open(`https://wa.me/${appSettings.wa || '917301053046'}`, '_blank'); };
-window.openERP = () => window.open(appSettings.erpLink, '_blank');
+window.switchTab = (t) => { document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active')); document.getElementById('tab-'+t).classList.add('active'); document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('nav-active')); document.getElementById('btn-'+t).classList.add('nav-active'); };
+window.showAdminSection = (s) => { document.querySelectorAll('.admin-section').forEach(el => el.classList.add('hidden')); document.getElementById('sec-'+s).classList.remove('hidden'); document.querySelectorAll('.admin-sub-tab').forEach(el => el.classList.remove('active')); document.getElementById('sub-btn-'+s).classList.add('active'); };
+window.buyERP = () => window.open(`https://wa.me/919229809156`, '_blank');
 </script>
 </body>
 </html>
