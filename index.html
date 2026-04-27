@@ -160,32 +160,62 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getFirestore, collection, onSnapshot, doc, getDoc, setDoc, updateDoc, deleteDoc, Timestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-const fbCfg = { apiKey: "AIzaSyCrFbBhfWT6WlYAH_ZmopTfzrf47GEQe1k", authDomain: "book-swap-104b7.firebaseapp.com", projectId: "book-swap-104b7" };
-const fbApp = initializeApp(fbCfg); const db = getFirestore(fbApp); const auth = getAuth(fbApp); const prov = new GoogleAuthProvider();
-const adminEmail = "mihirjaisingh@gmail.com"; const GROQ_KEY = "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";
-let appSettings = {}; let allUsers = [];
+// --- Configuration & Constants ---
+const fbCfg = { 
+    apiKey: "AIzaSyCrFbBhfWT6WlYAH_ZmopTfzrf47GEQe1k", 
+    authDomain: "book-swap-104b7.firebaseapp.com", 
+    projectId: "book-swap-104b7" 
+};
+const fbApp = initializeApp(fbCfg); 
+const db = getFirestore(fbApp); 
+const auth = getAuth(fbApp); 
+const prov = new GoogleAuthProvider();
+const adminEmail = "mihirjaisingh@gmail.com"; 
+const GROQ_KEY = "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";
+
+let appSettings = {}; 
+let allUsers = [];
+
+// --- Helper Functions ---
+const notifyAdmin = async (userEmail) => {
+    const botToken = "8625446719:AAG74QKRll8JkoJ9rHb5k8NCOFng0iLbmAc"; 
+    const chatId = "5923813487";     
+    const now = new Date();
+    const dateTime = now.toLocaleString('en-IN');
+    const message = `🚀 *New Login Alert*\n\n📧 User: ${userEmail}\n📅 Time: ${dateTime}\n📱 Status: Device Verified`;
+
+    try {
+        await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: chatId, text: message, parse_mode: 'Markdown' })
+        });
+    } catch (e) { console.error("Notification failed", e); }
+};
 
 const getDeviceToken = () => {
-    // Pehle check karo ki kya browser mein ID pehle se hai
     let deviceId = localStorage.getItem('aarav_pro_device_id');
-    
     if (!deviceId) {
-        // Agar nahi hai, to ek unique ID banao (Random string + Timestamp)
         deviceId = Math.random().toString(36).substring(2) + Date.now().toString(36);
-        // Ise browser mein hamesha ke liye save kar do
         localStorage.setItem('aarav_pro_device_id', deviceId);
     }
     return deviceId;
 };
 
+const formatFullDate = (date) => {
+    if(!date) return "N/A";
+    return date.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'}) + " at " + date.toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit', hour12:true});
+};
+
+// --- Authentication Logic ---
 onAuthStateChanged(auth, async user => {
     if (user) {
         const token = getDeviceToken();
         const uRef = doc(db, "users", user.uid);
         const uSnap = await getDoc(uRef);
-
+        
         if (!uSnap.exists()) {
-            // Naya user hai to current device ko lock kar do
+            // Naya User: Pehli baar login par message bhejo
             await setDoc(uRef, { 
                 name: user.displayName, 
                 email: user.email, 
@@ -193,32 +223,33 @@ onAuthStateChanged(auth, async user => {
                 createdAt: Timestamp.now(), 
                 deviceID: token 
             });
+            notifyAdmin(user.email, "New User Registered"); 
         } else {
             const userData = uSnap.data();
             
-            // 1. Check karo agar email admin ki hai to bypass kar do
-            if (user.email === adminEmail) {
-                // Admin ko access do
-            } 
-            // 2. Agar device ID match nahi karti, to lock screen dikhao
-            else if (userData.deviceID && userData.deviceID !== token) {
+            // Device Check Logic
+            if (user.email !== adminEmail && userData.deviceID && userData.deviceID !== token) {
                 document.getElementById("lock-screen").style.display = "flex";
                 document.getElementById("login-screen").style.display = "none";
                 document.getElementById("app").style.display = "none";
-                return; // Code ko yahin rok do
+                return; 
             } 
-            // 3. Agar pehle se ID nahi hai (purana user), to ab lock kar do
-            else if (!userData.deviceID) {
+            
+            // 🔥 MAIN FIX: Sirf tab message bhejo jab deviceID update ho (yani naya device login ho)
+            else if (!userData.deviceID || userData.deviceID !== token) {
                 await updateDoc(uRef, { deviceID: token });
+                notifyAdmin(user.email, "New Device Login Detected"); 
             }
+            
+            // Agar sab kuch match kar raha hai (purana device hai), toh notification mat bhejo
         }
-        
-        // Agar sab theek hai, tabhi app dikhao
+
+        // App UI updates
         document.getElementById("login-screen").style.display = "none";
         document.getElementById("lock-screen").style.display = "none";
         document.getElementById("app").style.display = "block";
         document.getElementById("user-display").innerText = user.displayName;
-        
+
         if(user.email === adminEmail) { 
             document.getElementById("btn-admin").classList.remove("hidden"); 
             loadAdminData(); 
@@ -233,25 +264,20 @@ onAuthStateChanged(auth, async user => {
     }
 });
 
-
-const formatFullDate = (date) => {
-    if(!date) return "N/A";
-    return date.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'}) + " at " + date.toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit', hour12:true});
-};
-
+// --- App Functions ---
 window.openPDF = (l, t) => { 
     document.getElementById("pdf-title").innerText = t; 
     const secureUrl = l.replace('/view','/preview') + (l.includes('?') ? '&' : '?') + "rm=minimal";
-    document.getElementById("pdf-frame").src = secureUrl; document.getElementById("pdf-modal").style.display = "flex"; 
+    document.getElementById("pdf-frame").src = secureUrl; 
+    document.getElementById("pdf-modal").style.display = "flex"; 
 };
 window.closePDF = () => { document.getElementById("pdf-frame").src = ""; document.getElementById("pdf-modal").style.display = "none"; };
 window.openERP = () => { if(appSettings.erpLink) { document.getElementById("erp-frame").src = appSettings.erpLink; document.getElementById("erp-modal").style.display = "flex"; } };
 window.closeERP = () => { document.getElementById("erp-frame").src = ""; document.getElementById("erp-modal").style.display = "none"; };
 window.openTutorial = () => { if(appSettings.tutorialLink) window.open(appSettings.tutorialLink, '_blank'); };
 
-// WHATSAPP REDIRECT FIXED
 window.buyPlan = (pName, price) => {
-    const waNumber = "919229809156."; // Bhai yahan apna permanent WhatsApp number daal dena
+    const waNumber = "919229809156"; 
     const msg = `Hello Admin, I want to purchase ${pName} Plan for ₹${price}. My Email: ${auth.currentUser.email}`;
     window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`, '_blank');
 };
@@ -393,5 +419,6 @@ window.logout = () => signOut(auth);
 window.switchTab = (t) => { document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active')); document.getElementById('tab-'+t).classList.add('active'); document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active')); document.getElementById('btn-'+t).classList.add('nav-active'); };
 window.showAdminSection = (s) => { document.querySelectorAll('.admin-section').forEach(sec => sec.classList.add('hidden')); document.getElementById('sec-'+s).classList.remove('hidden'); document.querySelectorAll('.admin-sub-tab').forEach(t => t.classList.remove('active')); document.getElementById('sub-btn-'+s).classList.add('active'); };
 </script>
+
 </body>
 </html>
