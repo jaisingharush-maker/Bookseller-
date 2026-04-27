@@ -315,4 +315,83 @@ window.filterUsers = () => {
 window.grant = async (uid, p) => {
     const name = appSettings[`p${p}n`] || `Plan ${p}`;
     const days = parseInt(appSettings[`p${p}d`]) || 30;
-    const ex
+    const exp = new Date(); exp.setDate(exp.getDate() + days);
+    await updateDoc(doc(db, "users", uid), { erpExpiry: Timestamp.fromDate(exp), planStartDate: Timestamp.now(), activePlan: name });
+    alert(name + " activated!");
+};
+
+window.saveBook = async () => {
+    const id = document.getElementById('edit-id').value || Date.now().toString();
+    await setDoc(doc(db, "secure_ebooks", id), { title: document.getElementById('book-title').value, link: document.getElementById('book-link').value, price: document.getElementById('book-price').value, wa: document.getElementById('book-wa').value, access: document.getElementById('book-access').value });
+    alert("Book Published!"); document.getElementById('edit-id').value = "";
+};
+
+window.saveSettings = async () => {
+    await setDoc(doc(db, "settings", "app"), { 
+        erpLink: document.getElementById("admin-erp-link").value, tutorialLink: document.getElementById("admin-video-link").value,
+        p1n: document.getElementById('p1n').value, p1d: document.getElementById('p1d').value, p1p: document.getElementById('p1p').value,
+        p2n: document.getElementById('p2n').value, p2d: document.getElementById('p2d').value, p2p: document.getElementById('p2p').value,
+        p3n: document.getElementById('p3n').value, p3d: document.getElementById('p3d').value, p3p: document.getElementById('p3p').value,
+        p4n: document.getElementById('p4n').value, p4d: document.getElementById('p4d').value, p4p: document.getElementById('p4p').value
+    }, {merge:true}); alert("Settings Updated!");
+};
+
+async function loadSettings() {
+    const s = await getDoc(doc(db, "settings", "app"));
+    if(s.exists()) { 
+        appSettings = s.data(); 
+        document.getElementById("admin-erp-link").value = appSettings.erpLink || "";
+        document.getElementById("admin-video-link").value = appSettings.tutorialLink || "";
+        document.getElementById("tutorial-box").classList.toggle("hidden", !appSettings.tutorialLink);
+        for(let i=1; i<=4; i++) {
+            if(document.getElementById(`p${i}n`)) {
+                document.getElementById(`p${i}n`).value = appSettings[`p${i}n`] || "";
+                document.getElementById(`p${i}d`).value = appSettings[`p${i}d`] || "";
+                document.getElementById(`p${i}p`).value = appSettings[`p${i}p`] || "";
+            }
+        }
+        renderPlansUI();
+    }
+}
+
+function renderPlansUI() {
+    const cont = document.getElementById("plans-container"); cont.innerHTML = "";
+    for(let i=1; i<=4; i++) {
+        if(appSettings[`p${i}n`]) {
+            const pName = appSettings[`p${i}n`]; const pPrice = appSettings[`p${i}p`];
+            cont.innerHTML += `<div class="glass flex justify-between items-center p-4"><div><b class="text-xs uppercase">${pName}</b><p class="text-[9px]">${appSettings[`p${i}d`]} Days</p></div><button onclick="buyPlan('${pName}', '${pPrice}')" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-xs font-bold">₹${pPrice}</button></div>`;
+        }
+    }
+}
+
+function loadBooks(email) {
+    onSnapshot(collection(db, "secure_ebooks"), snap => {
+        const g = document.getElementById("bookGrid"); g.innerHTML = "";
+        snap.forEach(d => { 
+            const b = d.data(); const ok = b.access === 'ALL' || b.access.includes(email);
+            const action = ok ? `openPDF('${b.link}','${b.title}')` : `window.open('https://wa.me/${b.wa}?text=I want to buy ${b.title}')`;
+            g.innerHTML += `<div class="glass flex justify-between items-center p-4"><div><b class="text-sm uppercase">${b.title}</b><p class="text-indigo-600 font-bold text-[10px]">₹${b.price || '0'}</p></div><button onclick="${action}" class="bg-slate-900 text-white px-5 py-2 rounded-xl text-[10px] font-bold">${ok?'READ':'BUY'}</button></div>`;
+        });
+    });
+}
+
+window.askAI = async () => {
+    const inp = document.getElementById('ai-input'); const box = document.getElementById('chat-box'); if(!inp.value.trim()) return;
+    const q = inp.value; box.innerHTML += `<div class="msg user">${q}</div>`; inp.value = "";
+    try {
+        const res = await fetch("https://api.groq.com/openai/v1/chat/completions", { method: "POST", headers: { "Authorization": `Bearer ${GROQ_KEY}`, "Content-Type": "application/json" }, body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: [{ role: "user", content: q }] }) });
+        const d = await res.json(); box.innerHTML += `<div class="msg bot">${d.choices[0].message.content}</div>`;
+    } catch(e) { box.innerHTML += `<div class="msg bot">Error...</div>`; }
+    box.scrollTop = box.scrollHeight;
+};
+
+window.resetD = async (uid) => { if(confirm("Reset Device?")) { await updateDoc(doc(db, "users", uid), { deviceID: null }); alert("Reset Done!"); } };
+window.editBook = async (id) => { const b = (await getDoc(doc(db, "secure_ebooks", id))).data(); document.getElementById('edit-id').value = id; document.getElementById('book-title').value = b.title; document.getElementById('book-link').value = b.link; document.getElementById('book-price').value = b.price || ""; document.getElementById('book-wa').value = b.wa || ""; document.getElementById('book-access').value = b.access || "ALL"; showAdminSection('publisher'); };
+window.deleteBook = async (id) => { if(confirm("Delete?")) await deleteDoc(doc(db, "secure_ebooks", id)); };
+window.login = () => signInWithPopup(auth, prov);
+window.logout = () => signOut(auth);
+window.switchTab = (t) => { document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active')); document.getElementById('tab-'+t).classList.add('active'); document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active')); document.getElementById('btn-'+t).classList.add('nav-active'); };
+window.showAdminSection = (s) => { document.querySelectorAll('.admin-section').forEach(sec => sec.classList.add('hidden')); document.getElementById('sec-'+s).classList.remove('hidden'); document.querySelectorAll('.admin-sub-tab').forEach(t => t.classList.remove('active')); document.getElementById('sub-btn-'+s).classList.add('active'); };
+</script>
+</body>
+</html>
