@@ -242,10 +242,19 @@ function lockDevice(reason) {
         updateDoc(doc(db, "users", auth.currentUser.uid), { deviceLocked: true });
     }
 }
-document.addEventListener("visibilitychange", () => { if(document.hidden) lockDevice("Suspicious Activity: Tab Switched."); });
-window.addEventListener("blur", () => { lockDevice("App Inactive: Possible Sharing."); });
+
 
 onAuthStateChanged(auth, async user => {
+    
+    if (!userData.deviceID) {
+    await updateDoc(uRef, { deviceID: token });
+} else if (user.email !== adminEmail && userData.deviceID !== token) {
+    lockDevice("Multiple Device Login Detected."); 
+    return; 
+}
+
+    
+    
     if (user) {
         const uRef = doc(db, "users", user.uid); const uSnap = await getDoc(uRef);
         let token = localStorage.getItem('aarav_device_token') || Math.random().toString(36).substring(2); 
