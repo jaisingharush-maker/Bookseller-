@@ -80,9 +80,7 @@
   .option-btn.selected { border-color: #6366f1; background: rgba(99, 102, 241, 0.2); }
 </style>
 </head>
-<body>
-
-<div id="lock-screen">
+<body oncontextmenu="return false;"> <div id="lock-screen">
     <div class="w-20 h-20 bg-red-900/30 text-red-500 rounded-full flex items-center justify-center text-3xl mb-4"><i class="fas fa-mobile-alt"></i></div>
     <h2 class="text-xl font-black uppercase text-white">Security Alert</h2>
     <p id="lock-reason" class="text-[10px] text-slate-400">Device Locked Please Contact Admin for Reset Your device📞📞 9229809156📞.</p>
@@ -219,6 +217,19 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getFirestore, collection, onSnapshot, doc, getDoc, setDoc, updateDoc, deleteDoc, Timestamp, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
+// --- SECURITY: INSPECT BLOCK ---
+document.onkeydown = function(e) {
+    if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74 || e.keyCode == 67)) || (e.ctrlKey && e.keyCode == 85)) {
+        return false;
+    }
+};
+setInterval(function() {
+    const start = new Date();
+    debugger;
+    if (new Date() - start > 100) { window.location.reload(); }
+}, 100);
+setInterval(() => console.clear(), 500);
+
 const fbCfg = { apiKey: "AIzaSyCrFbBhfWT6WlYAH_ZmopTfzrf47GEQe1k", authDomain: "book-swap-104b7.firebaseapp.com", projectId: "book-swap-104b7" };
 const fbApp = initializeApp(fbCfg); const db = getFirestore(fbApp); const auth = getAuth(fbApp); const prov = new GoogleAuthProvider();
 const adminEmail = "mihirjaisingh@gmail.com";
@@ -245,8 +256,7 @@ onAuthStateChanged(auth, async user => {
         let token = localStorage.getItem('aarav_device_token') || Math.random().toString(36).substring(2); 
         localStorage.setItem('aarav_device_token', token);
 
-        let userData; // Define userData here
-
+        let userData;
         if(!uSnap.exists()) {
             userData = { name: user.displayName, email: user.email, uid: user.uid, deviceID: token, activeBatchCode: "FREE", deviceLocked: false };
             await setDoc(uRef, userData);
@@ -283,9 +293,7 @@ async function checkAccess(uid) {
         const isAdmin = auth.currentUser.email === adminEmail;
         const active = (u?.erpExpiry?.toDate() > new Date()) || isAdmin;
         userBatchCode = u.activeBatchCode || "FREE";
-        
         document.getElementById("expiry-tag").innerText = active ? "STATUS: ACTIVE (" + userBatchCode + ")" : "STATUS: NO ACCESS";
-        
         if(active) { 
             document.getElementById("lec-locked").classList.add("hidden"); 
             document.getElementById("subscriber-content").classList.remove("hidden");
@@ -301,7 +309,6 @@ function syncContent() {
     const isAdmin = auth.currentUser.email === adminEmail;
     const qLec = isAdmin ? collection(db, "lectures") : query(collection(db, "lectures"), where("batch", "==", userBatchCode));
     onSnapshot(qLec, snap => { currentLectures = []; snap.forEach(d => currentLectures.push({...d.data(), id: d.id})); renderChapters(); });
-    
     const qDpp = isAdmin ? collection(db, "dpps") : query(collection(db, "dpps"), where("batch", "==", userBatchCode));
     onSnapshot(qDpp, snap => { currentDPPs = []; snap.forEach(d => currentDPPs.push({...d.data(), id: d.id})); renderDPPs(); });
 }
