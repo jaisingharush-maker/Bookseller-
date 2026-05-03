@@ -246,12 +246,7 @@ function lockDevice(reason) {
 
 onAuthStateChanged(auth, async user => {
     
-    if (!userData.deviceID) {
-    await updateDoc(uRef, { deviceID: token });
-} else if (user.email !== adminEmail && userData.deviceID !== token) {
-    lockDevice("Multiple Device Login Detected."); 
-    return; 
-}
+    
 
     
     
