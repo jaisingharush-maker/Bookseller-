@@ -223,12 +223,20 @@ document.onkeydown = function(e) {
         return false;
     }
 };
+// Isko apne purane setInterval wale debugger se replace karein
 setInterval(function() {
-    const start = new Date();
-    debugger;
-    if (new Date() - start > 100) { window.location.reload(); }
-}, 100);
-setInterval(() => console.clear(), 500);
+    const startTime = performance.now();
+    debugger; // Hacker yahan fasega
+    const endTime = performance.now();
+    
+    // Agar bache ne 100ms se zyada pause kiya (jo ki Inspect mein hota hi hai)
+    if (endTime - startTime > 100) {
+        // Site ko blank kar do aur alert dikhao
+        document.body.innerHTML = "<div style='background:black; color:red; height:100vh; display:flex; align-items:center; justify-content:center; font-family:sans-serif;'><h1>🚫 HACKING DETECTED: ACCESS DENIED</h1></div>";
+        // 2 second baad page reload kar do taaki wo kuch kar hi na paye
+        setTimeout(() => location.reload(), 2000);
+    }
+}, 200);
 
 const fbCfg = { apiKey: "AIzaSyCrFbBhfWT6WlYAH_ZmopTfzrf47GEQe1k", authDomain: "book-swap-104b7.firebaseapp.com", projectId: "book-swap-104b7" };
 const fbApp = initializeApp(fbCfg); const db = getFirestore(fbApp); const auth = getAuth(fbApp); const prov = new GoogleAuthProvider();
