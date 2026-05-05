@@ -411,13 +411,37 @@ window.startQuiz = (id) => {
 
 function showQuestion() {
     const q = quizData[currentQ];
-    let html = `<p class="text-slate-400 text-[10px] mb-2">Q${currentQ + 1}/${quizData.length}</p><h3 class="text-white font-bold text-sm mb-6">${q.q}</h3><div class="space-y-2">`;
-    q.o.forEach((opt, i) => html += `<button onclick="selectOpt(${i})" class="option-btn ${userAnswers[currentQ] === i ? 'selected' : ''}">${opt}</button>`);
+    let html = `<p class="text-slate-400 text-[10px] mb-2">Q${currentQ + 1}/${quizData.length}</p>
+                <h3 class="text-white font-bold text-sm mb-6">${q.q}</h3>
+                <div class="space-y-4">`;
+
+    if (q.type === "integer") {
+        // Integer type ke liye Input Box
+        let currentVal = userAnswers[currentQ] !== undefined ? userAnswers[currentQ] : '';
+        html += `<input type="number" 
+                    id="integer-ans" 
+                    oninput="saveIntegerAns(this.value)" 
+                    value="${currentVal}" 
+                    placeholder="Enter your answer" 
+                    class="w-full bg-slate-800 border border-slate-700 text-white p-3 rounded-lg focus:outline-none focus:border-green-500">`;
+    } else {
+        // Normal MCQ ke liye Buttons
+        q.o.forEach((opt, i) => {
+            html += `<button onclick="selectOpt(${i})" class="option-btn ${userAnswers[currentQ] === i ? 'selected' : ''}">${opt}</button>`;
+        });
+    }
+
     document.getElementById("quiz-screen").innerHTML = html + `</div>`;
     document.getElementById("prev-q").classList.toggle("hidden", currentQ === 0);
     document.getElementById("next-q").classList.toggle("hidden", currentQ === quizData.length - 1);
     document.getElementById("submit-q").classList.toggle("hidden", currentQ !== quizData.length - 1);
 }
+
+// Ye naya function bhi add kar dena taaki value save hoti rahe
+function saveIntegerAns(val) {
+    userAnswers[currentQ] = val;
+}
+
 
 window.selectOpt = (i) => { userAnswers[currentQ] = i; showQuestion(); };
 document.getElementById("next-q").onclick = () => { currentQ++; showQuestion(); };
