@@ -394,12 +394,15 @@ function renderDPPs() {
 
 window.toggleFeeDue = async (scholarId, currentStatus) => {
     
-    await updateDoc(
-        doc(db, "school_results", scholarId),
-        {
-            fee_due: !currentStatus
-        }
-    );
+    // 🔒 ADMIN CHECK
+    if (!auth.currentUser || auth.currentUser.email !== adminEmail) {
+        alert("Unauthorized Access");
+        return;
+    }
+    
+    await updateDoc(doc(db, "school_results", scholarId), {
+        fee_due: !currentStatus
+    });
     
     alert("Fee status updated!");
 };
@@ -424,7 +427,7 @@ window.fetchStudentResult = async () => {
         // FEE DUE CHECK
 let feeBlocked = data.fee_due === true;
 
-let blockUI = feeBlocked ? `
+let blockUI = `
     <div class="bg-red-50 border-4 border-red-600 rounded-3xl p-8 text-center">
         <i class="fas fa-lock text-5xl text-red-600 mb-4"></i>
 
@@ -436,13 +439,14 @@ let blockUI = feeBlocked ? `
             Your school fee is pending.
         </p>
 
-        <button 
-            onclick="toggleFeeDue('${data.scholar_id}', true)"
-            class="bg-green-600 text-white px-6 py-2 rounded-xl font-bold text-xs">
-            UNBLOCK RESULT
-        </button>
+        ${auth.currentUser.email === adminEmail ? `
+            <button onclick="toggleFeeDue('${data.scholar_id}', true)" 
+                class="bg-green-600 text-white px-4 py-2 rounded-xl font-bold">
+                UNBLOCK RESULT
+            </button>
+        ` : ``}
     </div>
-` : "";
+`;
 
 if (feeBlocked) {
     targetPanel.innerHTML = blockUI;
