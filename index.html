@@ -7,6 +7,8 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
   /* Aurora Mesh Gradient Background */
   body { 
@@ -161,6 +163,11 @@
           </div>
       </div>
       <div id="result-display-panel" class="hidden bg-white text-black rounded-3xl p-4 border border-slate-200 shadow-2xl overflow-x-auto"></div>
+      <button id="download-btn"
+onclick="downloadResult()"
+class="mt-3 bg-indigo-600 text-white px-5 py-2 rounded-xl font-bold text-xs">
+📥 Download Result
+</button>
   </div>
 
   <div id="tab-admin" class="tab-content space-y-4">
@@ -385,6 +392,18 @@ function renderDPPs() {
     });
 }
 
+window.toggleFeeDue = async (scholarId, currentStatus) => {
+    
+    await updateDoc(
+        doc(db, "school_results", scholarId),
+        {
+            fee_due: !currentStatus
+        }
+    );
+    
+    alert("Fee status updated!");
+};
+
 // --- STUDENT EXPERIMENTAL DIGITAL REPORT CARD ENGINE ---
 window.fetchStudentResult = async () => {
     const sId = document.getElementById("student-scholar-id").value.trim().toUpperCase();
@@ -397,10 +416,41 @@ window.fetchStudentResult = async () => {
         if(!rSnap.exists()) {
             alert("No result found for this Scholar ID. Contact School Admin.");
             targetPanel.classList.add("hidden");
+            document.getElementById("download-btn").classList.remove("hidden");
             return;
         }
         
         const data = rSnap.data();
+        // FEE DUE CHECK
+let feeBlocked = data.fee_due === true;
+
+let blockUI = feeBlocked ? `
+    <div class="bg-red-50 border-4 border-red-600 rounded-3xl p-8 text-center">
+        <i class="fas fa-lock text-5xl text-red-600 mb-4"></i>
+
+        <h2 class="text-2xl font-black text-red-700 uppercase mb-3">
+            RESULT BLOCKED
+        </h2>
+
+        <p class="text-sm text-slate-700 font-bold mb-4">
+            Your school fee is pending.
+        </p>
+
+        <button 
+            onclick="toggleFeeDue('${data.scholar_id}', true)"
+            class="bg-green-600 text-white px-6 py-2 rounded-xl font-bold text-xs">
+            UNBLOCK RESULT
+        </button>
+    </div>
+` : "";
+
+if (feeBlocked) {
+    targetPanel.innerHTML = blockUI;
+    targetPanel.classList.remove("hidden");
+    document.getElementById("download-btn").classList.remove("hidden");
+    return;
+    
+}
         let subjects = [];
         try { subjects = typeof data.subjects_json === "string" ? JSON.parse(data.subjects_json) : data.subjects_json; } catch(e) { console.error(e); }
         
@@ -419,10 +469,32 @@ window.fetchStudentResult = async () => {
 
         targetPanel.innerHTML = `
             <div class="border-4 border-blue-900 p-4 bg-slate-50 relative">
-                <div class="text-center border-b-2 border-blue-900 pb-3 mb-4">
-                    <h2 class="text-blue-900 font-black text-sm tracking-wide uppercase leading-tight">Central Board of Secondary Education</h2>
-                    <p class="text-slate-700 text-[10px] font-bold tracking-tight uppercase">Secondary School Examination (Class ${data.class || 'X'}) 2026</p>
-                </div>
+              <div class="text-center border-b-2 border-blue-900 pb-3 mb-4">
+
+    <!-- SCHOOL LOGO -->
+    <img 
+        src="https://i.postimg.cc/hjTFV5Hk/Screenshot-2026-0526-080731.png"
+        class="w-20 h-20 object-contain mx-auto mb-3" 
+    >
+
+    <!-- SCHOOL NAME -->
+    <h2 class="text-blue-900 font-black text-sm tracking-wide uppercase leading-tight">
+        TLSM WORLD SCHOOL
+    </h2>
+
+    <!-- BOARD -->
+    <p class="text-[10px] font-bold text-slate-600 uppercase">
+        Affiliated to CBSE
+    </p>
+
+    <!-- EXAM TITLE -->
+    <p class="text-slate-700 text-[10px] font-bold tracking-tight uppercase mt-1">
+        Secondary School Examination (Class X) 2026
+    </p>
+
+</div>
+
+
                 
                 <div class="grid grid-cols-3 gap-y-1 gap-x-2 text-[10px] text-slate-800 border-b border-dashed border-slate-400 pb-3 mb-3">
                     <div><span class="text-slate-500 font-bold">Roll No:</span></div>
@@ -460,6 +532,19 @@ window.fetchStudentResult = async () => {
                     <span class="text-xs font-black uppercase bg-white text-emerald-700 px-4 py-0.5 rounded-full shadow-inner">${data.result_status || 'PASS'}</span>
                 </div>
                 
+                ${auth.currentUser.email === adminEmail ? `
+<div class="mt-4 text-center">
+    <button
+        onclick="toggleFeeDue('${data.scholar_id}', ${data.fee_due || false})"
+        class="px-5 py-2 rounded-xl text-white font-bold text-xs
+        ${data.fee_due ? 'bg-green-600' : 'bg-red-600'}">
+
+        ${data.fee_due ? 'UNLOCK RESULT' : 'BLOCK RESULT'}
+
+    </button>
+</div>
+` : ''}
+                
                 <p class="text-[7px] text-slate-400 text-center uppercase tracking-tighter mt-4 leading-tight">
                     Disclaimer: This online system generated report sheet is explicitly delivered for strategic immediate reference info access over remote structures.
                 </p>
@@ -470,6 +555,7 @@ window.fetchStudentResult = async () => {
         console.error(err);
         alert("Firestore access query failure.");
     }
+    document.getElementById("download-btn").style.display = "inline-block";
 };
 
 // --- ADMIN SYSTEM EXCEL INGEST DATA PIPELINE ---
@@ -495,19 +581,142 @@ window.processExcelUpload = () => {
                 let keyPointer = row.scholar_id ? row.scholar_id.toString().trim().toUpperCase() : null;
                 if(!keyPointer) continue;
                 
-                let processedPayload = {
-                    scholar_id: keyPointer,
-                    roll_no: row.roll_no ? row.roll_no.toString() : '---',
-                    name: row.name || 'Unknown Student',
-                    mother: row.mother || '---',
-                    father: row.father || '---',
-                    dob: row.dob || '---',
-                    class: row.class || 'N/A',
-                    school: row.school || 'Aarav Public School',
-                    subjects_json: row.subjects_json || '[]',
-                    result_status: row.result_status || 'PASS',
-                    updatedAt: Timestamp.now()
-                };
+                // ===== UNIVERSAL AUTO SUBJECT DETECTION ENGINE =====
+
+let subjects = [];
+
+// ALL EXCEL COLUMNS
+const allColumns = Object.keys(row);
+
+// SUBJECT GROUPS
+let detectedSubjects = {};
+
+// Detect subject columns automatically
+allColumns.forEach(col => {
+
+    // Skip basic fields
+    const skipFields = [
+        "scholar_id",
+        "roll_no",
+        "name",
+        "mother",
+        "father",
+        "dob",
+        "class",
+        "school",
+        "result_status"
+    ];
+
+    if(skipFields.includes(col.toLowerCase())) return;
+
+    // Normalize column name
+    const cleanCol = col.toUpperCase().trim();
+
+    // THEORY DETECTION
+    if(
+        cleanCol.endsWith("_TH") ||
+        cleanCol.endsWith("_THEORY")
+    ) {
+
+        let subjectName = cleanCol
+            .replace("_TH", "")
+            .replace("_THEORY", "");
+
+        if(!detectedSubjects[subjectName]) {
+            detectedSubjects[subjectName] = {};
+        }
+
+        detectedSubjects[subjectName].theory =
+            Number(row[col] || 0);
+
+    }
+
+    // PRACTICAL DETECTION
+    else if(
+        cleanCol.endsWith("_PR") ||
+        cleanCol.endsWith("_PRACTICAL") ||
+        cleanCol.endsWith("_IA")
+    ) {
+
+        let subjectName = cleanCol
+            .replace("_PR", "")
+            .replace("_PRACTICAL", "")
+            .replace("_IA", "");
+
+        if(!detectedSubjects[subjectName]) {
+            detectedSubjects[subjectName] = {};
+        }
+
+        detectedSubjects[subjectName].practical =
+            Number(row[col] || 0);
+    }
+});
+
+// Convert detected subjects into final JSON
+Object.keys(detectedSubjects).forEach((sub, index) => {
+
+    const theory =
+        detectedSubjects[sub].theory || 0;
+
+    const practical =
+        detectedSubjects[sub].practical || 0;
+
+    // Skip fully empty subjects
+    if(theory === 0 && practical === 0) return;
+
+    const total = theory + practical;
+
+    // AUTO GRADE
+    let grade = "E";
+
+    if(total >= 91) grade = "A1";
+    else if(total >= 81) grade = "A2";
+    else if(total >= 71) grade = "B1";
+    else if(total >= 61) grade = "B2";
+    else if(total >= 51) grade = "C1";
+    else if(total >= 41) grade = "C2";
+    else if(total >= 33) grade = "D";
+
+    // AUTO GENERATED SUBJECT CODE
+    let autoCode =
+        (100 + index).toString();
+
+    subjects.push({
+        code: autoCode,
+        name: sub,
+        theory,
+        practical,
+        total,
+        grade
+    });
+});
+
+// FINAL PAYLOAD
+let processedPayload = {
+    scholar_id: keyPointer,
+    roll_no: row.roll_no
+        ? row.roll_no.toString()
+        : "---",
+
+    name: row.name || "Unknown Student",
+    mother: row.mother || "---",
+    father: row.father || "---",
+    dob: row.dob || "---",
+    class: row.class || "N/A",
+    school: row.school || "Aarav Public School",
+
+    // AUTO GENERATED SUBJECT ARRAY
+    subjects_json: subjects,
+
+    result_status:
+        row.result_status || "PASS",
+fee_due:
+    row.fee_due === true ||
+    row.fee_due === "TRUE",
+
+
+    updatedAt: Timestamp.now()
+};
                 
                 // Write single transactional batch rows straight to the cloud instance index
                 await setDoc(doc(db, "school_results", keyPointer), processedPayload, { merge: true });
@@ -733,8 +942,23 @@ function renderUserList(users) {
                 <div><b>${u.name || 'User'}</b><br><span class="opacity-60">${u.email}</span><br>
                 <span class="text-indigo-400 font-black">BATCH: ${u.activeBatchCode || 'NONE'}</span><br>
                 <span class="${u.deviceLocked?'text-red-400':'text-green-400'} font-bold">LOCKED: ${u.deviceLocked || 'NO'}</span></div>
-                <button onclick="window.resetD('${u.id}')" class="text-red-400 font-bold bg-red-900/20 px-2 py-1 rounded border border-red-900/30">UNLOCK</button>
-            </div><div class="grid grid-cols-3 gap-2 mt-4">${btns}</div></div>`;
+                <div class="flex justify-between items-start text-[10px] text-white">
+    
+   
+    </div>
+
+    <button 
+        onclick="window.resetD('${u.id}')"
+        class="text-red-400 font-bold bg-red-900/20 px-3 py-2 rounded-xl border border-red-900/30">
+        
+        UNLOCK
+        
+    </button>
+
+</div>
+
+
+            <div class="grid grid-cols-3 gap-2 mt-4">${btns}</div></div>`;
     });
 }
 
@@ -859,6 +1083,51 @@ window.searchAnalytics = () => {
         analyticsDiv.classList.remove("hidden");
         if (!found) { analyticsDiv.innerHTML = `<div class="text-center text-gray-500 text-[11px] py-6">No student data found</div>`; }
     });
+};
+
+window.downloadResult = async () => {
+    const element = document.getElementById("result-display-panel");
+    
+    if (!element || element.classList.contains("hidden")) {
+        alert("No result to download!");
+        return;
+    }
+    
+    const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#ffffff"
+    });
+    
+    const imgData = canvas.toDataURL("image/png");
+    
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF("p", "mm", "a4");
+    
+    const pageWidth = 210;
+    const pageHeight = 297;
+    
+    const margin = 10;
+    
+    const usableWidth = pageWidth - margin * 2;
+    const usableHeight = pageHeight - margin * 2;
+    
+    // 🔥 IMPORTANT: Force fit into single page
+    let imgWidth = usableWidth;
+    let imgHeight = (canvas.height * imgWidth) / canvas.width;
+    
+    // If height is too big, scale it down
+    if (imgHeight > usableHeight) {
+        imgHeight = usableHeight;
+        imgWidth = (canvas.width * imgHeight) / canvas.height;
+    }
+    
+    const x = (pageWidth - imgWidth) / 2;
+    const y = margin;
+    
+    pdf.addImage(imgData, "PNG", x, y, imgWidth, imgHeight);
+    
+    pdf.save("result_A4.pdf");
 };
 </script>
 </body>
