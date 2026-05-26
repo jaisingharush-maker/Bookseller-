@@ -1,1138 +1,1032 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>  
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Aarav ED-TECH</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<style>
-  /* Aurora Mesh Gradient Background */
-  body { 
-    background: #0f172a; 
-    background-color: #0f172a;
-    background-image: 
-      radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
-      radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
-      radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%), 
-      radial-gradient(at 0% 100%, hsla(339,49%,30%,1) 0, transparent 50%), 
-      radial-gradient(at 50% 100%, hsla(225,39%,30%,1) 0, transparent 50%), 
-      radial-gradient(at 100% 100%, hsla(253,16%,7%,1) 0, transparent 50%);
-    background-attachment: fixed;
-    font-family: -apple-system, sans-serif; 
-    min-height: 100vh; 
-    margin: 0; 
-    -webkit-user-select: none; 
-    user-select: none; 
-    overflow-x: hidden; 
-    color: white;
-  } 
+<!DOCTYPE html>  <html lang="en">  
+<head>    
+<meta charset="UTF-8">  
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">  
+<title>Aarav ED-TECH</title>  
+<script src="https://cdn.tailwindcss.com"></script>  
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>  
+<style>  
+  /* Aurora Mesh Gradient Background */  
+  body {   
+    background: #0f172a;   
+    background-color: #0f172a;  
+    background-image:   
+      radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%),   
+      radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%),   
+      radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%),   
+      radial-gradient(at 0% 100%, hsla(339,49%,30%,1) 0, transparent 50%),   
+      radial-gradient(at 50% 100%, hsla(225,39%,30%,1) 0, transparent 50%),   
+      radial-gradient(at 100% 100%, hsla(253,16%,7%,1) 0, transparent 50%);  
+    background-attachment: fixed;  
+    font-family: -apple-system, sans-serif;   
+    min-height: 100vh;   
+    margin: 0;   
+    -webkit-user-select: none;   
+    user-select: none;   
+    overflow-x: hidden;   
+    color: white;  
+  }   #app { padding: 16px; padding-bottom: 220px; display: none; position: relative; z-index: 10; }
 
-  #app { padding: 16px; padding-bottom: 220px; display: none; position: relative; z-index: 10; } 
-  
-  .glass { 
-    background: rgba(255, 255, 255, 0.05); 
-    backdrop-filter: blur(15px); 
-    -webkit-backdrop-filter: blur(15px);
-    border-radius: 30px; 
-    padding: 25px; 
-    border: 1px solid rgba(255, 255, 255, 0.1); 
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); 
-  }
+.glass {
+background: rgba(255, 255, 255, 0.05);
+backdrop-filter: blur(15px);
+-webkit-backdrop-filter: blur(15px);
+border-radius: 30px;
+padding: 25px;
+border: 1px solid rgba(255, 255, 255, 0.1);
+box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
 
-  header { background: rgba(255, 255, 255, 0.05) !important; backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
-  nav { background: rgba(15, 23, 42, 0.8) !important; backdrop-filter: blur(20px); border-top: 1px solid rgba(255, 255, 255, 0.1) !important; }
+header { background: rgba(255, 255, 255, 0.05) !important; backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+nav { background: rgba(15, 23, 42, 0.8) !important; backdrop-filter: blur(20px); border-top: 1px solid rgba(255, 255, 255, 0.1) !important; }
 
-  .chapter-card { 
-    background: rgba(255, 255, 255, 0.05); 
-    padding: 16px; 
-    border-radius: 20px; 
-    display: flex; 
-    align-items: center; 
-    gap: 15px; 
-    border: 1px solid rgba(255, 255, 255, 0.1); 
-    cursor: pointer; 
-    transition: 0.2s; 
-    backdrop-filter: blur(5px);
-  }
-  .chapter-card:active { transform: scale(0.97); background: rgba(255, 255, 255, 0.1); }
-  
-  #lock-screen { display: none; position: fixed; inset: 0; background: #0f172a; z-index: 10000; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
-  #login-screen { 
-    background: radial-gradient(circle at top right, #4338ca, transparent), radial-gradient(circle at bottom left, #7e22ce, #0f172a);
-    position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; 
-  }
-  
-  .login-card { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 40px; width: 85%; max-width: 360px; padding: 40px 30px; text-align: center; }
+.chapter-card {
+background: rgba(255, 255, 255, 0.05);
+padding: 16px;
+border-radius: 20px;
+display: flex;
+align-items: center;
+gap: 15px;
+border: 1px solid rgba(255, 255, 255, 0.1);
+cursor: pointer;
+transition: 0.2s;
+backdrop-filter: blur(5px);
+}
+.chapter-card:active { transform: scale(0.97); background: rgba(255, 255, 255, 0.1); }
 
-  .nav-active { color: #818cf8 !important; }
-  .tab-content { display: none; }
-  .tab-content.active { display: block; }
-  
-  .publisher-input { width: 100%; padding: 12px 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); color: white; font-size: 11px; outline: none; margin-bottom: 6px; }
-  .admin-sub-tab { font-size: 10px; font-weight: 800; padding: 8px 12px; border-radius: 12px; color: #94a3b8; cursor: pointer; transition: 0.3s; }
-  .admin-sub-tab.active { background: #6366f1; color: white; }
-  
-  .fs-modal { position: fixed; inset: 0; z-index: 5000; background: #0f172a; display: none; flex-direction: column; overflow-y: auto; }
-  #modal-header { padding: 12px 20px; background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(10px); color: white; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 5005; }
-  
-  .option-btn { width: 100%; text-align: left; padding: 12px; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; margin-bottom: 8px; font-size: 12px; transition: 0.2s; color: black; background: rgba(255,255,255,0.05); }
-  .option-btn.selected { border-color: #6366f1 !important; background: rgba(99, 102, 241, 0.3) !important; font-weight: bold; }
+#lock-screen { display: none; position: fixed; inset: 0; background: #0f172a; z-index: 10000; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
+#login-screen {
+background: radial-gradient(circle at top right, #4338ca, transparent), radial-gradient(circle at bottom left, #7e22ce, #0f172a);
+position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center;
+}
 
-  .media-wrapper { position: relative; width: 100%; height: 100%; overflow: hidden; }
-  .protection-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 55px; z-index: 5006; background: transparent; }
-  iframe { border: none; width: 100%; height: 100%; pointer-events: auto; }
+.login-card { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 40px; width: 85%; max-width: 360px; padding: 40px 30px; text-align: center; }
+
+.nav-active { color: #818cf8 !important; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+.publisher-input { width: 100%; padding: 12px 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); color: white; font-size: 11px; outline: none; margin-bottom: 6px; }
+.admin-sub-tab { font-size: 10px; font-weight: 800; padding: 8px 12px; border-radius: 12px; color: #94a3b8; cursor: pointer; transition: 0.3s; }
+.admin-sub-tab.active { background: #6366f1; color: white; }
+
+.fs-modal { position: fixed; inset: 0; z-index: 5000; background: #0f172a; display: none; flex-direction: column; overflow-y: auto; }
+#modal-header { padding: 12px 20px; background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(10px); color: white; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 5005; }
+
+.option-btn { width: 100%; text-align: left; padding: 12px; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; margin-bottom: 8px; font-size: 12px; transition: 0.2s; color: black; background: rgba(255,255,255,0.05); }
+.option-btn.selected { border-color: #6366f1 !important; background: rgba(99, 102, 241, 0.3) !important; font-weight: bold; }
+
+.media-wrapper { position: relative; width: 100%; height: 100%; overflow: hidden; }
+.protection-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 55px; z-index: 5006; background: transparent; }
+iframe { border: none; width: 100%; height: 100%; pointer-events: auto; }
 </style>
-</head>
-<body oncontextmenu="return false;"> 
 
-<script>
-    document.addEventListener('contextmenu', event => event.preventDefault());
-    document.onkeydown = function(e) {
-        if (e.keyCode == 123) { return false; } 
-        if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) { return false; } 
-        if (e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) { return false; } 
-        if (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) { return false; } 
-        if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) { return false; } 
-    };
-</script>
-
-<div id="lock-screen">
-    <div class="w-20 h-20 bg-red-900/30 text-red-500 rounded-full flex items-center justify-center text-3xl mb-4"><i class="fas fa-mobile-alt"></i></div>
-    <h2 class="text-xl font-black uppercase text-white">Security Alert</h2>
-    <p id="lock-reason" class="text-[10px] text-slate-400">Device Locked Please Contact Admin for Reset Your device📞📞 9229809156📞.</p>
-    <button onclick="logout()" class="mt-8 text-indigo-400 font-bold uppercase text-xs underline">Logout</button>
-</div>
-
-<div id="login-screen">
-  <div class="login-card">
-    <div class="w-16 h-16 bg-indigo-600 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-2xl rotate-3"><i class="fas fa-crown text-white text-2xl"></i></div>
-    <h1 class="text-2xl font-black text-white mb-8 uppercase italic tracking-wider">Aarav Tech Hub</h1>
-   <p class="text-slate-300 text [5px] font-bold uppercase tracking-widest mb-8">Aarav Jai Vishwanath Singh</p>
-    <button onclick="login()" class="w-full bg-white text-indigo-900 py-4 rounded-2xl font-black shadow-lg hover:bg-slate-100 transition-all">CONTINUE WITH GOOGLE</button>
+</head>  
+<body oncontextmenu="return false;">   <script>  
+    document.addEventListener('contextmenu', event => event.preventDefault());  
+    document.onkeydown = function(e) {  
+        if (e.keyCode == 123) { return false; }   
+        if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) { return false; }   
+        if (e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) { return false; }   
+        if (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) { return false; }   
+        if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) { return false; }   
+    };  
+</script>  <div id="lock-screen">  
+    <div class="w-20 h-20 bg-red-900/30 text-red-500 rounded-full flex items-center justify-center text-3xl mb-4"><i class="fas fa-mobile-alt"></i></div>  
+    <h2 class="text-xl font-black uppercase text-white">Security Alert</h2>  
+    <p id="lock-reason" class="text-[10px] text-slate-400">Device Locked Please Contact Admin for Reset Your device📞📞 9229809156📞.</p>  
+    <button onclick="logout()" class="mt-8 text-indigo-400 font-bold uppercase text-xs underline">Logout</button>  
+</div>  <div id="login-screen">  
+  <div class="login-card">  
+    <div class="w-16 h-16 bg-indigo-600 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-2xl rotate-3"><i class="fas fa-crown text-white text-2xl"></i></div>  
+    <h1 class="text-2xl font-black text-white mb-8 uppercase italic tracking-wider">Aarav Tech Hub</h1>  
+   <p class="text-slate-300 text [5px] font-bold uppercase tracking-widest mb-8">Aarav Jai Vishwanath Singh</p>  
+    <button onclick="login()" class="w-full bg-white text-indigo-900 py-4 rounded-2xl font-black shadow-lg hover:bg-slate-100 transition-all">CONTINUE WITH GOOGLE</button>  
+  </div>  
+</div>  <div id="app" class="max-w-md mx-auto">  
+  <header class="flex justify-between items-center p-4 rounded-b-[2rem] mb-4">  
+    <div class="flex items-center gap-3">  
+        <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-bold shadow-lg">π</div>  
+        <div>  
+          <p id="user-display" class="font-bold text-sm text-white uppercase">User Name</p>  
+          <span id="expiry-tag" class="text-[8px] text-indigo-400 font-bold uppercase block leading-tight">Syncing...</span>  
+        </div>  
+    </div>  
+    <button onclick="logout()" class="text-red-400 text-[10px] font-bold bg-red-900/20 px-3 py-1 rounded-full border border-red-900/30">LOGOUT</button>  
+  </header>    <div id="tab-library" class="tab-content active"><div id="bookGrid" class="grid gap-3 pb-10"></div></div>    <div id="tab-lectures" class="tab-content">  
+      <div id="lec-locked" class="glass hidden text-center mt-10">  
+          <i class="fas fa-lock text-indigo-500 text-4xl mb-4"></i>  
+          <p class="text-[12px] font-black text-white mb-4 uppercase italic">Premium Batch Required</p>  
+          <p class="text-[10px] text-slate-400 mb-6">You don't have an active subscription. Enroll in a batch to access Videos and DPP Tests.</p>  
+          <div id="plans-container" class="space-y-3 text-left"></div>  
+      </div>  <div id="subscriber-content" class="hidden">  
+      <div id="batch-content-nav" class="flex gap-2 mb-4">  
+          <button onclick="showContent('videos')" id="nav-v" class="flex-1 py-2 rounded-xl text-[10px] font-black bg-indigo-600 text-white shadow-lg">VIDEOS</button>  
+          <button onclick="showContent('dpps')" id="nav-d" class="flex-1 py-2 rounded-xl text-[10px] font-black bg-white/10 text-slate-300 border border-white/10">DPP TEST</button>  
+      </div>  
+      <div id="chapter-view" class="space-y-3 pb-10"></div>  
+      <div id="dpp-view" class="hidden space-y-3 pb-10"></div>  
+      <div id="lecture-list-view" class="hidden pb-10">  
+          <button onclick="showChapters()" class="mb-4 text-white text-xs font-bold flex items-center gap-2 uppercase opacity-70"><i class="fas fa-arrow-left"></i> Back</button>  
+          <h2 id="current-chapter-title" class="text-white font-black uppercase text-sm mb-4 italic">Chapter</h2>  
+          <div id="lecture-container" class="space-y-3"></div>  
+      </div>  
   </div>
+
+  </div>    <div id="tab-results" class="tab-content space-y-4 pb-10">  
+      <div class="glass !p-5">  
+          <h2 class="text-sm font-black text-white uppercase tracking-wider mb-2"><i class="fas fa-poll-h mr-2 text-indigo-400"></i>Check Examination Result</h2>  
+          <p class="text-[10px] text-slate-400 mb-4">Enter your Scholar ID / Admission Number to view your annual report card panel directly.</p>  
+          <div class="flex flex-col gap-2">  
+              <input type="text" id="student-scholar-id" class="publisher-input !mb-0 text-center text-sm font-bold tracking-widest uppercase py-3" placeholder="ENTER SCHOLAR ID (e.g. 2026101)">  
+              <button onclick="window.fetchStudentResult()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-bold text-xs tracking-wider uppercase transition-all shadow-lg"><i class="fas fa-search mr-2"></i>Get Result</button>  
+          </div>  
+      </div>  
+      <div id="result-display-panel" class="hidden bg-white text-black rounded-3xl p-4 border border-slate-200 shadow-2xl overflow-x-auto"></div>  
+      <button id="download-btn"  
+onclick="downloadResult()"  
+class="mt-3 bg-indigo-600 text-white px-5 py-2 rounded-xl font-bold text-xs">  
+📥 Download Result  
+</button>  
+  </div>    <div id="tab-admin" class="tab-content space-y-4">  
+    <div class="flex justify-center gap-2 bg-black/20 p-2 rounded-2xl border border-white/5">  
+        <div onclick="showAdminSection('publish')" id="sub-btn-publish" class="admin-sub-tab active">PUBLISH</div>  
+        <div onclick="showAdminSection('manage')" id="sub-btn-manage" class="admin-sub-tab">MANAGE</div>  
+        <div onclick="showAdminSection('users')" id="sub-btn-users" class="admin-sub-tab">USERS</div>  
+        <div onclick="showAdminSection('excel-results')" id="sub-btn-excel-results" class="admin-sub-tab">EXCEL RESULTS</div>  
+    </div>  <div id="sec-publish" class="admin-section space-y-4">  
+    <div class="glass !p-4">  
+        <p class="text-[9px] font-black text-indigo-400 mb-2 uppercase">Publish Lecture</p>  
+        <input id="lec-batch" class="publisher-input" placeholder="Batch ID (e.g. UDAAN 2027)">  
+        <input id="lec-chapter" class="publisher-input" placeholder="Chapter Name">  
+        <input id="lec-title" class="publisher-input" placeholder="Lecture Title">  
+        <input id="lec-link" class="publisher-input" placeholder="Video Link">  
+        <input id="lec-notes" class="publisher-input" placeholder="Notes Link">  
+        <button id="lec-save-btn" onclick="saveLecture()" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold text-[10px] shadow-lg">SAVE LECTURE</button>  
+    </div>  
+    <div class="glass !p-4">  
+        <p class="text-[9px] font-black text-red-400 mb-2 uppercase">Publish DPP Quiz</p>  
+        <input id="dpp-batch" class="publisher-input" placeholder="Batch ID">  
+        <input id="dpp-title" class="publisher-input" placeholder="DPP Title">  
+        <textarea id="dpp-data" class="publisher-input h-20" placeholder='JSON Questions'></textarea>  
+        <button id="dpp-save-btn" onclick="saveDPP()" class="w-full bg-red-600 text-white py-3 rounded-xl font-bold text-[10px] shadow-lg">SAVE DPP</button>  
+    </div>  
+    <div class="glass !p-4">  
+        <p class="text-[9px] font-black text-indigo-400 mb-2 uppercase">Publish Book</p>  
+        <input id="book-title" class="publisher-input" placeholder="Book Title">  
+        <input id="book-link" class="publisher-input" placeholder="PDF Link">  
+        <input id="book-price" class="publisher-input" placeholder="Price">  
+        <input id="book-access" class="publisher-input" placeholder="Access (ALL or emails with comma)">  
+        <button id="book-save-btn" onclick="saveBook()" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold text-[10px] shadow-lg">SAVE BOOK</button>  
+    </div>  
+    <div class="glass !p-4">  
+        <p class="text-[9px] font-black text-indigo-400 mb-2 uppercase">Batch Configuration</p>  
+        <div id="plan-inputs" class="space-y-1"></div>  
+        <button onclick="addNewPlanInput()" class="w-full border-2 border-dashed border-white/20 text-slate-400 py-2 rounded-xl font-bold text-[10px] mt-2">+ ADD BATCH</button>  
+        <button onclick="window.saveSettings()" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold text-[10px] mt-2 shadow-lg">SAVE CONFIG</button>  
+    </div>  
+</div>  
+
+<div id="sec-manage" class="admin-section hidden pb-20 space-y-4">  
+    <div id="manageLecGrid" class="space-y-2"></div>  
+    <div id="manageDPPGrid" class="space-y-2"></div>  
+    <div id="manageBookGrid" class="space-y-2"></div>  
+</div>  
+
+<div id="sec-users" class="admin-section hidden pb-20">  
+    <div id="adminUserList" class="space-y-3 mt-2"></div>  
+    <div class="glass mt-6 !p-4">  
+        <p class="text-[10px] font-black text-indigo-400 uppercase mb-3">Student DPP Analytics</p>  
+        <div class="flex gap-2 mb-4">  
+            <input type="text" id="analyticsSearch" placeholder="Enter student name or email" class="publisher-input !mb-0">  
+            <button onclick="searchAnalytics()" class="bg-indigo-600 text-white px-4 rounded-xl text-[10px] font-bold">SEARCH</button>  
+        </div>  
+        <div id="dppAnalytics" class="hidden"></div>  
+    </div>  
+</div>  
+
+<div id="sec-excel-results" class="admin-section hidden pb-20 space-y-4">  
+    <div class="glass !p-4">  
+        <p class="text-[10px] font-black text-indigo-400 mb-2 uppercase">Bulk Upload Student Results (.xlsx)</p>  
+        <p class="text-[9px] text-slate-400 mb-4 leading-relaxed">  
+            Make sure your sheet headers strictly match:<br>  
+            <code class="text-indigo-300">scholar_id, roll_no, name, mother, father, dob, class, school, subjects_json, result_status</code><br>  
+            * Note: <code class="text-emerald-400">subjects_json</code> column should contain explicit subject arrays like:<br>  
+            <code class="text-amber-400 text-[8px] block">[{"code":"002","name":"HINDI","theory":75,"practical":20,"total":95,"fullMarks":100}]</code><br>
+            * Ya fir columns me aap <code class="text-indigo-300">FULL_HINDI</code> jaisa automatic dynamic target setup use kar sakte hain.
+        </p>  
+        <input type="file" id="excel-file-input" accept=".xlsx, .xls" class="publisher-input text-xs pt-2">  
+        <button onclick="window.processExcelUpload()" class="w-full bg-emerald-600 text-white py-3 rounded-xl font-bold text-[10px] tracking-wider shadow-lg uppercase"><i class="fas fa-file-upload mr-2"></i>Process & Upload Data</button>  
+    </div>  
 </div>
 
-<div id="app" class="max-w-md mx-auto">
-  <header class="flex justify-between items-center p-4 rounded-b-[2rem] mb-4">
-    <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-bold shadow-lg">π</div>
-        <div>
-          <p id="user-display" class="font-bold text-sm text-white uppercase">User Name</p>
-          <span id="expiry-tag" class="text-[8px] text-indigo-400 font-bold uppercase block leading-tight">Syncing...</span>
-        </div>
-    </div>
-    <button onclick="logout()" class="text-red-400 text-[10px] font-bold bg-red-900/20 px-3 py-1 rounded-full border border-red-900/30">LOGOUT</button>
-  </header>
-
-  <div id="tab-library" class="tab-content active"><div id="bookGrid" class="grid gap-3 pb-10"></div></div>
+  </div>    <nav class="fixed bottom-0 left-0 right-0 flex justify-around p-3 pb-8 z-[1000]">  
+    <button onclick="switchTab('library')" id="btn-library" class="nav-btn text-[10px] nav-active"><i class="fas fa-book text-xl"></i><br>BOOKS</button>  
+    <button onclick="switchTab('lectures')" id="btn-lectures" class="nav-btn text-[10px]"><i class="fas fa-play-circle text-xl"></i><br>Courses</button>  
+    <button onclick="switchTab('results')" id="btn-results" class="nav-btn text-[10px]"><i class="fas fa-poll-h text-xl"></i><br>RESULT</button>  
+    <button onclick="switchTab('admin')" id="btn-admin" class="nav-btn text-[10px] hidden text-slate-400"><i class="fas fa-user-shield text-xl"></i><br>ADMIN</button>  
+  </nav>  
+</div>  <div id="main-modal" class="fs-modal">  
+    <div id="modal-header">  
+        <div class="flex items-center gap-2 overflow-hidden">  
+            <span id="modal-title" class="text-xs font-bold uppercase truncate">Secure Viewer</span>  
+        </div>  
+        <div class="flex items-center gap-2">  
+            <button onclick="toggleFullScreen()" class="text-white p-2"><i class="fas fa-expand"></i></button>  
+            <button onclick="closeModal()" class="text-white p-2"><i class="fas fa-times text-xl"></i></button>  
+        </div>  
+    </div>  
+    <div id="modal-content" class="flex-1 relative bg-black overflow-hidden"></div>  
+</div>  <div id="quiz-modal" class="fs-modal !bg-white">  
+    <div class="p-4 bg-black/40 text-white flex justify-between items-center border-b border-white/10">  
+        <span id="quiz-title" class="text-[10px] font-bold uppercase">Test</span>  
+        <button onclick="closeQuiz()"><i class="fas fa-times"></i></button>  
+    </div>  
+    <div id="quiz-screen" class="p-6 overflow-y-auto"></div>  
+    <div id="quiz-footer" class="p-4 border-t border-white/10 mt-auto flex justify-between bg-black/20">  
+        <button id="prev-q" class="bg-white/5 border border-white/10 px-4 py-2 rounded-xl text-[10px] font-bold text-white hidden">PREV</button>  
+        <button id="next-q" class="bg-indigo-600 text-white px-6 py-2 rounded-xl text-[10px] font-bold ml-auto shadow-lg">NEXT</button>  
+        <button id="submit-q" class="bg-green-600 text-white px-6 py-2 rounded-xl text-[10px] font-bold hidden ml-auto shadow-lg">SUBMIT</button>  
+    </div>  
+</div>  <script type="module">  
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";  
+import { getFirestore, collection, onSnapshot, doc, getDoc, setDoc, updateDoc, deleteDoc, Timestamp, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";  
+import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";  
   
-  <div id="tab-lectures" class="tab-content">
-      <div id="lec-locked" class="glass hidden text-center mt-10">
-          <i class="fas fa-lock text-indigo-500 text-4xl mb-4"></i>
-          <p class="text-[12px] font-black text-white mb-4 uppercase italic">Premium Batch Required</p>
-          <p class="text-[10px] text-slate-400 mb-6">You don't have an active subscription. Enroll in a batch to access Videos and DPP Tests.</p>
-          <div id="plans-container" class="space-y-3 text-left"></div>
-      </div>
-
-      <div id="subscriber-content" class="hidden">
-          <div id="batch-content-nav" class="flex gap-2 mb-4">
-              <button onclick="showContent('videos')" id="nav-v" class="flex-1 py-2 rounded-xl text-[10px] font-black bg-indigo-600 text-white shadow-lg">VIDEOS</button>
-              <button onclick="showContent('dpps')" id="nav-d" class="flex-1 py-2 rounded-xl text-[10px] font-black bg-white/10 text-slate-300 border border-white/10">DPP TEST</button>
-          </div>
-          <div id="chapter-view" class="space-y-3 pb-10"></div>
-          <div id="dpp-view" class="hidden space-y-3 pb-10"></div>
-          <div id="lecture-list-view" class="hidden pb-10">
-              <button onclick="showChapters()" class="mb-4 text-white text-xs font-bold flex items-center gap-2 uppercase opacity-70"><i class="fas fa-arrow-left"></i> Back</button>
-              <h2 id="current-chapter-title" class="text-white font-black uppercase text-sm mb-4 italic">Chapter</h2>
-              <div id="lecture-container" class="space-y-3"></div>
-          </div>
-      </div>
-  </div>
-
-  <div id="tab-results" class="tab-content space-y-4 pb-10">
-      <div class="glass !p-5">
-          <h2 class="text-sm font-black text-white uppercase tracking-wider mb-2"><i class="fas fa-poll-h mr-2 text-indigo-400"></i>Check Examination Result</h2>
-          <p class="text-[10px] text-slate-400 mb-4">Enter your Scholar ID / Admission Number to view your annual report card panel directly.</p>
-          <div class="flex flex-col gap-2">
-              <input type="text" id="student-scholar-id" class="publisher-input !mb-0 text-center text-sm font-bold tracking-widest uppercase py-3" placeholder="ENTER SCHOLAR ID (e.g. 2026101)">
-              <button onclick="window.fetchStudentResult()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-bold text-xs tracking-wider uppercase transition-all shadow-lg"><i class="fas fa-search mr-2"></i>Get Result</button>
-          </div>
-      </div>
-      <div id="result-display-panel" class="hidden bg-white text-black rounded-3xl p-4 border border-slate-200 shadow-2xl overflow-x-auto"></div>
-      <button id="download-btn"
-onclick="downloadResult()"
-class="mt-3 bg-indigo-600 text-white px-5 py-2 rounded-xl font-bold text-xs">
-📥 Download Result
-</button>
-  </div>
-
-  <div id="tab-admin" class="tab-content space-y-4">
-    <div class="flex justify-center gap-2 bg-black/20 p-2 rounded-2xl border border-white/5">
-        <div onclick="showAdminSection('publish')" id="sub-btn-publish" class="admin-sub-tab active">PUBLISH</div>
-        <div onclick="showAdminSection('manage')" id="sub-btn-manage" class="admin-sub-tab">MANAGE</div>
-        <div onclick="showAdminSection('users')" id="sub-btn-users" class="admin-sub-tab">USERS</div>
-        <div onclick="showAdminSection('excel-results')" id="sub-btn-excel-results" class="admin-sub-tab">EXCEL RESULTS</div>
-    </div>
-    
-    <div id="sec-publish" class="admin-section space-y-4">
-        <div class="glass !p-4">
-            <p class="text-[9px] font-black text-indigo-400 mb-2 uppercase">Publish Lecture</p>
-            <input id="lec-batch" class="publisher-input" placeholder="Batch ID (e.g. UDAAN 2027)">
-            <input id="lec-chapter" class="publisher-input" placeholder="Chapter Name">
-            <input id="lec-title" class="publisher-input" placeholder="Lecture Title">
-            <input id="lec-link" class="publisher-input" placeholder="Video Link">
-            <input id="lec-notes" class="publisher-input" placeholder="Notes Link">
-            <button id="lec-save-btn" onclick="saveLecture()" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold text-[10px] shadow-lg">SAVE LECTURE</button>
-        </div>
-        <div class="glass !p-4">
-            <p class="text-[9px] font-black text-red-400 mb-2 uppercase">Publish DPP Quiz</p>
-            <input id="dpp-batch" class="publisher-input" placeholder="Batch ID">
-            <input id="dpp-title" class="publisher-input" placeholder="DPP Title">
-            <textarea id="dpp-data" class="publisher-input h-20" placeholder='JSON Questions'></textarea>
-            <button id="dpp-save-btn" onclick="saveDPP()" class="w-full bg-red-600 text-white py-3 rounded-xl font-bold text-[10px] shadow-lg">SAVE DPP</button>
-        </div>
-        <div class="glass !p-4">
-            <p class="text-[9px] font-black text-indigo-400 mb-2 uppercase">Publish Book</p>
-            <input id="book-title" class="publisher-input" placeholder="Book Title">
-            <input id="book-link" class="publisher-input" placeholder="PDF Link">
-            <input id="book-price" class="publisher-input" placeholder="Price">
-            <input id="book-access" class="publisher-input" placeholder="Access (ALL or emails with comma)">
-            <button id="book-save-btn" onclick="saveBook()" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold text-[10px] shadow-lg">SAVE BOOK</button>
-        </div>
-        <div class="glass !p-4">
-            <p class="text-[9px] font-black text-indigo-400 mb-2 uppercase">Batch Configuration</p>
-            <div id="plan-inputs" class="space-y-1"></div>
-            <button onclick="addNewPlanInput()" class="w-full border-2 border-dashed border-white/20 text-slate-400 py-2 rounded-xl font-bold text-[10px] mt-2">+ ADD BATCH</button>
-            <button onclick="window.saveSettings()" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold text-[10px] mt-2 shadow-lg">SAVE CONFIG</button>
-        </div>
-    </div>
-
-    <div id="sec-manage" class="admin-section hidden pb-20 space-y-4">
-        <div id="manageLecGrid" class="space-y-2"></div>
-        <div id="manageDPPGrid" class="space-y-2"></div>
-        <div id="manageBookGrid" class="space-y-2"></div>
-    </div>
-
-    <div id="sec-users" class="admin-section hidden pb-20">
-        <div id="adminUserList" class="space-y-3 mt-2"></div>
-        <div class="glass mt-6 !p-4">
-            <p class="text-[10px] font-black text-indigo-400 uppercase mb-3">Student DPP Analytics</p>
-            <div class="flex gap-2 mb-4">
-                <input type="text" id="analyticsSearch" placeholder="Enter student name or email" class="publisher-input !mb-0">
-                <button onclick="searchAnalytics()" class="bg-indigo-600 text-white px-4 rounded-xl text-[10px] font-bold">SEARCH</button>
-            </div>
-            <div id="dppAnalytics" class="hidden"></div>
-        </div>
-    </div>
-
-    <div id="sec-excel-results" class="admin-section hidden pb-20 space-y-4">
-        <div class="glass !p-4">
-            <p class="text-[10px] font-black text-indigo-400 mb-2 uppercase">Bulk Upload Student Results (.xlsx)</p>
-            <p class="text-[9px] text-slate-400 mb-4 leading-relaxed">
-                Make sure your sheet headers strictly match:<br>
-                <code class="text-indigo-300">scholar_id, roll_no, name, mother, father, dob, class, school, subjects_json, result_status</code><br>
-                * Note: <code class="text-emerald-400">subjects_json</code> column should contain explicit subject arrays like:<br>
-                <code class="text-amber-400 text-[8px] block">[{"code":"002","name":"HINDI","theory":75,"practical":20,"total":95},{"code":"041","name":"MATHS","theory":76,"practical":20,"total":96}]</code>
-            </p>
-            <input type="file" id="excel-file-input" accept=".xlsx, .xls" class="publisher-input text-xs pt-2">
-            <button onclick="window.processExcelUpload()" class="w-full bg-emerald-600 text-white py-3 rounded-xl font-bold text-[10px] tracking-wider shadow-lg uppercase"><i class="fas fa-file-upload mr-2"></i>Process & Upload Data</button>
-        </div>
-    </div>
-  </div>
-
-  <nav class="fixed bottom-0 left-0 right-0 flex justify-around p-3 pb-8 z-[1000]">
-    <button onclick="switchTab('library')" id="btn-library" class="nav-btn text-[10px] nav-active"><i class="fas fa-book text-xl"></i><br>BOOKS</button>
-    <button onclick="switchTab('lectures')" id="btn-lectures" class="nav-btn text-[10px]"><i class="fas fa-play-circle text-xl"></i><br>Courses</button>
-    <button onclick="switchTab('results')" id="btn-results" class="nav-btn text-[10px]"><i class="fas fa-poll-h text-xl"></i><br>RESULT</button>
-    <button onclick="switchTab('admin')" id="btn-admin" class="nav-btn text-[10px] hidden text-slate-400"><i class="fas fa-user-shield text-xl"></i><br>ADMIN</button>
-  </nav>
-</div>
-
-<div id="main-modal" class="fs-modal">
-    <div id="modal-header">
-        <div class="flex items-center gap-2 overflow-hidden">
-            <span id="modal-title" class="text-xs font-bold uppercase truncate">Secure Viewer</span>
-        </div>
-        <div class="flex items-center gap-2">
-            <button onclick="toggleFullScreen()" class="text-white p-2"><i class="fas fa-expand"></i></button>
-            <button onclick="closeModal()" class="text-white p-2"><i class="fas fa-times text-xl"></i></button>
-        </div>
-    </div>
-    <div id="modal-content" class="flex-1 relative bg-black overflow-hidden"></div>
-</div>
-
-<div id="quiz-modal" class="fs-modal !bg-white">
-    <div class="p-4 bg-black/40 text-white flex justify-between items-center border-b border-white/10">
-        <span id="quiz-title" class="text-[10px] font-bold uppercase">Test</span>
-        <button onclick="closeQuiz()"><i class="fas fa-times"></i></button>
-    </div>
-    <div id="quiz-screen" class="p-6 overflow-y-auto"></div>
-    <div id="quiz-footer" class="p-4 border-t border-white/10 mt-auto flex justify-between bg-black/20">
-        <button id="prev-q" class="bg-white/5 border border-white/10 px-4 py-2 rounded-xl text-[10px] font-bold text-white hidden">PREV</button>
-        <button id="next-q" class="bg-indigo-600 text-white px-6 py-2 rounded-xl text-[10px] font-bold ml-auto shadow-lg">NEXT</button>
-        <button id="submit-q" class="bg-green-600 text-white px-6 py-2 rounded-xl text-[10px] font-bold hidden ml-auto shadow-lg">SUBMIT</button>
-    </div>
-</div>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, onSnapshot, doc, getDoc, setDoc, updateDoc, deleteDoc, Timestamp, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-const fbCfg = { apiKey: "AIzaSyCrFbBhfWT6WlYAH_ZmopTfzrf47GEQe1k", authDomain: "book-swap-104b7.firebaseapp.com", projectId: "book-swap-104b7" };
-const fbApp = initializeApp(fbCfg); const db = getFirestore(fbApp); const auth = getAuth(fbApp); const prov = new GoogleAuthProvider();
-const adminEmail = "mihirjaisingh@gmail.com";
-
-let currentLectures = []; let currentDPPs = []; let allUsers = []; 
-let userBatchCode = "FREE"; let appBatches = [];
-let editLecId = null; let editDppId = null; let editBookId = null;
-let userCompletedDPPs = {};
-let quizStarted = false; let quizSubmitted = false;
-
-onAuthStateChanged(auth, async user => {
-    if (user) {
-        const uRef = doc(db, "users", user.uid); 
-        const uSnap = await getDoc(uRef);
-        let token = localStorage.getItem('aarav_device_token') || Math.random().toString(36).substring(2); 
-        localStorage.setItem('aarav_device_token', token);
-
-        let userData;
-        if(!uSnap.exists()) {
-            userData = { name: user.displayName, email: user.email, uid: user.uid, deviceID: token, activeBatchCode: "FREE", deviceLocked: false };
-            await setDoc(uRef, userData);
-        } else {
-            userData = uSnap.data();
-            if(userData.deviceLocked && user.email !== adminEmail) { lockDevice("Account Locked by Admin."); return; }
-            if (!userData.deviceID) await updateDoc(uRef, { deviceID: token });
-            else if (user.email !== adminEmail && userData.deviceID !== token) { lockDevice("Multiple Device Login Detected."); return; }
-        }
-        
-        document.getElementById("lock-screen").style.display = "none";
-        document.getElementById("login-screen").style.display = "none";
-        document.getElementById("app").style.display = "block";
-        document.getElementById("user-display").innerText = user.displayName;
-        if(user.email === adminEmail) { document.getElementById("btn-admin").classList.remove("hidden"); loadAdminData(); }
-        checkAccess(user.uid); loadBooks(); loadSettings(); loadUserSubmissions(user.uid);
-    } else { 
-        document.getElementById("login-screen").style.display = "flex"; 
-        document.getElementById("app").style.display = "none";
-    }
-});
-
-function lockDevice(reason) {
-    document.getElementById("lock-screen").style.display = "flex"; 
-    document.getElementById("app").style.display = "none";
-    document.getElementById("lock-reason").innerText = reason;
-}
-
-async function loadUserSubmissions(uid) {
-    onSnapshot(collection(db, "user_submissions"), snap => {
-        userCompletedDPPs = {};
-        snap.forEach(d => { const data = d.data(); if(data.uid === uid) userCompletedDPPs[data.dppId] = data.score; });
-        renderDPPs();
-    });
-}
-
-async function checkAccess(uid) {
-    onSnapshot(doc(db, "users", uid), snap => {
-        const u = snap.data();
-        const isAdmin = auth.currentUser.email === adminEmail;
-        const active = (u?.erpExpiry?.toDate() > new Date()) || isAdmin;
-        userBatchCode = u.activeBatchCode || "FREE";
-        document.getElementById("expiry-tag").innerText = active ? "STATUS: ACTIVE (" + userBatchCode + ")" : "STATUS: NO ACCESS";
-        if(active) { 
-            document.getElementById("lec-locked").classList.add("hidden"); 
-            document.getElementById("subscriber-content").classList.remove("hidden");
-            syncContent(); 
-        } else { 
-            document.getElementById("lec-locked").classList.remove("hidden"); 
-            document.getElementById("subscriber-content").classList.add("hidden");
-        }
-    });
-}
-
-function syncContent() {
-    const isAdmin = auth.currentUser.email === adminEmail;
-    const qLec = isAdmin ? collection(db, "lectures") : query(collection(db, "lectures"), where("batch", "==", userBatchCode));
-    onSnapshot(qLec, snap => { currentLectures = []; snap.forEach(d => currentLectures.push({...d.data(), id: d.id})); renderChapters(); });
-    const qDpp = isAdmin ? collection(db, "dpps") : query(collection(db, "dpps"), where("batch", "==", userBatchCode));
-    onSnapshot(qDpp, snap => { currentDPPs = []; snap.forEach(d => currentDPPs.push({...d.data(), id: d.id})); renderDPPs(); });
-}
-
-window.showContent = (type) => {
-    document.getElementById('chapter-view').classList.toggle('hidden', type !== 'videos');
-    document.getElementById('dpp-view').classList.toggle('hidden', type !== 'dpps');
-    document.getElementById('lecture-list-view').classList.add('hidden');
-    document.getElementById('nav-v').className = type === 'videos' ? 'flex-1 py-2 rounded-xl text-[10px] font-black bg-indigo-600 text-white shadow-lg' : 'flex-1 py-2 rounded-xl text-[10px] font-black bg-white/10 text-slate-300 border border-white/10';
-    document.getElementById('nav-d').className = type === 'dpps' ? 'flex-1 py-2 rounded-xl text-[10px] font-black bg-indigo-600 text-white shadow-lg' : 'flex-1 py-2 rounded-xl text-[10px] font-black bg-white/10 text-slate-300 border border-white/10';
+// GLOBAL GRADING FUNCTION
+window.getGrade = function(percent) {  
+    if (percent >= 91) return "A1";  
+    if (percent >= 81) return "A2";  
+    if (percent >= 71) return "B1";  
+    if (percent >= 61) return "B2";  
+    if (percent >= 51) return "C1";  
+    if (percent >= 41) return "C2";  
+    if (percent >= 33) return "D";  
+    return "E";  
 };
+  
+const fbCfg = { apiKey: "AIzaSyCrFbBhfWT6WlYAH_ZmopTfzrf47GEQe1k", authDomain: "book-swap-104b7.firebaseapp.com", projectId: "book-swap-104b7" };  
+const fbApp = initializeApp(fbCfg); const db = getFirestore(fbApp); const auth = getAuth(fbApp); const prov = new GoogleAuthProvider();  
+const adminEmail = "mihirjaisingh@gmail.com";  
+  
+let currentLectures = []; let currentDPPs = []; let allUsers = [];   
+let userBatchCode = "FREE"; let appBatches = [];  
+let editLecId = null; let editDppId = null; let editBookId = null;  
+let userCompletedDPPs = {};  
+let quizStarted = false; let quizSubmitted = false;  
+  
+onAuthStateChanged(auth, async user => {  
+    if (user) {  
+        const uRef = doc(db, "users", user.uid);   
+        const uSnap = await getDoc(uRef);  
+        let token = localStorage.getItem('aarav_device_token') || Math.random().toString(36).substring(2);   
+        localStorage.setItem('aarav_device_token', token);  
+  
+        let userData;  
+        if(!uSnap.exists()) {  
+            userData = { name: user.displayName, email: user.email, uid: user.uid, deviceID: token, activeBatchCode: "FREE", deviceLocked: false };  
+            await setDoc(uRef, userData);  
+        } else {  
+            userData = uSnap.data();  
+            if(userData.deviceLocked && user.email !== adminEmail) { lockDevice("Account Locked by Admin."); return; }  
+            if (!userData.deviceID) await updateDoc(uRef, { deviceID: token });  
+            else if (user.email !== adminEmail && userData.deviceID !== token) { lockDevice("Multiple Device Login Detected."); return; }  
+        }  
+          
+        document.getElementById("lock-screen").style.display = "none";  
+        document.getElementById("login-screen").style.display = "none";  
+        document.getElementById("app").style.display = "block";  
+        document.getElementById("user-display").innerText = user.displayName;  
+        if(user.email === adminEmail) { document.getElementById("btn-admin").classList.remove("hidden"); loadAdminData(); }  
+        checkAccess(user.uid); loadBooks(); loadSettings(); loadUserSubmissions(user.uid);  
+    } else {   
+        document.getElementById("login-screen").style.display = "flex";   
+        document.getElementById("app").style.display = "none";  
+    }  
+});  
+  
+function lockDevice(reason) {  
+    document.getElementById("lock-screen").style.display = "flex";   
+    document.getElementById("app").style.display = "none";  
+    document.getElementById("lock-reason").innerText = reason;  
+}  
+  
+async function loadUserSubmissions(uid) {  
+    onSnapshot(collection(db, "user_submissions"), snap => {  
+        userCompletedDPPs = {};  
+        snap.forEach(d => { const data = d.data(); if(data.uid === uid) userCompletedDPPs[data.dppId] = data.score; });  
+        renderDPPs();  
+    });  
+}  
+  
+async function checkAccess(uid) {  
+    onSnapshot(doc(db, "users", uid), snap => {  
+        const u = snap.data();  
+        const isAdmin = auth.currentUser.email === adminEmail;  
+        const active = (u?.erpExpiry?.toDate() > new Date()) || isAdmin;  
+        userBatchCode = u.activeBatchCode || "FREE";  
+        document.getElementById("expiry-tag").innerText = active ? "STATUS: ACTIVE (" + userBatchCode + ")" : "STATUS: NO ACCESS";  
+        if(active) {   
+            document.getElementById("lec-locked").classList.add("hidden");   
+            document.getElementById("subscriber-content").classList.remove("hidden");  
+            syncContent();   
+        } else {   
+            document.getElementById("lec-locked").classList.remove("hidden");   
+            document.getElementById("subscriber-content").classList.add("hidden");  
+        }  
+    });  
+}  
+  
+function syncContent() {  
+    const isAdmin = auth.currentUser.email === adminEmail;  
+    const qLec = isAdmin ? collection(db, "lectures") : query(collection(db, "lectures"), where("batch", "==", userBatchCode));  
+    onSnapshot(qLec, snap => { currentLectures = []; snap.forEach(d => currentLectures.push({...d.data(), id: d.id})); renderChapters(); });  
+    const qDpp = isAdmin ? collection(db, "dpps") : query(collection(db, "dpps"), where("batch", "==", userBatchCode));  
+    onSnapshot(qDpp, snap => { currentDPPs = []; snap.forEach(d => currentDPPs.push({...d.data(), id: d.id})); renderDPPs(); });  
+}  
+  
+window.showContent = (type) => {  
+    document.getElementById('chapter-view').classList.toggle('hidden', type !== 'videos');  
+    document.getElementById('dpp-view').classList.toggle('hidden', type !== 'dpps');  
+    document.getElementById('lecture-list-view').classList.add('hidden');  
+    document.getElementById('nav-v').className = type === 'videos' ? 'flex-1 py-2 rounded-xl text-[10px] font-black bg-indigo-600 text-white shadow-lg' : 'flex-1 py-2 rounded-xl text-[10px] font-black bg-white/10 text-slate-300 border border-white/10';  
+    document.getElementById('nav-d').className = type === 'dpps' ? 'flex-1 py-2 rounded-xl text-[10px] font-black bg-indigo-600 text-white shadow-lg' : 'flex-1 py-2 rounded-xl text-[10px] font-black bg-white/10 text-slate-300 border border-white/10';  
+};  
+  
+function renderChapters() {  
+    const container = document.getElementById("chapter-view"); container.innerHTML = "";  
+    const chapters = [...new Set(currentLectures.map(l => l.chapter))].filter(Boolean);  
+    chapters.forEach(ch => {  
+        const count = currentLectures.filter(l => l.chapter === ch).length;  
+        container.innerHTML += `<div class="chapter-card" onclick="openChapter('${ch}')"><div class="w-12 h-12 bg-indigo-500/20 text-indigo-400 rounded-xl flex items-center justify-center text-xl shadow-inner"><i class="fas fa-folder"></i></div><div class="flex-1"><b class="text-sm text-white uppercase block">${ch}</b><span class="text-[10px] text-slate-400 font-bold uppercase">${count} Lectures</span></div><i class="fas fa-chevron-right text-white/20"></i></div>`;  
+    });  
+}  
+  
+function renderDPPs() {  
+    const container = document.getElementById("dpp-view"); container.innerHTML = "";  
+    currentDPPs.forEach(d => {  
+        const isDone = userCompletedDPPs[d.id] !== undefined;  
+        container.innerHTML += `<div class="chapter-card" onclick="startQuiz('${d.id}')">  
+            <div class="w-12 h-12 ${isDone?'bg-green-500/20 text-green-400':'bg-red-500/20 text-red-400'} rounded-xl flex items-center justify-center text-xl shadow-inner"><i class="fas ${isDone?'fa-check-circle':'fa-file-signature'}"></i></div>  
+            <div class="flex-1"><b class="text-sm text-white uppercase block">${d.title}</b>  
+            <span class="text-[10px] ${isDone?'text-green-400':'text-slate-400'} font-bold uppercase">${isDone?'DPP COMPLETED':'CBT TEST'}</span></div>  
+            <i class="fas fa-play ${isDone?'text-green-400':'text-red-400'} text-xs"></i></div>`;  
+    });  
+}  
+  
+window.toggleFeeDue = async (scholarId, currentStatus) => {  
+    if (!auth.currentUser || auth.currentUser.email !== adminEmail) {  
+        alert("Unauthorized Access");  
+        return;  
+    }  
+    await updateDoc(doc(db, "school_results", scholarId), {  
+        fee_due: !currentStatus  
+    });  
+    alert("Fee status updated!");  
+    window.fetchStudentResult();
+};  
+  
+// --- STUDENT EXPERIMENTAL DIGITAL REPORT CARD ENGINE ---  
+window.fetchStudentResult = async () => {  
+    const sId = document.getElementById("student-scholar-id").value.trim().toUpperCase();  
+    const targetPanel = document.getElementById("result-display-panel");  
+      
+    if(!sId) { alert("Please input a valid Scholar ID!"); return; }  
+      
+    try {  
+        const rSnap = await getDoc(doc(db, "school_results", sId));  
+        if(!rSnap.exists()) {  
+            alert("No result found for this Scholar ID. Contact School Admin.");  
+            targetPanel.classList.add("hidden");  
+            return;  
+        }  
+          
+        const data = rSnap.data();  
+        let feeBlocked = data.fee_due === true;  
+  
+        let blockUI = `  
+            <div class="bg-red-50 border-4 border-red-600 rounded-3xl p-8 text-center">  
+                <i class="fas fa-lock text-5xl text-red-600 mb-4"></i>  
+                <h2 class="text-2xl font-black text-red-700 uppercase mb-3">RESULT BLOCKED</h2>  
+                <p class="text-sm text-slate-700 font-bold mb-4">Your school fee is pending.</p>  
+                ${auth.currentUser.email === adminEmail ? `  
+                    <button onclick="toggleFeeDue('${data.scholar_id}', true)" class="bg-green-600 text-white px-4 py-2 rounded-xl font-bold">UNBLOCK RESULT</button>  
+                ` : ``}  
+            </div>  
+        `;  
+  
+        if (feeBlocked) {  
+            targetPanel.innerHTML = blockUI;  
+            targetPanel.classList.remove("hidden");  
+            return;  
+        }  
 
-function renderChapters() {
-    const container = document.getElementById("chapter-view"); container.innerHTML = "";
-    const chapters = [...new Set(currentLectures.map(l => l.chapter))].filter(Boolean);
-    chapters.forEach(ch => {
-        const count = currentLectures.filter(l => l.chapter === ch).length;
-        container.innerHTML += `<div class="chapter-card" onclick="openChapter('${ch}')"><div class="w-12 h-12 bg-indigo-500/20 text-indigo-400 rounded-xl flex items-center justify-center text-xl shadow-inner"><i class="fas fa-folder"></i></div><div class="flex-1"><b class="text-sm text-white uppercase block">${ch}</b><span class="text-[10px] text-slate-400 font-bold uppercase">${count} Lectures</span></div><i class="fas fa-chevron-right text-white/20"></i></div>`;
-    });
-}
+        let subjects = [];  
+        try { subjects = typeof data.subjects_json === "string" ? JSON.parse(data.subjects_json) : data.subjects_json; } catch(e) { console.error(e); }  
+          
+        let totalMarks = 0;  
+        let maxMarks = 0;  
+  
+        // Dynamic evaluation loops fixing the fullMarks logic
+        subjects.forEach(sub => {  
+            totalMarks += Number(sub.total || 0);  
+            maxMarks += Number(sub.fullMarks || 100);  
+        });  
+          
+        let percentage = maxMarks > 0 ? (totalMarks / maxMarks) * 100 : 0;  
+        percentage = percentage.toFixed(2);  
+          
+        let subjectRows = "";  
+        subjects.forEach(sub => {  
+            let calculatedTotal = Number(sub.total || 0);  
+            let calculatedMax = Number(sub.fullMarks || 100);  
+            let subPercent = calculatedMax > 0 ? (calculatedTotal / calculatedMax) * 100 : 0;  
+            let dynamicGrade = (sub.grade && sub.grade !== "E" && sub.grade.trim() !== "") ? sub.grade : window.getGrade(subPercent);  
+  
+            subjectRows += `  
+            <tr class="border-b border-slate-300 text-[11px] text-center text-slate-800">  
+                <td class="p-2 font-mono">${sub.code || '---'}</td>  
+                <td class="p-2 text-left font-bold uppercase">${sub.name || '---'}</td>  
+                <td class="p-2">${sub.theory !== undefined ? sub.theory : '---'}</td>  
+                <td class="p-2">${sub.practical !== undefined ? sub.practical : '---'}</td>  
+                <td class="p-2 font-black">${calculatedTotal} / ${calculatedMax}</td>  
+                <td class="p-2 text-indigo-600 font-bold">${dynamicGrade}</td>  
+            </tr>`;  
+        });  
+  
+        targetPanel.innerHTML = `  
+         <div class="border-4 border-blue-900 p-4 bg-slate-50 relative">
+                <div class="flex items-center justify-between border-b-2 border-blue-900 pb-3 mb-4">
 
-function renderDPPs() {
-    const container = document.getElementById("dpp-view"); container.innerHTML = "";
-    currentDPPs.forEach(d => {
-        const isDone = userCompletedDPPs[d.id] !== undefined;
-        container.innerHTML += `<div class="chapter-card" onclick="startQuiz('${d.id}')">
-            <div class="w-12 h-12 ${isDone?'bg-green-500/20 text-green-400':'bg-red-500/20 text-red-400'} rounded-xl flex items-center justify-center text-xl shadow-inner"><i class="fas ${isDone?'fa-check-circle':'fa-file-signature'}"></i></div>
-            <div class="flex-1"><b class="text-sm text-white uppercase block">${d.title}</b>
-            <span class="text-[10px] ${isDone?'text-green-400':'text-slate-400'} font-bold uppercase">${isDone?'DPP COMPLETED':'CBT TEST'}</span></div>
-            <i class="fas fa-play ${isDone?'text-green-400':'text-red-400'} text-xs"></i></div>`;
-    });
-}
+    <!-- LEFT LOGO -->
+    <div class="flex items-center gap-3">
+        <img 
+            src="https://i.postimg.cc/hjTFV5Hk/Screenshot-2026-0526-080731.png"
+            class="w-14 h-14 object-contain"
+        >
+    </div>
 
-window.toggleFeeDue = async (scholarId, currentStatus) => {
-    
-    // 🔒 ADMIN CHECK
-    if (!auth.currentUser || auth.currentUser.email !== adminEmail) {
-        alert("Unauthorized Access");
-        return;
-    }
-    
-    await updateDoc(doc(db, "school_results", scholarId), {
-        fee_due: !currentStatus
-    });
-    
-    alert("Fee status updated!");
-};
-
-// --- STUDENT EXPERIMENTAL DIGITAL REPORT CARD ENGINE ---
-window.fetchStudentResult = async () => {
-    const sId = document.getElementById("student-scholar-id").value.trim().toUpperCase();
-    const targetPanel = document.getElementById("result-display-panel");
-    
-    if(!sId) { alert("Please input a valid Scholar ID!"); return; }
-    
-    try {
-        const rSnap = await getDoc(doc(db, "school_results", sId));
-        if(!rSnap.exists()) {
-            alert("No result found for this Scholar ID. Contact School Admin.");
-            targetPanel.classList.add("hidden");
-            document.getElementById("download-btn").classList.remove("hidden");
-            return;
-        }
-        
-        const data = rSnap.data();
-        // FEE DUE CHECK
-let feeBlocked = data.fee_due === true;
-
-let blockUI = `
-    <div class="bg-red-50 border-4 border-red-600 rounded-3xl p-8 text-center">
-        <i class="fas fa-lock text-5xl text-red-600 mb-4"></i>
-
-        <h2 class="text-2xl font-black text-red-700 uppercase mb-3">
-            RESULT BLOCKED
+    <!-- CENTER TEXT -->
+    <div class="text-center flex-1">
+        <h2 class="text-blue-900 font-black text-sm tracking-wide uppercase leading-tight">
+            TLSM WORLD SCHOOL
         </h2>
 
-        <p class="text-sm text-slate-700 font-bold mb-4">
-            Your school fee is pending.
+        <p class="text-[10px] font-bold text-slate-600 uppercase">
+            Affiliated to CBSE
         </p>
 
-        ${auth.currentUser.email === adminEmail ? `
-            <button onclick="toggleFeeDue('${data.scholar_id}', true)" 
-                class="bg-green-600 text-white px-4 py-2 rounded-xl font-bold">
-                UNBLOCK RESULT
-            </button>
-        ` : ``}
-    </div>
-`;
-
-if (feeBlocked) {
-    targetPanel.innerHTML = blockUI;
-    targetPanel.classList.remove("hidden");
-    document.getElementById("download-btn").classList.remove("hidden");
-    return;
-    
-}
-        let subjects = [];
-        try { subjects = typeof data.subjects_json === "string" ? JSON.parse(data.subjects_json) : data.subjects_json; } catch(e) { console.error(e); }
-        
-        let subjectRows = "";
-        subjects.forEach(sub => {
-            subjectRows += `
-            <tr class="border-b border-slate-300 text-[11px] text-center text-slate-800">
-                <td class="p-2 font-mono">${sub.code || ''}</td>
-                <td class="p-2 text-left font-bold uppercase">${sub.name || ''}</td>
-                <td class="p-2">${sub.theory !== undefined ? sub.theory : '---'}</td>
-                <td class="p-2">${sub.practical !== undefined ? sub.practical : '---'}</td>
-                <td class="p-2 font-black">${sub.total || '0'}</td>
-                <td class="p-2 text-indigo-600 font-bold">${sub.grade || ' '}</td>
-            </tr>`;
-        });
-
-        targetPanel.innerHTML = `
-            <div class="border-4 border-blue-900 p-4 bg-slate-50 relative">
-              <div class="text-center border-b-2 border-blue-900 pb-3 mb-4">
-
-    <!-- SCHOOL LOGO -->
-    <img 
-        src="https://i.postimg.cc/hjTFV5Hk/Screenshot-2026-0526-080731.png"
-        class="w-20 h-20 object-contain mx-auto mb-3" 
-    >
-
-    <!-- SCHOOL NAME -->
-    <h2 class="text-blue-900 font-black text-sm tracking-wide uppercase leading-tight">
-        TLSM WORLD SCHOOL
-    </h2>
-
-    <!-- BOARD -->
-    <p class="text-[10px] font-bold text-slate-600 uppercase">
-        Affiliated to CBSE
-    </p>
-
-    <!-- EXAM TITLE -->
-    <p class="text-slate-700 text-[10px] font-bold tracking-tight uppercase mt-1">
-        Secondary School Examination (Class X) 2026
-    </p>
-
-</div>
-
-
-                
-                <div class="grid grid-cols-3 gap-y-1 gap-x-2 text-[10px] text-slate-800 border-b border-dashed border-slate-400 pb-3 mb-3">
-                    <div><span class="text-slate-500 font-bold">Roll No:</span></div>
-                    <div class="col-span-2 font-mono font-bold text-black">${data.roll_no || 'N/A'}</div>
-                    <div><span class="text-slate-500 font-bold">Candidate Name:</span></div>
-                    <div class="col-span-2 font-black uppercase text-black">${data.name || ''}</div>
-                    <div><span class="text-slate-500 font-bold">Mother's Name:</span></div>
-                    <div class="col-span-2 font-bold uppercase">${data.mother || ''}</div>
-                    <div><span class="text-slate-500 font-bold">Father's Name:</span></div>
-                    <div class="col-span-2 font-bold uppercase">${data.father || ''}</div>
-                    <div><span class="text-slate-500 font-bold">Date of Birth:</span></div>
-                    <div class="col-span-2 font-mono font-bold">${data.dob || ''}</div>
-                    <div><span class="text-slate-500 font-bold">School's Name:</span></div>
-                    <div class="col-span-2 font-bold uppercase text-blue-950">${data.school || ''}</div>
-                </div>
-                
-                <table class="w-full text-left border-collapse border border-blue-900 mb-4 bg-white shadow-sm">
-                    <thead>
-                        <tr class="bg-blue-900 text-white text-[9px] font-black uppercase text-center">
-                            <th class="p-2 border border-blue-900">SUB CODE</th>
-                            <th class="p-2 border border-blue-900 text-left">SUB NAME</th>
-                            <th class="p-2 border border-blue-900">THEORY</th>
-                            <th class="p-2 border border-blue-900">I.A / PRAC</th>
-                            <th class="p-2 border border-blue-900">TOTAL</th>
-                            <th class="p-2 border border-blue-900">POS. GRADE</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${subjectRows}
-                    </tbody>
-                </table>
-                
-                <div class="flex items-center justify-between p-2 bg-blue-900 text-white rounded-xl px-4 shadow-md">
-                    <span class="text-[10px] font-black uppercase tracking-wider">Final Result Outcome:</span>
-                    <span class="text-xs font-black uppercase bg-white text-emerald-700 px-4 py-0.5 rounded-full shadow-inner">${data.result_status || 'PASS'}</span>
-                </div>
-                
-                ${auth.currentUser.email === adminEmail ? `
-<div class="mt-4 text-center">
-    <button
-        onclick="toggleFeeDue('${data.scholar_id}', ${data.fee_due || false})"
-        class="px-5 py-2 rounded-xl text-white font-bold text-xs
-        ${data.fee_due ? 'bg-green-600' : 'bg-red-600'}">
-
-        ${data.fee_due ? 'UNLOCK RESULT' : 'BLOCK RESULT'}
-
-    </button>
-</div>
-` : ''}
-                
-                <p class="text-[7px] text-slate-400 text-center uppercase tracking-tighter mt-4 leading-tight">
-                    Disclaimer: This online system generated report sheet is explicitly delivered for strategic immediate reference info access over remote structures.
-                </p>
-            </div>
-        `;
-        targetPanel.classList.remove("hidden");
-    } catch(err) {
-        console.error(err);
-        alert("Firestore access query failure.");
-    }
-    document.getElementById("download-btn").style.display = "inline-block";
-};
-
-// --- ADMIN SYSTEM EXCEL INGEST DATA PIPELINE ---
-window.processExcelUpload = () => {
-    const fileInput = document.getElementById("excel-file-input");
-    if(!fileInput.files || fileInput.files.length === 0) { alert("Please select a valid excel .xlsx structure report card master first!"); return; }
-    
-    const targetFile = fileInput.files[0];
-    const fileReader = new FileReader();
-    
-    fileReader.onload = async (e) => {
-        try {
-            const rawBuffer = e.target.result;
-            const parsedWorkbook = XLSX.read(rawBuffer, { type: 'binary' });
-            const initialSheetName = parsedWorkbook.SheetNames[0];
-            const parsedJsonRows = XLSX.utils.sheet_to_json(parsedWorkbook.Sheets[initialSheetName]);
-            
-            if(parsedJsonRows.length === 0) { alert("Target Worksheet array structure evaluates completely empty mapping rows."); return; }
-            
-            let loadCounter = 0;
-            for(let row of parsedJsonRows) {
-                // Primary Key mapping constraint check validation
-                let keyPointer = row.scholar_id ? row.scholar_id.toString().trim().toUpperCase() : null;
-                if(!keyPointer) continue;
-                
-                // ===== UNIVERSAL AUTO SUBJECT DETECTION ENGINE =====
-
-let subjects = [];
-
-// ALL EXCEL COLUMNS
-const allColumns = Object.keys(row);
-
-// SUBJECT GROUPS
-let detectedSubjects = {};
-
-// Detect subject columns automatically
-allColumns.forEach(col => {
-
-    // Skip basic fields
-    const skipFields = [
-        "scholar_id",
-        "roll_no",
-        "name",
-        "mother",
-        "father",
-        "dob",
-        "class",
-        "school",
-        "result_status"
-    ];
-
-    if(skipFields.includes(col.toLowerCase())) return;
-
-    // Normalize column name
-    const cleanCol = col.toUpperCase().trim();
-
-    // THEORY DETECTION
-    if(
-        cleanCol.endsWith("_TH") ||
-        cleanCol.endsWith("_THEORY")
-    ) {
-
-        let subjectName = cleanCol
-            .replace("_TH", "")
-            .replace("_THEORY", "");
-
-        if(!detectedSubjects[subjectName]) {
-            detectedSubjects[subjectName] = {};
-        }
-
-        detectedSubjects[subjectName].theory =
-            Number(row[col] || 0);
-
-    }
-
-    // PRACTICAL DETECTION
-    else if(
-        cleanCol.endsWith("_PR") ||
-        cleanCol.endsWith("_PRACTICAL") ||
-        cleanCol.endsWith("_IA")
-    ) {
-
-        let subjectName = cleanCol
-            .replace("_PR", "")
-            .replace("_PRACTICAL", "")
-            .replace("_IA", "");
-
-        if(!detectedSubjects[subjectName]) {
-            detectedSubjects[subjectName] = {};
-        }
-
-        detectedSubjects[subjectName].practical =
-            Number(row[col] || 0);
-    }
-});
-
-// Convert detected subjects into final JSON
-Object.keys(detectedSubjects).forEach((sub, index) => {
-
-    const theory =
-        detectedSubjects[sub].theory || 0;
-
-    const practical =
-        detectedSubjects[sub].practical || 0;
-
-    // Skip fully empty subjects
-    if(theory === 0 && practical === 0) return;
-
-    const total = theory + practical;
-
-    // AUTO GRADE
-    let grade = "E";
-
-    if(total >= 91) grade = "A1";
-    else if(total >= 81) grade = "A2";
-    else if(total >= 71) grade = "B1";
-    else if(total >= 61) grade = "B2";
-    else if(total >= 51) grade = "C1";
-    else if(total >= 41) grade = "C2";
-    else if(total >= 33) grade = "D";
-
-    // AUTO GENERATED SUBJECT CODE
-    let autoCode =
-        (100 + index).toString();
-
-    subjects.push({
-        code: autoCode,
-        name: sub,
-        theory,
-        practical,
-        total,
-        grade
-    });
-});
-
-// FINAL PAYLOAD
-let processedPayload = {
-    scholar_id: keyPointer,
-    roll_no: row.roll_no
-        ? row.roll_no.toString()
-        : "---",
-
-    name: row.name || "Unknown Student",
-    mother: row.mother || "---",
-    father: row.father || "---",
-    dob: row.dob || "---",
-    class: row.class || "N/A",
-    school: row.school || "Aarav Public School",
-
-    // AUTO GENERATED SUBJECT ARRAY
-    subjects_json: subjects,
-
-    result_status:
-        row.result_status || "PASS",
-fee_due:
-    row.fee_due === true ||
-    row.fee_due === "TRUE",
-
-
-    updatedAt: Timestamp.now()
-};
-                
-                // Write single transactional batch rows straight to the cloud instance index
-                await setDoc(doc(db, "school_results", keyPointer), processedPayload, { merge: true });
-                loadCounter++;
-            }
-            alert(`Success! Successfully synchronized and deployed ${loadCounter} student records directly into app storage memory infrastructure updates.`);
-            fileInput.value = "";
-        } catch(err) {
-            console.error(err);
-            alert("Error encounter during structural runtime processing parsing index schemas.");
-        }
-    };
-    
-    fileReader.readAsBinaryString(targetFile);
-};
-
-// --- QUIZ LOGIC ---
-let quizData = []; let currentQ = 0; let userAnswers = []; let activeDPPId = null;
-
-window.startQuiz = (id) => {
-    activeDPPId = id; const dpp = currentDPPs.find(x => x.id === id); 
-    try {
-        quizData = JSON.parse(dpp.data);
-    } catch(e) {
-        alert("Invalid DPP Data Format"); return;
-    }
-    currentQ = 0; 
-    userAnswers = new Array(quizData.length).fill(null);
-    quizStarted = true; quizSubmitted = false;
-    
-    document.getElementById("quiz-title").innerText = dpp.title; 
-    document.getElementById("quiz-modal").style.display = "flex";
-    
-    document.getElementById("quiz-footer").innerHTML = `
-        <button id="prev-q" onclick="prevQuestion()" class="bg-white/5 border border-white/10 px-4 py-2 rounded-xl text-[10px] font-bold text-white hidden">PREV</button>
-        <button id="next-q" onclick="nextQuestion()" class="bg-indigo-600 text-white px-6 py-2 rounded-xl text-[10px] font-bold ml-auto shadow-lg">NEXT</button>
-        <button id="submit-q" onclick="submitQuiz()" class="bg-green-600 text-white px-6 py-2 rounded-xl text-[10px] font-bold hidden ml-auto shadow-lg">SUBMIT</button>`;
-
-    if(userCompletedDPPs[id] !== undefined) {
-        document.getElementById("quiz-screen").innerHTML = `<div class="text-center p-10"><i class="fas fa-check-circle text-green-400 text-5xl mb-4"></i><h2 class="font-bold uppercase text-white">Already Submitted</h2><p class="text-xs text-slate-400">Your Score: ${userCompletedDPPs[id]}/${quizData.length}</p></div>`;
-        document.getElementById("quiz-footer").innerHTML = `<button onclick="closeQuiz()" class="w-full bg-slate-800 text-white py-3 rounded-xl font-bold text-[10px]">BACK</button>`;
-    } else { 
-        showQuestion(); 
-    }
-};
-
-function showQuestion() {
-    const q = quizData[currentQ];
-    let html = `<p class="text-slate-400 text-[10px] mb-2 font-bold">QUESTION ${currentQ + 1} OF ${quizData.length}</p>
-    ${q.img ? `<img src="${q.img}" class="w-full rounded-2xl mb-4 border border-gray-300">` : ''}
-                <h3 class="text-black font-bold text-sm mb-6 leading-relaxed">${q.q}</h3>
-                <div class="space-y-4">`;
-
-    if (q.type === "integer") {
-        let currentVal = userAnswers[currentQ] !== null ? userAnswers[currentQ] : '';
-        html += `<input type="text" id="integer-ans" 
-                    oninput="window.saveAns(this.value)" 
-                    value="${currentVal}" 
-                    placeholder="Type your answer here..." 
-                    class="w-full bg-white/5 border border-white/10 text-black p-4 rounded-2xl focus:outline-none focus:border-indigo-500">`;
-    } else {
-        q.o.forEach((opt, i) => {
-            const isSelected = userAnswers[currentQ] === i;
-            html += `<button onclick="window.saveAns(${i})" class="option-btn ${isSelected ? 'selected' : ''}">
-                <span class="mr-3 opacity-40">${String.fromCharCode(65 + i)}.</span> ${opt}
-            </button>`;
-        });
-    }
-
-    document.getElementById("quiz-screen").innerHTML = html + `</div>`;
-    document.getElementById("prev-q").classList.toggle("hidden", currentQ === 0);
-    document.getElementById("next-q").classList.toggle("hidden", currentQ === quizData.length - 1);
-    document.getElementById("submit-q").classList.toggle("hidden", currentQ !== quizData.length - 1);
-}
-
-window.saveAns = (val) => { 
-    userAnswers[currentQ] = val; 
-    if(quizData[currentQ].type !== "integer") showQuestion(); 
-};
-
-window.nextQuestion = () => { if(currentQ < quizData.length - 1) { currentQ++; showQuestion(); } };
-window.prevQuestion = () => { if(currentQ > 0) { currentQ--; showQuestion(); } };
-
-window.submitQuiz = async () => {
-    if(!confirm("Are you sure you want to submit?")) return;
-    quizSubmitted = true;
-    let score = 0;
-    
-    quizData.forEach((q, i) => {
-        if(q.type === "integer") {
-            if(userAnswers[i] && userAnswers[i].toString().trim() == q.a.toString().trim()) score++;
-        } else {
-            if(userAnswers[i] === q.a) score++;
-        }
-    });
-
-    let questionAnalytics = [];
-    quizData.forEach((q, i) => {
-        let correct = false;
-        if (q.type === "integer") {
-            correct = (userAnswers[i] && userAnswers[i].toString().trim() == q.a.toString().trim());
-        } else {
-            correct = userAnswers[i] === q.a;
-        }
-        questionAnalytics.push({
-            question: q.q,
-            studentAnswer: userAnswers[i],
-            correctAnswer: q.a,
-            isCorrect: correct
-        });
-    });
-
-    await setDoc(doc(db, "user_submissions", auth.currentUser.uid + "_" + activeDPPId), {
-        uid: auth.currentUser.uid,
-        studentName: auth.currentUser.displayName,
-        studentEmail: auth.currentUser.email,
-        dppId: activeDPPId,
-        score: score,
-        answers: questionAnalytics,
-        timestamp: Timestamp.now()
-    });
-
-    let resHtml = `<div class="bg-indigo-600/20 text-indigo-300 p-6 rounded-3xl text-center mb-6 border border-indigo-500/30">
-                    <p class="text-[10px] font-black uppercase tracking-widest">Test Result</p>
-                    <h2 class="text-3xl font-black">${score} / ${quizData.length}</h2>
-                  </div><div class="space-y-4">`;
-
-    quizData.forEach((q, i) => {
-        let isCorrect = false;
-        if(q.type === "integer") isCorrect = (userAnswers[i] && userAnswers[i].toString().trim() == q.a.toString().trim());
-        else isCorrect = (userAnswers[i] === q.a);
-
-        let userText = userAnswers[i] === null ? 'Skipped' : (q.type === 'integer' ? userAnswers[i] : q.o[userAnswers[i]]);
-        let solText = q.type === 'integer' ? q.a : q.o[q.a];
-
-        resHtml += `<div class="p-4 bg-white/5 rounded-2xl border border-white/5">
-            <p class="text-[11px] font-bold text-white mb-2">${i+1}. ${q.q}</p>
-            <p class="text-[10px] ${isCorrect?'text-green-400':'text-red-400'} font-black uppercase">
-                YOURS: ${userText}
-            </p>
-            <p class="text-[10px] text-indigo-400 font-black uppercase mt-1">SOLUTION: ${solText}</p>
-        </div>`;
-    });
-
-    document.getElementById("quiz-screen").innerHTML = resHtml + `</div>`;
-    document.getElementById("quiz-footer").innerHTML = `<button onclick="closeQuiz()" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold text-[10px] shadow-lg">DONE</button>`;
-};
-
-window.closeQuiz = () => { 
-    quizStarted = false;
-    document.getElementById("quiz-modal").style.display = "none"; 
-};
-
-// --- ADMIN FUNCTIONS ---
-function loadAdminData() {
-    onSnapshot(collection(db, "lectures"), s => {
-        const g = document.getElementById("manageLecGrid"); g.innerHTML = "<p class='text-[10px] text-indigo-400 uppercase font-black'>Lectures</p>";
-        s.forEach(d => { const l = d.data(); g.innerHTML += `<div class="bg-black/30 p-3 rounded-xl flex justify-between items-center text-[10px] border border-white/10"><span><b>[${l.batch}]</b> ${l.title}</span><div class="flex gap-2"><button onclick='window.editItem("lec", ${JSON.stringify({...l, id:d.id})})' class="text-indigo-400 font-bold">EDIT</button><button onclick="window.delDoc('lectures','${d.id}')" class="text-red-400 font-bold">DEL</button></div></div>`; });
-    });
-    onSnapshot(collection(db, "dpps"), s => {
-        const g = document.getElementById("manageDPPGrid"); g.innerHTML = "<p class='text-[10px] text-indigo-400 uppercase font-black mt-2'>DPP Tests</p>";
-        s.forEach(d => { const dp = d.data(); g.innerHTML += `<div class="bg-black/30 p-3 rounded-xl flex justify-between items-center text-[10px] border border-white/10"><span><b>[${dp.batch}]</b> ${dp.title}</span><div class="flex gap-2"><button onclick='window.editItem("dpp", ${JSON.stringify({...dp, id:d.id})})' class="text-indigo-400 font-bold">EDIT</button><button onclick="window.delDoc('dpps','${d.id}')" class="text-red-400 font-bold">DEL</button></div></div>`; });
-    });
-    onSnapshot(collection(db, "secure_ebooks"), s => {
-        const g = document.getElementById("manageBookGrid"); g.innerHTML = "<p class='text-[10px] text-indigo-400 uppercase font-black mt-2'>Books</p>";
-        s.forEach(d => { const b = d.data(); g.innerHTML += `<div class="bg-black/30 p-3 rounded-xl flex justify-between items-center text-[10px] border border-white/10"><span>${b.title}</span><div class="flex gap-2"><button onclick='window.editItem("book", ${JSON.stringify({...b, id:d.id})})' class="text-indigo-400 font-bold">EDIT</button><button onclick="window.delDoc('secure_ebooks','${d.id}')" class="text-red-400 font-bold">DEL</button></div></div>`; });
-    });
-    onSnapshot(collection(db, "users"), s => { allUsers = []; s.forEach(d => allUsers.push({...d.data(), id: d.id})); renderUserList(allUsers); });
-}
-
-window.editItem = (type, data) => {
-    window.switchTab('admin'); window.showAdminSection('publish');
-    if(type === 'lec') {
-        editLecId = data.id; document.getElementById('lec-batch').value = data.batch; document.getElementById('lec-chapter').value = data.chapter; document.getElementById('lec-title').value = data.title; document.getElementById('lec-link').value = data.link; document.getElementById('lec-notes').value = data.notes; document.getElementById('lec-save-btn').innerText = "UPDATE LECTURE";
-    } else if (type === 'dpp') {
-        editDppId = data.id; document.getElementById('dpp-batch').value = data.batch; document.getElementById('dpp-title').value = data.title; document.getElementById('dpp-data').value = data.data; document.getElementById('dpp-save-btn').innerText = "UPDATE DPP";
-    } else if (type === 'book') {
-        editBookId = data.id; document.getElementById('book-title').value = data.title; document.getElementById('book-link').value = data.link; document.getElementById('book-price').value = data.price; document.getElementById('book-access').value = data.access; document.getElementById('book-save-btn').innerText = "UPDATE BOOK";
-    }
-};
-
-window.saveLecture = async () => {
-    const id = editLecId || ("lec_" + Date.now());
-    await setDoc(doc(db,"lectures", id), { batch: document.getElementById('lec-batch').value.toUpperCase(), chapter: document.getElementById('lec-chapter').value, title: document.getElementById('lec-title').value, link: document.getElementById('lec-link').value, notes: document.getElementById('lec-notes').value }, {merge: true});
-    alert("Saved!"); editLecId = null; document.getElementById('lec-save-btn').innerText = "SAVE LECTURE";
-    ['lec-batch','lec-chapter','lec-title','lec-link','lec-notes'].forEach(i=>document.getElementById(i).value="");
-};
-
-window.saveDPP = async () => {
-    const id = editDppId || ("dpp_" + Date.now());
-    await setDoc(doc(db, "dpps", id), { batch: document.getElementById("dpp-batch").value.toUpperCase(), title: document.getElementById("dpp-title").value, data: document.getElementById("dpp-data").value }, {merge: true}); 
-    alert("Saved!"); editDppId = null; document.getElementById('dpp-save-btn').innerText = "SAVE DPP";
-    ['dpp-batch','dpp-title','dpp-data'].forEach(i=>document.getElementById(i).value="");
-};
-
-window.saveBook = async () => {
-    const id = editBookId || ("book_" + Date.now());
-    await setDoc(doc(db,"secure_ebooks", id), { title: document.getElementById('book-title').value, link: document.getElementById('book-link').value, price: document.getElementById('book-price').value, access: document.getElementById('book-access').value }, {merge: true});
-    alert("Saved!"); editBookId = null; document.getElementById('book-save-btn').innerText = "SAVE BOOK";
-    ['book-title','book-link','book-price','book-access'].forEach(i=>document.getElementById(i).value="");
-};
-
-// --- GENERAL APP FUNCTIONS ---
-function loadBooks() {
-    onSnapshot(collection(db, "secure_ebooks"), snap => {
-        const g = document.getElementById("bookGrid"); g.innerHTML = "";
-        snap.forEach(d => { 
-            const b = d.data(); const userEmail = auth.currentUser.email.toLowerCase().trim();
-            const accessList = b.access ? b.access.toLowerCase().split(',').map(e => e.trim()) : [];
-            const ok = accessList.includes('all') || accessList.includes(userEmail) || userEmail === adminEmail.toLowerCase(); 
-            g.innerHTML += `<div class="glass flex justify-between items-center p-4"><div><b class="text-xs uppercase text-white">${b.title}</b><p class="text-indigo-400 font-bold text-[10px]">₹${b.price}</p></div><button onclick="${ok?`window.openMedia('${b.link}', '${b.title}')`:`window.open('https://wa.me/919229809156')`}" class="bg-indigo-600 text-white px-5 py-2 rounded-xl text-[9px] font-bold shadow-lg">${ok?'READ':'BUY'}</button></div>`; 
-        });
-    });
-}
-
-function renderUserList(users) {
-    const list = document.getElementById("adminUserList"); list.innerHTML = "";
-    users.forEach(u => {
-        const active = u.erpExpiry?.toDate() > new Date();
-        let btns = appBatches.map(b => `<button onclick="window.grant('${u.id}', '${b.name}')" class="bg-white/5 text-indigo-300 text-[8px] px-2 py-1.5 rounded-lg font-bold border border-white/10 hover:bg-indigo-600 hover:text-white transition-all">+ ${b.name}</button>`).join('');
-        list.innerHTML += `<div class="glass !p-4 border-l-4 ${active?'border-indigo-500':'border-white/10'} mb-2">
-            <div class="flex justify-between items-start text-[10px] text-white">
-                <div><b>${u.name || 'User'}</b><br><span class="opacity-60">${u.email}</span><br>
-                <span class="text-indigo-400 font-black">BATCH: ${u.activeBatchCode || 'NONE'}</span><br>
-                <span class="${u.deviceLocked?'text-red-400':'text-green-400'} font-bold">LOCKED: ${u.deviceLocked || 'NO'}</span></div>
-                <div class="flex justify-between items-start text-[10px] text-white">
-    
-   
+        <p class="text-slate-700 text-[10px] font-bold uppercase mt-1">
+            Secondary School Examination (Class X) 2026
+        </p>
     </div>
 
-    <button 
-        onclick="window.resetD('${u.id}')"
-        class="text-red-400 font-bold bg-red-900/20 px-3 py-2 rounded-xl border border-red-900/30">
-        
-        UNLOCK
-        
-    </button>
+    <!-- RIGHT SPACER (for balance) -->
+    <div class="w-14"></div>
 
 </div>
-
-
-            <div class="grid grid-cols-3 gap-2 mt-4">${btns}</div></div>`;
-    });
-}
-
-window.addNewPlanInput = (name = '', price = '') => {
-    const pi = document.getElementById("plan-inputs"); const div = document.createElement('div');
-    div.className = "flex gap-1 plan-row mb-1"; div.innerHTML = `<input class="p-name publisher-input !m-0" placeholder="Batch" value="${name}"> <input class="p-price publisher-input !m-0" placeholder="Price" value="${price}"> <button onclick="this.parentElement.remove()" class="text-red-400 px-2"><i class="fas fa-trash"></i></button>`;
-    pi.appendChild(div);
-};
-
-async function loadSettings() { 
-    const s = await getDoc(doc(db,"settings","app")); 
-    if(s.exists()) {
-        appBatches = s.data().batches || []; 
-        const pc = document.getElementById("plans-container"); pc.innerHTML = "";
-        const pi = document.getElementById("plan-inputs"); pi.innerHTML = "";
-        appBatches.forEach(b => {
-            window.addNewPlanInput(b.name, b.price);
-            pc.innerHTML += `<div class="bg-white/5 border border-white/10 p-4 rounded-2xl flex justify-between items-center"><b class="text-xs uppercase text-white">${b.name}</b><button onclick="window.open('https://wa.me/919229809156?text=Enroll in ${b.name}')" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-[10px] font-black shadow-lg">₹${b.price} ENROLL</button></div>`;
-        });
-        if(auth.currentUser?.email === adminEmail) renderUserList(allUsers);
-    }
-}
-
-window.saveSettings = async () => { 
-    let batches = []; document.querySelectorAll('.plan-row').forEach(row => {
-        const n = row.querySelector('.p-name').value.toUpperCase(); const p = row.querySelector('.p-price').value;
-        if(n) batches.push({ name: n, price: p });
-    });
-    await setDoc(doc(db,"settings","app"), { batches }, {merge:true}); alert("Batches Saved!"); loadSettings(); 
-};
-
-window.openChapter = (ch) => {
-    document.getElementById("chapter-view").classList.add("hidden"); document.getElementById("lecture-list-view").classList.remove("hidden");
-    document.getElementById("current-chapter-title").innerText = ch; const container = document.getElementById("lecture-container"); container.innerHTML = "";
-    currentLectures.filter(l => l.chapter === ch).forEach(l => {
-        container.innerHTML += `<div class="glass !p-4 space-y-3"><b class="text-[12px] uppercase text-white font-black">${l.title}</b><div class="flex gap-2"><button onclick="window.openMedia('${l.link}', '${l.title}')" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-[9px] font-bold uppercase shadow-lg">Watch</button>${l.notes ? `<button onclick="window.openMedia('${l.notes}', 'Notes')" class="bg-white/10 text-white px-4 py-2 rounded-xl text-[9px] font-bold uppercase border border-white/10">Notes</button>` : ''}</div></div>`;
-    });
-};
-
-window.showChapters = () => { document.getElementById("chapter-view").classList.remove("hidden"); document.getElementById("lecture-list-view").classList.add("hidden"); };
-
-window.openMedia = (link, title) => {
-    let url = link.replace('/view','/preview'); 
-    document.getElementById("modal-title").innerText = title;
-    document.getElementById("modal-content").innerHTML = `
-        <div class="media-wrapper h-full">
-            <div class="protection-overlay"></div>
-            <iframe id="media-frame" src="${url}" sandbox="allow-scripts allow-same-origin" allow="autoplay"></iframe>
-        </div>`;
-    document.getElementById("main-modal").style.display = "flex";
-};
-
-window.toggleFullScreen = () => {
-    const elem = document.getElementById("modal-content");
-    if (!document.fullscreenElement) {
-        elem.requestFullscreen().catch(err => { alert(`Error: ${err.message}`); });
-    } else {
-        document.exitFullscreen();
-    }
-};
-
-window.delDoc = async (col, id) => { if(confirm("Are you sure?")) await deleteDoc(doc(db, col, id)); };
-
-window.switchTab = (t) => { 
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active')); 
-    document.getElementById('tab-'+t).classList.add('active'); 
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active')); 
-    if(document.getElementById('btn-'+t)) document.getElementById('btn-'+t).classList.add('nav-active'); 
-};
-
-window.showAdminSection = (s) => { 
-    document.querySelectorAll('.admin-section').forEach(sec => sec.classList.add('hidden')); 
-    document.getElementById('sec-'+s).classList.remove('hidden'); 
-    document.querySelectorAll('.admin-sub-tab').forEach(t => t.classList.remove('active')); 
-    document.getElementById('sub-btn-'+s).classList.add('active'); 
-};
-
-window.closeModal = () => { 
-    if(document.fullscreenElement) document.exitFullscreen();
-    document.getElementById("main-modal").style.display = "none"; 
-    document.getElementById("modal-content").innerHTML=""; 
-};
-
-window.login = () => signInWithPopup(auth, prov);
-window.logout = () => signOut(auth);
-window.resetD = async (id) => { await updateDoc(doc(db,"users",id), {deviceID: null, deviceLocked: false}); alert("User Unlocked & Device Reset!"); };
-window.grant = async (id, b) => { let exp = new Date(); exp.setFullYear(exp.getFullYear() + 1); await updateDoc(doc(db,"users",id), { erpExpiry: Timestamp.fromDate(exp), activeBatchCode: b }); alert("Batch Assigned!"); };
-
-window.searchAnalytics = () => {
-    const searchText = document.getElementById("analyticsSearch").value.toLowerCase().trim();
-    const analyticsDiv = document.getElementById("dppAnalytics");
-    analyticsDiv.innerHTML = "";
-    if (!searchText) { analyticsDiv.classList.add("hidden"); return; }
-    
-    onSnapshot(collection(db, "user_submissions"), snap => {
-        analyticsDiv.innerHTML = "";
-        let found = false;
-        snap.forEach(docSnap => {
-            const data = docSnap.data();
-            const studentName = (data.studentName || "").toLowerCase();
-            const studentEmail = (data.studentEmail || "").toLowerCase();
-            if (studentName.includes(searchText) || studentEmail.includes(searchText)) {
-                found = true;
-                let html = `<div class="bg-white border border-gray-200 rounded-2xl p-4 mb-4">
-                    <div class="mb-4">
-                        <p class="text-black font-black text-sm">${data.studentName || 'Student'}</p>
-                        <p class="text-gray-500 text-[10px]">${data.studentEmail || ''}</p>
-                        <p class="text-indigo-600 text-[10px] font-black uppercase mt-1">TEST: ${data.dppId}</p>
-                    </div>`;
-                if (data.answers && Array.isArray(data.answers)) {
-                    data.answers.forEach((ans, index) => {
-                        html += `<div class="rounded-xl p-3 mb-2 border ${ans.isCorrect ? 'bg-green-50 border-green-300' : 'bg-red-50 border-red-300'}">
-                            <p class="text-black text-[11px] font-bold mb-2">Q${index + 1}. ${ans.question}</p>
-                            <p class="text-[10px] font-black uppercase ${ans.isCorrect ? 'text-green-700' : 'text-red-700'}">${ans.isCorrect ? 'CORRECT' : 'WRONG'}</p>
-                        </div>`;
-                    });
-                }
-                html += `</div>`;
-                analyticsDiv.innerHTML += html;
-            }
-        });
-        analyticsDiv.classList.remove("hidden");
-        if (!found) { analyticsDiv.innerHTML = `<div class="text-center text-gray-500 text-[11px] py-6">No student data found</div>`; }
-    });
-};
-
-window.downloadResult = async () => {
-    const element = document.getElementById("result-display-panel");
-    
-    if (!element || element.classList.contains("hidden")) {
-        alert("No result to download!");
-        return;
-    }
-    
-    const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: "#ffffff"
-    });
-    
-    const imgData = canvas.toDataURL("image/png");
-    
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF("p", "mm", "a4");
-    
-    const pageWidth = 210;
-    const pageHeight = 297;
-    
-    const margin = 10;
-    
-    const usableWidth = pageWidth - margin * 2;
-    const usableHeight = pageHeight - margin * 2;
-    
-    // 🔥 IMPORTANT: Force fit into single page
-    let imgWidth = usableWidth;
-    let imgHeight = (canvas.height * imgWidth) / canvas.width;
-    
-    // If height is too big, scale it down
-    if (imgHeight > usableHeight) {
-        imgHeight = usableHeight;
-        imgWidth = (canvas.width * imgHeight) / canvas.height;
-    }
-    
-    const x = (pageWidth - imgWidth) / 2;
-    const y = margin;
-    
-    pdf.addImage(imgData, "PNG", x, y, imgWidth, imgHeight);
-    
-    pdf.save("result_A4.pdf");
-};
-</script>
-</body>
+                  
+                <div class="grid grid-cols-3 gap-y-1 gap-x-2 text-[10px] text-slate-800 border-b border-dashed border-slate-400 pb-3 mb-3">  
+                    <div><span class="text-slate-500 font-bold">Roll No:</span></div>  
+                    <div class="col-span-2 font-mono font-bold text-black">${data.roll_no || 'N/A'}</div>  
+                    <div><span class="text-slate-500 font-bold">Candidate Name:</span></div>  
+                    <div class="col-span-2 font-black uppercase text-black">${data.name || ''}</div>  
+                    <div><span class="text-slate-500 font-bold">Mother's Name:</span></div>  
+                    <div class="col-span-2 font-bold uppercase">${data.mother || ''}</div>  
+                    <div><span class="text-slate-500 font-bold">Father's Name:</span></div>  
+                    <div class="col-span-2 font-bold uppercase">${data.father || ''}</div>  
+                    <div><span class="text-slate-500 font-bold">Class:</span></div>  
+                    <div class="col-span-2 font-bold uppercase">${data.class || 'N/A'}</div>  
+                    <div><span class="text-slate-500 font-bold">Section:</span></div>  
+                    <div class="col-span-2 font-bold uppercase">${data.section || 'N/A'}</div>  
+                    <div><span class="text-slate-500 font-bold">Date of Birth:</span></div>  
+                    <div class="col-span-2 font-mono font-bold">${data.dob || ''}</div>  
+                    <div><span class="text-slate-500 font-bold">School's Name:</span></div>  
+                    <div class="col-span-2 font-bold uppercase text-blue-950">${data.school || ''}</div>  
+                </div>  
+                  
+                <table class="w-full text-left border-collapse border border-blue-900 mb-4 bg-white shadow-sm">  
+                    <thead>  
+                        <tr class="bg-blue-900 text-white text-[9px] font-black uppercase text-center">  
+                            <th class="p-2 border border-blue-900">SUB CODE</th>  
+                            <th class="p-2 border border-blue-900 text-left">SUB NAME</th>  
+                            <th class="p-2 border border-blue-900">THEORY</th>  
+                            <th class="p-2 border border-blue-900">I.A / PRAC</th>  
+                            <th class="p-2 border border-blue-900">TOTAL</th>  
+                            <th class="p-2 border border-blue-900">POS. GRADE</th>  
+                        </tr>  
+                    </thead>  
+                    <tbody>  
+                        ${subjectRows}  
+                    </tbody>  
+                </table>  
+                  
+                <div class="flex justify-between items-center p-2 bg-white border border-blue-900 rounded-xl mb-3">  
+                    <span class="text-[10px] font-black uppercase">Total Marks</span>  
+                    <span class="text-xs font-black">${totalMarks} / ${maxMarks}</span>  
+                </div>  
+  
+                <div class="flex justify-between items-center p-2 bg-white border border-blue-900 rounded-xl mb-3">  
+                    <span class="text-[10px] font-black uppercase">Percentage</span>  
+                    <span class="text-xs font-black">${percentage}%</span>  
+                </div>  
+  
+                <div class="flex items-center justify-between p-2 bg-blue-900 text-white rounded-xl px-4 shadow-md">  
+                    <span class="text-[10px] font-black uppercase tracking-wider">Final Result Outcome:</span>  
+                    <span class="text-xs font-black uppercase bg-white text-emerald-700 px-4 py-0.5 rounded-full shadow-inner">${data.result_status || 'PASS'}</span>  
+                </div>  
+                  
+                ${auth.currentUser.email === adminEmail ? `  
+                <div class="mt-4 text-center">  
+                    <button onclick="toggleFeeDue('${data.scholar_id}', ${data.fee_due || false})" class="px-5 py-2 rounded-xl text-white font-bold text-xs ${data.fee_due ? 'bg-green-600' : 'bg-red-600'}">  
+                        ${data.fee_due ? 'UNLOCK RESULT' : 'BLOCK RESULT'}  
+                    </button>  
+                </div>  
+                ` : ''}  
+                  
+                <p class="text-[7px] text-slate-400 text-center uppercase tracking-tighter mt-4 leading-tight font-bold text-black">  
+                Disclaimer:
+This software and its contents are the intellectual property of AARAV TECH HUB [MIHIR JAI VISHWANATH SINGH & AARAV JAI VISHWANATH SINGH]. Any unauthorized use, reproduction, modification, or distribution is prohibited and may result in legal action.
+© 2026 All Rights Reserved | Unauthorized duplication or misuse is prohibited. DEVELOPER CONTACT NUM: 9430444443 / 8986900009
+                </p>  
+            </div>  
+        `;  
+        targetPanel.classList.remove("hidden");  
+    } catch(err) {  
+        console.error(err);  
+        alert("Firestore access query failure.");  
+    }  
+};  
+  
+// --- ADMIN SYSTEM EXCEL INGEST DATA PIPELINE ---  
+window.processExcelUpload = () => {  
+    const fileInput = document.getElementById("excel-file-input");  
+    if(!fileInput.files || fileInput.files.length === 0) { alert("Please select a valid excel .xlsx structure report card master first!"); return; }  
+      
+    const targetFile = fileInput.files[0];  
+    const fileReader = new FileReader();  
+      
+    fileReader.onload = async (e) => {  
+        try {  
+            const rawBuffer = e.target.result;  
+            const parsedWorkbook = XLSX.read(rawBuffer, { type: 'binary' });  
+            const initialSheetName = parsedWorkbook.SheetNames[0];  
+            const parsedJsonRows = XLSX.utils.sheet_to_json(parsedWorkbook.Sheets[initialSheetName]);  
+              
+            if(parsedJsonRows.length === 0) { alert("Target Worksheet array structure evaluates completely empty mapping rows."); return; }  
+              
+            let loadCounter = 0;  
+            for(let row of parsedJsonRows) {  
+                let keyPointer = row.scholar_id ? row.scholar_id.toString().trim().toUpperCase() : null;  
+                if(!keyPointer) continue;  
+                  
+                let subjects = [];  
+                const allColumns = Object.keys(row);  
+                let detectedSubjects = {};  
+  
+                allColumns.forEach(col => {  
+                    const skipFields = ["scholar_id", "roll_no", "name", "mother", "father", "dob", "class", "school", "result_status", "fee_due", "section"];  
+                    if(skipFields.includes(col.toLowerCase())) return;  
+  
+                    const cleanCol = col.toUpperCase().trim();  
+                    if(cleanCol.endsWith("_TH") || cleanCol.endsWith("_THEORY")) {  
+                        let subjectName = cleanCol.replace("_TH", "").replace("_THEORY", "");  
+                        if(!detectedSubjects[subjectName]) detectedSubjects[subjectName] = {};  
+                        detectedSubjects[subjectName].theory = Number(row[col] || 0);  
+                    }  
+                    else if(cleanCol.endsWith("_PR") || cleanCol.endsWith("_PRACTICAL") || cleanCol.endsWith("_IA")) {  
+                        let subjectName = cleanCol.replace("_PR", "").replace("_PRACTICAL", "").replace("_IA", "");  
+                        if(!detectedSubjects[subjectName]) detectedSubjects[subjectName] = {};  
+                        detectedSubjects[subjectName].practical = Number(row[col] || 0);  
+                    }  
+                });  
+  
+                Object.keys(detectedSubjects).forEach((sub, index) => {  
+                    const theory = detectedSubjects[sub].theory || 0;  
+                    const practical = detectedSubjects[sub].practical || 0;  
+                    if(theory === 0 && practical === 0) return;  
+  
+                    const totalSubjectMarks = theory + practical;  
+                      
+                    // Check kar raha hai agar sheet me explicit "FULL_SUBJECTNAME" column hai ya nahi
+                    let customFullMarks = row[`FULL_${sub}`] || row[`FULL_${sub}_MARKS`] || 100;  
+                    let autoCode = (100 + index).toString();  
+                    let subPercent = (totalSubjectMarks / Number(customFullMarks)) * 100;  
+                    let grade = window.getGrade(subPercent);  
+  
+                    subjects.push({  
+                        code: autoCode,  
+                        name: sub,  
+                        theory: theory,  
+                        practical: practical,  
+                        total: totalSubjectMarks,  
+                        fullMarks: Number(customFullMarks),  
+                        grade: grade  
+                    });  
+                });  
+  
+                let processedPayload = {  
+                    scholar_id: keyPointer,  
+                    roll_no: row.roll_no ? row.roll_no.toString() : "---",  
+                    name: row.name || "Unknown Student",  
+                    mother: row.mother || "---",  
+                    father: row.father || "---",  
+                    dob: row.dob || "---",  
+                    class: row.class || "N/A",  
+                    section: row.section || "A",  
+                    school: row.school || "Aarav Public School",  
+                    subjects_json: subjects,  
+                    result_status: row.result_status || "PASS",  
+                    fee_due: row.fee_due === true || row.fee_due === "TRUE",  
+                    updatedAt: Timestamp.now()  
+                };  
+                  
+                await setDoc(doc(db, "school_results", keyPointer), processedPayload, { merge: true });  
+                loadCounter++;  
+            }  
+            alert(`Success! Successfully synchronized and deployed ${loadCounter} student records directly into app storage memory infrastructure updates.`);  
+            fileInput.value = "";  
+        } catch(err) {  
+            console.error(err);  
+            alert("Error encounter during structural runtime processing parsing index schemas.");  
+        }  
+    };  
+    fileReader.readAsBinaryString(targetFile);  
+};  
+  
+// --- QUIZ LOGIC ---  
+let quizData = []; let currentQ = 0; let userAnswers = []; let activeDPPId = null;  
+  
+window.startQuiz = (id) => {  
+    activeDPPId = id; const dpp = currentDPPs.find(x => x.id === id);   
+    try {  
+        quizData = JSON.parse(dpp.data);  
+    } catch(e) {  
+        alert("Invalid DPP Data Format"); return;  
+    }  
+    currentQ = 0;   
+    userAnswers = new Array(quizData.length).fill(null);  
+    quizStarted = true; quizSubmitted = false;  
+      
+    document.getElementById("quiz-title").innerText = dpp.title;   
+    document.getElementById("quiz-modal").style.display = "flex";  
+      
+    document.getElementById("quiz-footer").innerHTML = `  
+        <button id="prev-q" onclick="prevQuestion()" class="bg-white/5 border border-white/10 px-4 py-2 rounded-xl text-[10px] font-bold text-white hidden">PREV</button>  
+        <button id="next-q" onclick="nextQuestion()" class="bg-indigo-600 text-white px-6 py-2 rounded-xl text-[10px] font-bold ml-auto shadow-lg">NEXT</button>  
+        <button id="submit-q" onclick="submitQuiz()" class="bg-green-600 text-white px-6 py-2 rounded-xl text-[10px] font-bold hidden ml-auto shadow-lg">SUBMIT</button>`;  
+  
+    if(userCompletedDPPs[id] !== undefined) {  
+        document.getElementById("quiz-screen").innerHTML = `<div class="text-center p-10"><i class="fas fa-check-circle text-green-400 text-5xl mb-4"></i><h2 class="font-bold uppercase text-white">Already Submitted</h2><p class="text-xs text-slate-400">Your Score: ${userCompletedDPPs[id]}/${quizData.length}</p></div>`;  
+        document.getElementById("quiz-footer").innerHTML = `<button onclick="closeQuiz()" class="w-full bg-slate-800 text-white py-3 rounded-xl font-bold text-[10px]">BACK</button>`;  
+    } else {   
+        showQuestion();   
+    }  
+};  
+  
+function showQuestion() {  
+    const q = quizData[currentQ];  
+    let html = `<p class="text-slate-400 text-[10px] mb-2 font-bold">QUESTION ${currentQ + 1} OF ${quizData.length}</p>  
+    ${q.img ? `<img src="${q.img}" class="w-full rounded-2xl mb-4 border border-gray-300">` : ''}  
+                <h3 class="text-black font-bold text-sm mb-6 leading-relaxed">${q.q}</h3>  
+                <div class="space-y-4">`;  
+  
+    if (q.type === "integer") {  
+        let currentVal = userAnswers[currentQ] !== null ? userAnswers[currentQ] : '';  
+        html += `<input type="text" id="integer-ans"   
+                    oninput="window.saveAns(this.value)"   
+                    value="${currentVal}"   
+                    placeholder="Type your answer here..."   
+                    class="w-full bg-white/5 border border-white/10 text-black p-4 rounded-2xl focus:outline-none focus:border-indigo-500">`;  
+    } else {  
+        q.o.forEach((opt, i) => {  
+            const isSelected = userAnswers[currentQ] === i;  
+            html += `<button onclick="window.saveAns(${i})" class="option-btn ${isSelected ? 'selected' : ''}">  
+                <span class="mr-3 opacity-40">${String.fromCharCode(65 + i)}.</span> ${opt}  
+            </button>`;  
+        });  
+    }  
+  
+    document.getElementById("quiz-screen").innerHTML = html + `</div>`;  
+    document.getElementById("prev-q").classList.toggle("hidden", currentQ === 0);  
+    document.getElementById("next-q").classList.toggle("hidden", currentQ === quizData.length - 1);  
+    document.getElementById("submit-q").classList.toggle("hidden", currentQ !== quizData.length - 1);  
+}  
+  
+window.saveAns = (val) => {   
+    userAnswers[currentQ] = val;   
+    if(quizData[currentQ].type !== "integer") showQuestion();   
+};  
+  
+window.nextQuestion = () => { if(currentQ < quizData.length - 1) { currentQ++; showQuestion(); } };  
+window.prevQuestion = () => { if(currentQ > 0) { currentQ--; showQuestion(); } };  
+  
+window.submitQuiz = async () => {  
+    if(!confirm("Are you sure you want to submit?")) return;  
+    quizSubmitted = true;  
+    let score = 0;  
+      
+    quizData.forEach((q, i) => {  
+        if(q.type === "integer") {  
+            if(userAnswers[i] && userAnswers[i].toString().trim() == q.a.toString().trim()) score++;  
+        } else {  
+            if(userAnswers[i] === q.a) score++;  
+        }  
+    });  
+  
+    let questionAnalytics = [];  
+    quizData.forEach((q, i) => {  
+        let correct = false;  
+        if (q.type === "integer") {  
+            correct = (userAnswers[i] && userAnswers[i].toString().trim() == q.a.toString().trim());  
+        } else {  
+            correct = userAnswers[i] === q.a;  
+        }  
+        questionAnalytics.push({  
+            question: q.q,  
+            studentAnswer: userAnswers[i],  
+            correctAnswer: q.a,  
+            isCorrect: correct  
+        });  
+    });  
+  
+    await setDoc(doc(db, "user_submissions", auth.currentUser.uid + "_" + activeDPPId), {  
+        uid: auth.currentUser.uid,  
+        studentName: auth.currentUser.displayName,  
+        studentEmail: auth.currentUser.email,  
+        dppId: activeDPPId,  
+        score: score,  
+        answers: questionAnalytics,  
+        timestamp: Timestamp.now()  
+    });  
+  
+    let resHtml = `<div class="bg-indigo-600/20 text-indigo-300 p-6 rounded-3xl text-center mb-6 border border-indigo-500/30">  
+                    <p class="text-[10px] font-black uppercase tracking-widest">Test Result</p>  
+                    <h2 class="text-3xl font-black">${score} / ${quizData.length}</h2>  
+                  </div><div class="space-y-4">`;  
+  
+    quizData.forEach((q, i) => {  
+        let isCorrect = false;  
+        if(q.type === "integer") isCorrect = (userAnswers[i] && userAnswers[i].toString().trim() == q.a.toString().trim());  
+        else isCorrect = (userAnswers[i] === q.a);  
+  
+        let userText = userAnswers[i] === null ? 'Skipped' : (q.type === 'integer' ? userAnswers[i] : q.o[userAnswers[i]]);  
+        let solText = q.type === 'integer' ? q.a : q.o[q.a];  
+  
+        resHtml += `<div class="p-4 bg-white/5 rounded-2xl border border-white/5">  
+            <p class="text-[11px] font-bold text-white mb-2">${i+1}. ${q.q}</p>  
+            <p class="text-[10px] ${isCorrect?'text-green-400':'text-red-400'} font-black uppercase">  
+                YOURS: ${userText}  
+            </p>  
+            <p class="text-[10px] text-indigo-400 font-black uppercase mt-1">SOLUTION: ${solText}</p>  
+        </div>`;  
+    });  
+  
+    document.getElementById("quiz-screen").innerHTML = resHtml + `</div>`;  
+    document.getElementById("quiz-footer").innerHTML = `<button onclick="closeQuiz()" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold text-[10px] shadow-lg">DONE</button>`;  
+};  
+  
+window.closeQuiz = () => {   
+    quizStarted = false;  
+    document.getElementById("quiz-modal").style.display = "none";   
+};  
+  
+// --- ADMIN FUNCTIONS ---  
+function loadAdminData() {  
+    onSnapshot(collection(db, "lectures"), s => {  
+        const g = document.getElementById("manageLecGrid"); g.innerHTML = "<p class='text-[10px] text-indigo-400 uppercase font-black'>Lectures</p>";  
+        s.forEach(d => { const l = d.data(); g.innerHTML += `<div class="bg-black/30 p-3 rounded-xl flex justify-between items-center text-[10px] border border-white/10"><span><b>[${l.batch}]</b> ${l.title}</span><div class="flex gap-2"><button onclick='window.editItem("lec", ${JSON.stringify({...l, id:d.id})})' class="text-indigo-400 font-bold">EDIT</button><button onclick="window.delDoc('lectures','${d.id}')" class="text-red-400 font-bold">DEL</button></div></div>`; });  
+    });  
+    onSnapshot(collection(db, "dpps"), s => {  
+        const g = document.getElementById("manageDPPGrid"); g.innerHTML = "<p class='text-[10px] text-indigo-400 uppercase font-black mt-2'>DPP Tests</p>";  
+        s.forEach(d => { const dp = d.data(); g.innerHTML += `<div class="bg-black/30 p-3 rounded-xl flex justify-between items-center text-[10px] border border-white/10"><span><b>[${dp.batch}]</b> ${dp.title}</span><div class="flex gap-2"><button onclick='window.editItem("dpp", ${JSON.stringify({...dp, id:d.id})})' class="text-indigo-400 font-bold">EDIT</button><button onclick="window.delDoc('dpps','${d.id}')" class="text-red-400 font-bold">DEL</button></div></div>`; });  
+    });  
+    onSnapshot(collection(db, "secure_ebooks"), s => {  
+        const g = document.getElementById("manageBookGrid"); g.innerHTML = "<p class='text-[10px] text-indigo-400 uppercase font-black mt-2'>Books</p>";  
+        s.forEach(d => { const b = d.data(); g.innerHTML += `<div class="bg-black/30 p-3 rounded-xl flex justify-between items-center text-[10px] border border-white/10"><span>${b.title}</span><div class="flex gap-2"><button onclick='window.editItem("book", ${JSON.stringify({...b, id:d.id})})' class="text-indigo-400 font-bold">EDIT</button><button onclick="window.delDoc('secure_ebooks','${d.id}')" class="text-red-400 font-bold">DEL</button></div></div>`; });  
+    });  
+    onSnapshot(collection(db, "users"), s => { allUsers = []; s.forEach(d => allUsers.push({...d.data(), id: d.id})); renderUserList(allUsers); });  
+}  
+  
+window.editItem = (type, data) => {  
+    window.switchTab('admin'); window.showAdminSection('publish');  
+    if(type === 'lec') {  
+        editLecId = data.id; document.getElementById('lec-batch').value = data.batch; document.getElementById('lec-chapter').value = data.chapter; document.getElementById('lec-title').value = data.title; document.getElementById('lec-link').value = data.link; document.getElementById('lec-notes').value = data.notes; document.getElementById('lec-save-btn').innerText = "UPDATE LECTURE";  
+    } else if (type === 'dpp') {  
+        editDppId = data.id; document.getElementById('dpp-batch').value = data.batch; document.getElementById('dpp-title').value = data.title; document.getElementById('dpp-data').value = data.data; document.getElementById('dpp-save-btn').innerText = "UPDATE DPP";  
+    } else if (type === 'book') {  
+        editBookId = data.id; document.getElementById('book-title').value = data.title; document.getElementById('book-link').value = data.link; document.getElementById('book-price').value = data.price; document.getElementById('book-access').value = data.access; document.getElementById('book-save-btn').innerText = "UPDATE BOOK";  
+    }  
+};  
+  
+window.saveLecture = async () => {  
+    const id = editLecId || ("lec_" + Date.now());  
+    await setDoc(doc(db,"lectures", id), { batch: document.getElementById('lec-batch').value.toUpperCase(), chapter: document.getElementById('lec-chapter').value, title: document.getElementById('lec-title').value, link: document.getElementById('lec-link').value, notes: document.getElementById('lec-notes').value }, {merge: true});  
+    alert("Saved!"); editLecId = null; document.getElementById('lec-save-btn').innerText = "SAVE LECTURE";  
+    ['lec-batch','lec-chapter','lec-title','lec-link','lec-notes'].forEach(i=>document.getElementById(i).value="");  
+};  
+  
+window.saveDPP = async () => {  
+    const id = editDppId || ("dpp_" + Date.now());  
+    await setDoc(doc(db, "dpps", id), { batch: document.getElementById("dpp-batch").value.toUpperCase(), title: document.getElementById("dpp-title").value, data: document.getElementById("dpp-data").value }, {merge: true});   
+    alert("Saved!"); editDppId = null; document.getElementById('dpp-save-btn').innerText = "SAVE DPP";  
+    ['dpp-batch','dpp-title','dpp-data'].forEach(i=>document.getElementById(i).value="");  
+};  
+  
+window.saveBook = async () => {  
+    const id = editBookId || ("book_" + Date.now());  
+    await setDoc(doc(db,"secure_ebooks", id), { title: document.getElementById('book-title').value, link: document.getElementById('book-link').value, price: document.getElementById('book-price').value, access: document.getElementById('book-access').value }, {merge: true});  
+    alert("Saved!"); editBookId = null; document.getElementById('book-save-btn').innerText = "SAVE BOOK";  
+    ['book-title','book-link','book-price','book-access'].forEach(i=>document.getElementById(i).value="");  
+};  
+  
+// --- GENERAL APP FUNCTIONS ---  
+function loadBooks() {  
+    onSnapshot(collection(db, "secure_ebooks"), snap => {  
+        const g = document.getElementById("bookGrid"); g.innerHTML = "";  
+        snap.forEach(d => {   
+            const b = d.data(); const userEmail = auth.currentUser.email.toLowerCase().trim();  
+            const accessList = b.access ? b.access.toLowerCase().split(',').map(e => e.trim()) : [];  
+            const ok = accessList.includes('all') || accessList.includes(userEmail) || userEmail === adminEmail.toLowerCase();   
+            g.innerHTML += `<div class="glass flex justify-between items-center p-4"><div><b class="text-xs uppercase text-white">${b.title}</b><p class="text-indigo-400 font-bold text-[10px]">₹${b.price}</p></div><button onclick="${ok?`window.openMedia('${b.link}', '${b.title}')`:`window.open('https://wa.me/919229809156')`}" class="bg-indigo-600 text-white px-5 py-2 rounded-xl text-[9px] font-bold shadow-lg">${ok?'READ':'BUY'}</button></div>`;   
+        });  
+    });  
+}  
+  
+function renderUserList(users) {  
+    const list = document.getElementById("adminUserList"); list.innerHTML = "";  
+    users.forEach(u => {  
+        const active = u.erpExpiry?.toDate() > new Date();  
+        let btns = appBatches.map(b => `<button onclick="window.grant('${u.id}', '${b.name}')" class="bg-white/5 text-indigo-300 text-[8px] px-2 py-1.5 rounded-lg font-bold border border-white/10 hover:bg-indigo-600 hover:text-white transition-all">+ ${b.name}</button>`).join('');  
+        list.innerHTML += `<div class="glass !p-4 border-l-4 ${active?'border-indigo-500':'border-white/10'} mb-2">  
+            <div class="flex justify-between items-start text-[10px] text-white">  
+                <div><b>${u.name || 'User'}</b><br><span class="opacity-60">${u.email}</span><br>  
+                <span class="text-indigo-400 font-black">BATCH: ${u.activeBatchCode || 'NONE'}</span><br>  
+                <span class="${u.deviceLocked?'text-red-400':'text-green-400'} font-bold">LOCKED: ${u.deviceLocked || 'NO'}</span></div>  
+                <div class="flex justify-between items-start text-[10px] text-white">  
+    </div>  
+    <button onclick="window.resetD('${u.id}')" class="text-red-400 font-bold bg-red-900/20 px-3 py-2 rounded-xl border border-red-900/30">UNLOCK</button>  
+</div>  
+            <div class="grid grid-cols-3 gap-2 mt-4">${btns}</div></div>`;  
+    });  
+}  
+  
+window.addNewPlanInput = (name = '', price = '') => {  
+    const pi = document.getElementById("plan-inputs"); const div = document.createElement('div');  
+    div.className = "flex gap-1 plan-row mb-1"; div.innerHTML = `<input class="p-name publisher-input !m-0" placeholder="Batch" value="${name}"> <input class="p-price publisher-input !m-0" placeholder="Price" value="${price}"> <button onclick="this.parentElement.remove()" class="text-red-400 px-2"><i class="fas fa-trash"></i></button>`;  
+    pi.appendChild(div);  
+};  
+  
+async function loadSettings() {   
+    const s = await getDoc(doc(db,"settings","app"));   
+    if(s.exists()) {  
+        appBatches = s.data().batches || [];   
+        const pc = document.getElementById("plans-container"); pc.innerHTML = "";  
+        const pi = document.getElementById("plan-inputs"); pi.innerHTML = "";  
+        appBatches.forEach(b => {  
+            window.addNewPlanInput(b.name, b.price);  
+            pc.innerHTML += `<div class="bg-white/5 border border-white/10 p-4 rounded-2xl flex justify-between items-center"><b class="text-xs uppercase text-white">${b.name}</b><button onclick="window.open('https://wa.me/919229809156?text=Enroll in ${b.name}')" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-[10px] font-black shadow-lg">₹${b.price} ENROLL</button></div>`;  
+        });  
+        if(auth.currentUser?.email === adminEmail) renderUserList(allUsers);  
+    }  
+}  
+  
+window.saveSettings = async () => {   
+    let batches = []; document.querySelectorAll('.plan-row').forEach(row => {  
+        const n = row.querySelector('.p-name').value.toUpperCase(); const p = row.querySelector('.p-price').value;  
+        if(n) batches.push({ name: n, price: p });  
+    });  
+    await setDoc(doc(db,"settings","app"), { batches }, {merge:true}); alert("Batches Saved!"); loadSettings();   
+};  
+  
+window.openChapter = (ch) => {  
+    document.getElementById("chapter-view").classList.add("hidden"); document.getElementById("lecture-list-view").classList.remove("hidden");  
+    document.getElementById("current-chapter-title").innerText = ch; const container = document.getElementById("lecture-container"); container.innerHTML = "";  
+    currentLectures.filter(l => l.chapter === ch).forEach(l => {  
+        container.innerHTML += `<div class="glass !p-4 space-y-3"><b class="text-[12px] uppercase text-white font-black">${l.title}</b><div class="flex gap-2"><button onclick="window.openMedia('${l.link}', '${l.title}')" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-[9px] font-bold uppercase shadow-lg">Watch</button>${l.notes ? `<button onclick="window.openMedia('${l.notes}', 'Notes')" class="bg-white/10 text-white px-4 py-2 rounded-xl text-[9px] font-bold uppercase border border-white/10">Notes</button>` : ''}</div></div>`;  
+    });  
+};  
+  
+window.showChapters = () => { document.getElementById("chapter-view").classList.remove("hidden"); document.getElementById("lecture-list-view").classList.add("hidden"); };  
+  
+window.openMedia = (link, title) => {  
+    let url = link.replace('/view','/preview');   
+    document.getElementById("modal-title").innerText = title;  
+    document.getElementById("modal-content").innerHTML = `  
+        <div class="media-wrapper h-full">  
+            <div class="protection-overlay"></div>  
+            <iframe id="media-frame" src="${url}" sandbox="allow-scripts allow-same-origin" allow="autoplay"></iframe>  
+        </div>`;  
+    document.getElementById("main-modal").style.display = "flex";  
+};  
+  
+window.toggleFullScreen = () => {  
+    const elem = document.getElementById("modal-content");  
+    if (!document.fullscreenElement) {  
+        elem.requestFullscreen().catch(err => { alert(`Error: ${err.message}`); });  
+    } else {  
+        document.exitFullscreen();  
+    }  
+};  
+  
+window.delDoc = async (col, id) => { if(confirm("Are you sure?")) await deleteDoc(doc(db, col, id)); };  
+  
+window.switchTab = (t) => {   
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));   
+    document.getElementById('tab-'+t).classList.add('active');   
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active'));   
+    if(document.getElementById('btn-'+t)) document.getElementById('btn-'+t).classList.add('nav-active');   
+};  
+  
+window.showAdminSection = (s) => {   
+    document.querySelectorAll('.admin-section').forEach(sec => sec.classList.add('hidden'));   
+    document.getElementById('sec-'+s).classList.remove('hidden');   
+    document.querySelectorAll('.admin-sub-tab').forEach(t => t.classList.remove('active'));   
+    document.getElementById('sub-btn-'+s).classList.add('active');   
+};  
+  
+window.closeModal = () => {   
+    if(document.fullscreenElement) document.exitFullscreen();  
+    document.getElementById("main-modal").style.display = "none";   
+    document.getElementById("modal-content").innerHTML="";   
+};  
+  
+window.login = () => signInWithPopup(auth, prov);  
+window.logout = () => signOut(auth);  
+window.resetD = async (id) => { await updateDoc(doc(db,"users",id), {deviceID: null, deviceLocked: false}); alert("User Unlocked & Device Reset!"); };  
+window.grant = async (id, b) => { let exp = new Date(); exp.setFullYear(exp.getFullYear() + 1); await updateDoc(doc(db,"users",id), { erpExpiry: Timestamp.fromDate(exp), activeBatchCode: b }); alert("Batch Assigned!"); };  
+  
+window.searchAnalytics = () => {  
+    const searchText = document.getElementById("analyticsSearch").value.toLowerCase().trim();  
+    const analyticsDiv = document.getElementById("dppAnalytics");  
+    analyticsDiv.innerHTML = "";  
+    if (!searchText) { analyticsDiv.classList.add("hidden"); return; }  
+      
+    onSnapshot(collection(db, "user_submissions"), snap => {  
+        analyticsDiv.innerHTML = "";  
+        let found = false;  
+        snap.forEach(docSnap => {  
+            const data = docSnap.data();  
+            const studentName = (data.studentName || "").toLowerCase();  
+            const studentEmail = (data.studentEmail || "").toLowerCase();  
+            if (studentName.includes(searchText) || studentEmail.includes(searchText)) {  
+                found = true;  
+                let html = `<div class="bg-white border border-gray-200 rounded-2xl p-4 mb-4">  
+                    <div class="mb-4">  
+                        <p class="text-black font-black text-sm">${data.studentName || 'Student'}</p>  
+                        <p class="text-gray-500 text-[10px]">${data.studentEmail || ''}</p>  
+                        <p class="text-indigo-600 text-[10px] font-black uppercase mt-1">TEST: ${data.dppId}</p>  
+                    </div>`;  
+                if (data.answers && Array.isArray(data.answers)) {  
+                    data.answers.forEach((ans, index) => {  
+                        html += `<div class="rounded-xl p-3 mb-2 border ${ans.isCorrect ? 'bg-green-50 border-green-300' : 'bg-red-50 border-red-300'}">  
+                            <p class="text-black text-[11px] font-bold mb-2">Q${index + 1}. ${ans.question}</p>  
+                            <p class="text-[10px] font-black uppercase ${ans.isCorrect ? 'text-green-700' : 'text-red-700'}">${ans.isCorrect ? 'CORRECT' : 'WRONG'}</p>  
+                        </div>`;  
+                    });  
+                }  
+                html += `</div>`;  
+                analyticsDiv.innerHTML += html;  
+            }  
+        });  
+        analyticsDiv.classList.remove("hidden");  
+        if (!found) { analyticsDiv.innerHTML = `<div class="text-center text-gray-500 text-[11px] py-6">No student data found</div>`; }  
+    });  
+};  
+  
+window.downloadResult = async () => {  
+    const element = document.getElementById("result-display-panel");  
+    if (!element || element.classList.contains("hidden")) {  
+        alert("No result to download!");  
+        return;  
+    }  
+    const canvas = await html2canvas(element, {  
+        scale: 2,  
+        useCORS: true,  
+        backgroundColor: "#ffffff"  
+    });  
+    const imgData = canvas.toDataURL("image/png");  
+    const { jsPDF } = window.jspdf;  
+    const pdf = new jsPDF("p", "mm", "a4");  
+    const pageWidth = 210;  
+    const pageHeight = 297;  
+    const margin = 10;  
+    const usableWidth = pageWidth - margin * 2;  
+    const usableHeight = pageHeight - margin * 2;  
+      
+    let imgWidth = usableWidth;  
+    let imgHeight = (canvas.height * imgWidth) / canvas.width;  
+    if (imgHeight > usableHeight) {  
+        imgHeight = usableHeight;  
+        imgWidth = (canvas.width * imgHeight) / canvas.height;  
+    }  
+    const x = (pageWidth - imgWidth) / 2;  
+    const y = margin;  
+    pdf.addImage(imgData, "PNG", x, y, imgWidth, imgHeight);  
+    pdf.save("result_A4.pdf");  
+};  
+</script>  </body>  
 </html>
