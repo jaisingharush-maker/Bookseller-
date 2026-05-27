@@ -92,17 +92,14 @@ iframe { border: none; width: 100%; height: 100%; pointer-events: auto; }
         if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) { return false; }   
         if (e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) { return false; }   
         if (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) { return false; }   
-        if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) { return false; }   
+        if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) { return false; }  
     };  
 </script>  <div id="lock-screen">  
     <div class="w-20 h-20 bg-red-900/30 text-red-500 rounded-full flex items-center justify-center text-3xl mb-4"><i class="fas fa-mobile-alt"></i></div>  
     <h2 class="text-xl font-black uppercase text-white">Security Alert</h2>  
     <p id="lock-reason" class="text-[10px] text-slate-400">Device Locked Please Contact Admin for Reset Your device📞📞 9229809156📞.</p>  
-    <button onclick="logout()" class="mt-8 text-indigo-400 font-bold uppercase text-xs underline">Logout</button>
-    <button onclick="deleteAllResults()"
-style="background:red;color:white;padding:10px;border:none;border-radius:8px;">
-Delete All Results
-</button>
+    <button onclick="logout()" class="mt-8 text-indigo-400 font-bold uppercase text-xs underline">Logout</button>  
+    <button onclick="deleteAllResults()" style="background:red;color:white;padding:10px;border:none;border-radius:8px;">Delete All Results</button>
 </div>  <div id="login-screen">  
   <div class="login-card">  
     <div class="w-16 h-16 bg-indigo-600 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-2xl rotate-3"><i class="fas fa-crown text-white text-2xl"></i></div>  
@@ -163,11 +160,7 @@ Delete All Results
           </div>  
       </div>  
       <div id="result-display-panel" class="hidden bg-white text-black rounded-3xl p-4 border border-slate-200 shadow-2xl overflow-x-auto"></div>  
-      <button id="download-btn"  
-onclick="downloadResult()"  
-class="mt-3 bg-indigo-600 text-white px-5 py-2 rounded-xl font-bold text-xs">  
-📥 Download Result  
-</button>  
+      <button id="download-btn" onclick="downloadResult()" class="mt-3 bg-indigo-600 text-white px-5 py-2 rounded-xl font-bold text-xs">📥 Download Result</button>  
   </div>    <div id="tab-admin" class="tab-content space-y-4">  
     <div class="flex justify-center gap-2 bg-black/20 p-2 rounded-2xl border border-white/5">  
         <div onclick="showAdminSection('publish')" id="sub-btn-publish" class="admin-sub-tab active">PUBLISH</div>  
@@ -226,6 +219,29 @@ class="mt-3 bg-indigo-600 text-white px-5 py-2 rounded-xl font-bold text-xs">
 </div>  
 
 <div id="sec-excel-results" class="admin-section hidden pb-20 space-y-4">  
+    <div class="glass !p-4 border-2 border-indigo-500/50">
+        <p class="text-[10px] font-black text-indigo-400 mb-2 uppercase"><i class="fas fa-print mr-1"></i> Bulk Print Class Results (Admin Only)</p>
+        <p class="text-[9px] text-slate-400 mb-3">Ek hi baar me kisi ek class ke sabhi bacho ka result card single PDF me print karein.</p>
+        
+        <div class="space-y-2">
+            <input type="text" id="admin-print-class" class="publisher-input !mb-0 text-center text-xs font-bold uppercase py-2" placeholder="ENTER CLASS (e.g. 10, 12, 9TH)">
+            
+            <div class="grid grid-cols-2 gap-2">
+                <select id="admin-print-academic-year" class="publisher-input text-[10px] font-bold bg-slate-950 text-white">
+                    <option value="2025-26">SESSION: 2025-26</option>
+                    <option value="2026-27">SESSION: 2026-27</option>
+                    <option value="2027-28">SESSION: 2027-28</option>
+                </select>
+                <select id="admin-print-exam-type" class="publisher-input text-[10px] font-bold bg-slate-950 text-white">
+                    <option value="PMT">PMT EXAM</option>
+                    <option value="HALF_YEARLY">HALF YEARLY</option>
+                    <option value="ANNUAL">ANNUAL EXAM</option>
+                </select>
+            </div>
+            <button onclick="window.printBulkClassResults()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-bold text-[10px] tracking-wider uppercase transition-all shadow-lg"><i class="fas fa-file-pdf mr-2"></i>Generate Bulk Class PDF</button>
+        </div>
+    </div>
+
     <div class="glass !p-4">  
         <p class="text-[10px] font-black text-indigo-400 mb-2 uppercase">Bulk Upload Student Results (.xlsx)</p>  
         
@@ -253,10 +269,7 @@ class="mt-3 bg-indigo-600 text-white px-5 py-2 rounded-xl font-bold text-xs">
         <input type="file" id="excel-file-input" accept=".xlsx, .xls" class="publisher-input text-xs pt-2">  
         <button onclick="window.processExcelUpload()" class="w-full bg-emerald-600 text-white py-3 rounded-xl font-bold text-[10px] tracking-wider shadow-lg uppercase"><i class="fas fa-file-upload mr-2"></i>Process & Upload Data</button>  
     </div>  
-    <button onclick="deleteAllResults()"
-style="background:red;color:white;padding:10px;border:none;border-radius:8px;">
-Delete All Results
-</button>
+    <button onclick="deleteAllResults()" style="background:red;color:white;padding:10px;border:none;border-radius:8px;">Delete All Results</button>
 </div>
 
   </div>    <nav class="fixed bottom-0 left-0 right-0 flex justify-around p-3 pb-8 z-[1000]">  
@@ -265,7 +278,11 @@ Delete All Results
     <button onclick="switchTab('results')" id="btn-results" class="nav-btn text-[10px]"><i class="fas fa-poll-h text-xl"></i><br>RESULT</button>  
     <button onclick="switchTab('admin')" id="btn-admin" class="nav-btn text-[10px] hidden text-slate-400"><i class="fas fa-user-shield text-xl"></i><br>ADMIN</button>  
   </nav>  
-</div>  <div id="main-modal" class="fs-modal">  
+</div>  
+
+<div id="bulk-print-sandbox" style="position: absolute; top: -9999px; left: -9999px; width: 450px; background: white; color: black; padding: 15px;"></div>
+
+<div id="main-modal" class="fs-modal">  
     <div id="modal-header">  
         <div class="flex items-center gap-2 overflow-hidden">  
             <span id="modal-title" class="text-xs font-bold uppercase truncate">Secure Viewer</span>  
@@ -422,43 +439,33 @@ window.toggleFeeDue = async (docId, currentStatus) => {
         fee_due: !currentStatus  
     });  
     alert("Fee status updated!");  
-    window.fetchStudentResult();
+    window.fetchStudentResult();  
 };  
   
-  window.deleteAllResults = async () => {
-    
-    // ADMIN SECURITY
-    if (!auth.currentUser || auth.currentUser.email !== adminEmail) {
-        alert("Unauthorized Access");
-        return;
-    }
-    
-    // CONFIRM
-    const confirmDelete = confirm("Are you sure? All results will be deleted!");
-    
-    if (!confirmDelete) return;
-    
-    // FETCH ALL RESULTS
-    const snapshot = await getDocs(collection(db, "school_results"));
-    
-    // DELETE EACH DOCUMENT
-    snapshot.forEach(async (d) => {
-        await deleteDoc(doc(db, "school_results", d.id));
-    });
-    
-    alert("All Results Deleted Successfully");
-}
+window.deleteAllResults = async () => {  
+    if (!auth.currentUser || auth.currentUser.email !== adminEmail) {  
+        alert("Unauthorized Access");  
+        return;  
+    }  
+    const confirmDelete = confirm("Are you sure? All results will be deleted!");  
+    if (!confirmDelete) return;  
+    const snapshot = await getDocs(collection(db, "school_results"));  
+    snapshot.forEach(async (d) => {  
+        await deleteDoc(doc(db, "school_results", d.id));  
+    });  
+    alert("All Results Deleted Successfully");  
+}  
   
-// --- STUDENT EXPERIMENTAL DIGITAL REPORT CARD ENGINE (UPDATED & FIXED RANK SYSTEM) ---  
+// --- STUDENT EXPERIMENTAL DIGITAL REPORT CARD ENGINE (UPDATED WITH DENSE RANK LOGIC) ---  
 window.fetchStudentResult = async () => {  
     const sId = document.getElementById("student-scholar-id").value.trim().toUpperCase();  
-    const examType = document.getElementById("student-exam-type").value;
-    const academicYear = document.getElementById("student-academic-year").value; 
+    const examType = document.getElementById("student-exam-type").value;  
+    const academicYear = document.getElementById("student-academic-year").value;   
     const targetPanel = document.getElementById("result-display-panel");  
       
     if(!sId) { alert("Please input a valid Scholar ID!"); return; }  
       
-    const targetDocId = `${sId}_${examType}_${academicYear}`;
+    const targetDocId = `${sId}_${examType}_${academicYear}`;  
 
     try {  
         const rSnap = await getDoc(doc(db, "school_results", targetDocId));  
@@ -502,55 +509,61 @@ window.fetchStudentResult = async () => {
         let percentage = maxMarks > 0 ? (totalMarks / maxMarks) * 100 : 0;  
         percentage = percentage.toFixed(2);  
           
-        let autoResultStatus = percentage >= 33 ? "PASS" : "FAIL";
+        let autoResultStatus = percentage >= 33 ? "PASS" : "FAIL";  
 
-        // --- FIXED CLASS WISE RANK CALCULATION ---
-        let classRank = "N/A";
-        let totalInClass = 0;
+        // --- FIXED DENSE RANK CALCULATION ---  
+        let classRank = "N/A";  
+        let totalInClass = 0;  
 
-        const studentClass = data.class || "N/A";
-        const currentScholarId = data.scholar_id.toString().trim().toUpperCase();
+        const studentClass = data.class || "N/A";  
+        const currentScholarId = data.scholar_id.toString().trim().toUpperCase();  
 
-        if(studentClass !== "N/A") {
-            const qClass = query(
-                collection(db, "school_results"), 
-                where("class", "==", studentClass),
-                where("exam_type", "==", examType),
-                where("academic_year", "==", academicYear)
-            );
-            const classSnap = await getDocs(qClass);
-            
-            let classStudents = [];
+        if(studentClass !== "N/A") {  
+            const qClass = query(  
+                collection(db, "school_results"),   
+                where("class", "==", studentClass),  
+                where("exam_type", "==", examType),  
+                where("academic_year", "==", academicYear)  
+            );  
+            const classSnap = await getDocs(qClass);  
+              
+            let classStudents = [];  
 
-            classSnap.forEach(docSnap => {
-                let sData = docSnap.data();
-                if(!sData.scholar_id) return;
+            classSnap.forEach(docSnap => {  
+                let sData = docSnap.data();  
+                if(!sData.scholar_id) return;  
 
-                let sSubs = [];
-                try { sSubs = typeof sData.subjects_json === "string" ? JSON.parse(sData.subjects_json) : sData.subjects_json; } catch(e){}
-                
-                let sTotal = 0;
-                if(sSubs && Array.isArray(sSubs)){
-                    sSubs.forEach(sub => { sTotal += Number(sub.total || 0); });
+                let sSubs = [];  
+                try { sSubs = typeof sData.subjects_json === "string" ? JSON.parse(sData.subjects_json) : sData.subjects_json; } catch(e){}  
+                  
+                let sTotal = 0;  
+                if(sSubs && Array.isArray(sSubs)){  
+                    sSubs.forEach(sub => { sTotal += Number(sub.total || 0); });  
+                }  
+
+                let studentScoreObj = {   
+                    scholar_id: sData.scholar_id.toString().trim().toUpperCase(),   
+                    totalMarks: sTotal   
+                };  
+                  
+                classStudents.push(studentScoreObj);  
+            });  
+
+            classStudents.sort((a, b) => b.totalMarks - a.totalMarks);  
+            totalInClass = classStudents.length;  
+
+            // Dense Ranking Strategy (Same Marks = Same Rank, Next Rank NO SKIP)
+            let currentRank = 1;
+            for(let i = 0; i < classStudents.length; i++) {
+                if (i > 0 && classStudents[i].totalMarks < classStudents[i-1].totalMarks) {
+                    currentRank++; 
                 }
-
-                let studentScoreObj = { 
-                    scholar_id: sData.scholar_id.toString().trim().toUpperCase(), 
-                    totalMarks: sTotal 
-                };
-                
-                classStudents.push(studentScoreObj);
-            });
-
-            // Sort by total marks in descending order (highest score first)
-            classStudents.sort((a, b) => b.totalMarks - a.totalMarks);
-
-            totalInClass = classStudents.length;
-
-            // Find current student index for Class Rank
-            let cRankIdx = classStudents.findIndex(x => x.scholar_id === currentScholarId);
-            if(cRankIdx !== -1) classRank = cRankIdx + 1;
-        }
+                if(classStudents[i].scholar_id === currentScholarId) {
+                    classRank = currentRank;
+                    break;
+                }
+            }
+        }  
 
         let subjectRows = "";  
         subjects.forEach(sub => {  
@@ -570,23 +583,23 @@ window.fetchStudentResult = async () => {
             </tr>`;  
         });  
   
-        let examDisplayName = data.exam_type ? data.exam_type.replace("_", " ") : "Examination";
-        let displayAcademicYear = data.academic_year || academicYear; 
+        let examDisplayName = data.exam_type ? data.exam_type.replace("_", " ") : "Examination";  
+        let displayAcademicYear = data.academic_year || academicYear;   
 
         targetPanel.innerHTML = `  
-         <div class="border-4 border-blue-900 p-4 bg-slate-50 relative">
-                <div class="flex items-center justify-between border-b-2 border-blue-900 pb-3 mb-4">
-                    <div class="flex items-center gap-3">
-                        <img src="https://i.postimg.cc/hjTFV5Hk/Screenshot-2026-0526-080731.png" class="w-14 h-14 object-contain">
-                    </div>
-                    <div class="text-center flex-1">
-                        <h2 class="text-blue-900 font-black text-sm tracking-wide uppercase leading-tight">TLSM WORLD SCHOOL</h2>
-                        <p class="text-[8px] font-bold text-slate-600 uppercase">Affiliated to CBSE Delhi Upto+2 Level</p>
-                        <p class="text-slate-700 text-[10px] font-bold uppercase mt-1">${examDisplayName} Report Card (Class ${studentClass})</p>
-                        <p class="text-indigo-600 text-[10px] font-black uppercase">Session / Year: ${displayAcademicYear}</p>
-                    </div>
-                    <div class="w-14"></div>
-                </div>
+         <div class="border-4 border-blue-900 p-4 bg-slate-50 relative">  
+                <div class="flex items-center justify-between border-b-2 border-blue-900 pb-3 mb-4">  
+                    <div class="flex items-center gap-3">  
+                        <img src="https://i.postimg.cc/hjTFV5Hk/Screenshot-2026-0526-080731.png" class="w-14 h-14 object-contain">  
+                    </div>  
+                    <div class="text-center flex-1">  
+                        <h2 class="text-blue-900 font-black text-sm tracking-wide uppercase leading-tight">TLSM WORLD SCHOOL</h2>  
+                        <p class="text-[8px] font-bold text-slate-600 uppercase">Affiliated to CBSE Delhi Upto+2 Level</p>  
+                        <p class="text-slate-700 text-[10px] font-bold uppercase mt-1">${examDisplayName} Report Card (Class ${studentClass})</p>  
+                        <p class="text-indigo-600 text-[10px] font-black uppercase">Session / Year: ${displayAcademicYear}</p>  
+                    </div>  
+                    <div class="w-14"></div>  
+                </div>  
                   
                 <div class="grid grid-cols-3 gap-y-1 gap-x-2 text-[10px] text-slate-800 border-b border-dashed border-slate-400 pb-3 mb-3">  
                     <div><span class="text-slate-500 font-bold">Roll No:</span></div>  
@@ -633,17 +646,24 @@ window.fetchStudentResult = async () => {
                     <span class="text-xs font-black">${percentage}%</span>  
                 </div>  
 
-                <div class="grid grid-cols-1 mb-3">
+                <div class="grid grid-cols-1 mb-3">  
                     <div class="flex justify-between items-center p-2 bg-white border border-blue-900 rounded-xl">  
                         <span class="text-[9px] font-black uppercase">Class Rank</span>  
                         <span class="text-xs font-black text-indigo-700">${classRank} <span class="text-[9px] text-slate-500 font-normal">of ${totalInClass}</span></span>  
-                    </div> 
-                </div>
+                    </div>   
+                </div>  
   
-                <div class="flex items-center justify-between p-2 bg-blue-900 text-white rounded-xl px-4 shadow-md">  
+                <div class="flex items-center justify-between p-2 bg-blue-900 text-white rounded-xl px-4 shadow-md mb-4">  
                     <span class="text-[10px] font-black uppercase tracking-wider">Final Result Outcome:</span>  
                     <span class="text-xs font-black uppercase bg-white ${autoResultStatus === 'PASS' ? 'text-emerald-700' : 'text-red-700'} px-4 py-0.5 rounded-full shadow-inner">${autoResultStatus}</span>  
                 </div>  
+
+                <div class="flex justify-end mt-4 mb-2">
+                    <div class="text-center" style="width: 110px;">
+                        <img src="https://i.postimg.cc/mhfGSdq7/Screenshot-2026-0527-204541.png" alt="Signature" class="mx-auto object-contain" style="width: 100px; height: 40px; max-height: 40px;">
+                        <p class="text-[9px] font-black text-blue-900 uppercase border-t border-blue-900/30 mt-1 pt-0.5">Principal Sign</p>
+                    </div>
+                </div>
                   
                 ${auth.currentUser.email === adminEmail ? `  
                 <div class="mt-4 text-center">  
@@ -654,7 +674,7 @@ window.fetchStudentResult = async () => {
                 ` : ''}  
                   
                 <p class="text-[7px] text-slate-400 text-center uppercase tracking-tighter mt-4 leading-tight font-bold text-black">  
-                Disclaimer: This software and its contents are the intellectual property of AARAV TECH HUB...
+                Disclaimer: This software and its contents are the intellectual property of AARAV TECH HUB [MIHIR JAI VISHWANATH SINGH & AARAV JAI VISHWANATH SINGH]. Any unauthorized use, reproduction, modification, or distribution is prohibited and may result in legal action. © 2026 All Rights Reserved | Unauthorized duplication or misuse is prohibited. DEVELOPER CONTACT NUM: 9430444443 / 8986900009
                 </p>  
             </div>  
         `;  
@@ -664,11 +684,207 @@ window.fetchStudentResult = async () => {
         alert("Firestore access query failure.");  
     }  
 };  
+
+// --- ADMIN ONE-CLICK BULK CLASS RESULT PRINT ENGINE (UPDATED WITH DENSE RANK LOGIC) ---
+window.printBulkClassResults = async () => {
+    if (!auth.currentUser || auth.currentUser.email !== adminEmail) {
+        alert("Unauthorized Admin Access Only!");
+        return;
+    }
+
+    const targetClass = document.getElementById("admin-print-class").value.trim().toUpperCase();
+    const examType = document.getElementById("admin-print-exam-type").value;
+    const academicYear = document.getElementById("admin-print-academic-year").value;
+    const sandbox = document.getElementById("bulk-print-sandbox");
+
+    if (!targetClass) { alert("Please specify a valid Class to print!"); return; }
+
+    alert("Fetching class details from firestore database, please hold on...");
+
+    try {
+        const qClass = query(
+            collection(db, "school_results"), 
+            where("class", "==", targetClass),
+            where("exam_type", "==", examType),
+            where("academic_year", "==", academicYear)
+        );
+        const snapshot = await getDocs(qClass);
+        if (snapshot.empty) { alert("No report records found for this precise configuration."); return; }
+
+        let classStudents = [];
+        snapshot.forEach(docSnap => {
+            let sData = docSnap.data();
+            let sSubs = [];
+            try { sSubs = typeof sData.subjects_json === "string" ? JSON.parse(sData.subjects_json) : sData.subjects_json; } catch(e){}
+            
+            let sTotal = 0;
+            if (sSubs && Array.isArray(sSubs)){
+                sSubs.forEach(sub => { sTotal += Number(sub.total || 0); });
+            }
+            classStudents.push({ ...sData, totalMarks: sTotal });
+        });
+
+        classStudents.sort((a, b) => b.totalMarks - a.totalMarks);
+        let totalInClass = classStudents.length;
+
+        // Pre-calculate Dense ranks for bulk printing
+        let rankedStudentsMap = {};
+        let currentRank = 1;
+        for (let i = 0; i < classStudents.length; i++) {
+            if (i > 0 && classStudents[i].totalMarks < classStudents[i-1].totalMarks) {
+                currentRank++;
+            }
+            rankedStudentsMap[classStudents[i].scholar_id] = currentRank;
+        }
+
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF("p", "mm", "a4");
+        const pageWidth = 210; const pageHeight = 297; const margin = 10;
+        const usableWidth = pageWidth - margin * 2; const usableHeight = pageHeight - margin * 2;
+
+        alert(`Processing ${totalInClass} students data grids. Compiling your multi-page PDF document...`);
+
+        for (let idx = 0; idx < classStudents.length; idx++) {
+            let data = classStudents[idx];
+            let classRank = rankedStudentsMap[data.scholar_id];
+
+            let subjects = data.subjects_json || [];
+            let totalMarks = data.totalMarks;
+            let maxMarks = 0;
+            subjects.forEach(s => maxMarks += Number(s.fullMarks || 100));
+
+            let percentage = maxMarks > 0 ? ((totalMarks / maxMarks) * 100).toFixed(2) : 0;
+            let autoResultStatus = percentage >= 33 ? "PASS" : "FAIL";
+            let examDisplayName = examType.replace("_", " ");
+
+            let subjectRows = "";
+            subjects.forEach(sub => {
+                let calculatedTotal = Number(sub.total || 0);
+                let calculatedMax = Number(sub.fullMarks || 100);
+                let subPercent = calculatedMax > 0 ? (calculatedTotal / calculatedMax) * 100 : 0;
+                let dynamicGrade = sub.grade || window.getGrade(subPercent);
+
+                subjectRows += `
+                <tr style="border-bottom: 1px solid #cbd5e1; text-align: center; font-size: 11px;">
+                    <td style="padding: 6px; font-family: monospace;">${sub.code || '---'}</td>
+                    <td style="padding: 6px; text-align: left; font-weight: bold;">${sub.name || '---'}</td>
+                    <td style="padding: 6px;">${sub.theory !== undefined ? sub.theory : '---'}</td>
+                    <td style="padding: 6px;">${sub.practical !== undefined ? sub.practical : '---'}</td>
+                    <td style="padding: 6px; font-weight: 900;">${calculatedTotal} / ${calculatedMax}</td>
+                    <td style="padding: 6px; color: #4f46e5; font-weight: bold;">${dynamicGrade}</td>
+                </tr>`;
+            });
+
+            sandbox.innerHTML = `
+                <div style="border: 4px solid #1e3a8a; padding: 15px; background: #f8fafc; font-family: sans-serif; color: black;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #1e3a8a; padding-bottom: 10px; margin-bottom: 12px;">
+                        <div style="margin-right: 10px;">
+                            <img src="https://i.postimg.cc/hjTFV5Hk/Screenshot-2026-0526-080731.png" style="width: 55px; height: 55px; object-fit: contain;">
+                        </div>
+                        <div style="text-align: center; flex: 1;">
+                            <h2 style="color: #1e3a8a; font-weight: 900; font-size: 15px; margin: 0; text-transform: uppercase;">TLSM WORLD SCHOOL</h2>
+                            <p style="font-size: 8px; font-weight: bold; color: #475569; margin: 2px 0 0 0; text-transform: uppercase;">Affiliated to CBSE Delhi Upto+2 Level</p>
+                            <p style="color: #334155; font-size: 11px; font-weight: bold; margin: 4px 0 0 0; text-transform: uppercase;">${examDisplayName} Report Card (Class ${targetClass})</p>
+                            <p style="color: #4f46e5; font-size: 10px; font-weight: 900; margin: 2px 0 0 0; text-transform: uppercase;">Session / Year: ${academicYear}</p>
+                        </div>
+                        <div style="width: 55px;"></div>
+                    </div>
+                      
+                    <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 4px; font-size: 10px; border-bottom: 1px dashed #94a3b8; padding-bottom: 10px; margin-bottom: 12px;">
+                        <div><span style="color: #64748b; font-weight: bold;">Roll No:</span></div>
+                        <div style="font-weight: bold;">${data.roll_no || 'N/A'}</div>
+                        <div><span style="color: #64748b; font-weight: bold;">Candidate Name:</span></div>
+                        <div style="font-weight: 900; text-transform: uppercase;">${data.name || ''}</div>
+                        <div><span style="color: #64748b; font-weight: bold;">Mother's Name:</span></div>
+                        <div style="font-weight: bold; text-transform: uppercase;">${data.mother || ''}</div>
+                        <div><span style="color: #64748b; font-weight: bold;">Father's Name:</span></div>
+                        <div style="font-weight: bold; text-transform: uppercase;">${data.father || ''}</div>
+                        <div><span style="color: #64748b; font-weight: bold;">Class / Section:</span></div>
+                        <div style="font-weight: bold; text-transform: uppercase;">${targetClass} - ${(data.section || "A")}</div>
+                        <div><span style="color: #64748b; font-weight: bold;">Date of Birth:</span></div>
+                        <div style="font-weight: bold;">${data.dob || ''}</div>
+                        <div><span style="color: #64748b; font-weight: bold;">School's Name:</span></div>
+                        <div style="font-weight: bold; color: #1e3a8a; text-transform: uppercase;">${data.school || ''}</div>
+                    </div>  
+                      
+                    <table style="width: 100%; border-collapse: collapse; border: 1px solid #1e3a8a; margin-bottom: 12px; background: white;">  
+                        <thead>  
+                            <tr style="background: #1e3a8a; color: white; font-size: 9px; font-weight: 900; text-transform: uppercase;">  
+                                <th style="padding: 6px; border: 1px solid #1e3a8a;">SUB CODE</th>  
+                                <th style="padding: 6px; border: 1px solid #1e3a8a; text-align: left;">SUB NAME</th>  
+                                <th style="padding: 6px; border: 1px solid #1e3a8a;">THEORY</th>  
+                                <th style="padding: 6px; border: 1px solid #1e3a8a;">PRAC</th>  
+                                <th style="padding: 6px; border: 1px solid #1e3a8a;">TOTAL</th>  
+                                <th style="padding: 6px; border: 1px solid #1e3a8a;">GRADE</th>  
+                            </tr>  
+                        </thead>  
+                        <tbody>  
+                            ${subjectRows}  
+                        </tbody>  
+                    </table>  
+                      
+                    <div style="display: flex; justify-content: space-between; padding: 6px; background: white; border: 1px solid #1e3a8a; border-radius: 8px; margin-bottom: 6px; font-size: 11px;">
+                        <span style="font-weight: bold; text-transform: uppercase;">Total Marks:</span>
+                        <span style="margin-left: auto; font-weight: 900;">${totalMarks} / ${maxMarks}</span>
+                    </div>  
+      
+                    <div style="display: flex; justify-content: space-between; padding: 6px; background: white; border: 1px solid #1e3a8a; border-radius: 8px; margin-bottom: 6px; font-size: 11px;">
+                        <span style="font-weight: bold; text-transform: uppercase;">Percentage:</span>
+                        <span style="margin-left: auto; font-weight: 900;">${percentage}%</span>
+                    </div>  
+    
+                    <div style="display: flex; justify-content: space-between; padding: 6px; background: white; border: 1px solid #1e3a8a; border-radius: 8px; margin-bottom: 6px; font-size: 11px;">
+                        <span style="font-weight: bold; text-transform: uppercase;">Class Rank:</span>
+                        <span style="margin-left: auto; font-weight: 900; color: #4f46e5;">${classRank} of ${totalInClass}</span>
+                    </div>  
+      
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px; background: #1e3a8a; color: white; border-radius: 8px; font-size: 11px; font-weight: bold; margin-top: 10px;">  
+                        <span>FINAL OUTCOME:</span>  
+                        <span style="margin-left: auto; background: white; color: ${autoResultStatus === 'PASS' ? '#047857' : '#b91c1c'}; padding: 2px 10px; border-radius: 20px;">${autoResultStatus}</span>  
+                    </div>  
+
+                    <div style="display: flex; justify-content: flex-end; margin-top: 15px; margin-bottom: 5px;">
+                        <div style="text-align: center; width: 90px;">
+                            <img src="https://i.postimg.cc/mhfGSdq7/Screenshot-2026-0527-204541.png" style="width: 100px; height: 40px; max-height: 40px; object-fit: contain; margin: 0 auto;">
+                            <p style="font-size: 9px; font-weight: 900; color: #1e3a8a; border-top: 1px solid rgba(30,58,138,0.3); margin: 4px 0 0 0; padding-top: 2px; text-transform: uppercase;">Principal Sign</p>
+                        </div>
+                    </div>
+
+                    <p style="font-size: 7px; color: #64748b; text-align: center; text-transform: uppercase; margin-top: 12px; line-height: 1.2; font-weight: bold;">
+                    Disclaimer: This software and its contents are the intellectual property of AARAV TECH HUB [MIHIR JAI VISHWANATH SINGH & AARAV JAI VISHWANATH SINGH]. Any unauthorized use, reproduction, modification, or distribution is prohibited and may result in legal action. © 2026 All Rights Reserved | Unauthorized duplication or misuse is prohibited. DEVELOPER CONTACT NUM: 9430444443 / 8986900009
+                    </p>
+                </div>
+            `;
+
+            let canvas = await html2canvas(sandbox, { scale: 2, useCORS: true, backgroundColor: "#ffffff" });
+            let imgData = canvas.toDataURL("image/png");
+
+            let imgWidth = usableWidth;  
+            let imgHeight = (canvas.height * imgWidth) / canvas.width;  
+            if (imgHeight > usableHeight) {  
+                imgHeight = usableHeight;  
+                imgWidth = (canvas.width * imgHeight) / canvas.height;  
+            }  
+            const x = (pageWidth - imgWidth) / 2;  
+            const y = margin;  
+
+            if (idx > 0) pdf.addPage();
+            pdf.addImage(imgData, "PNG", x, y, imgWidth, imgHeight);
+        }
+
+        pdf.save(`Bulk_Class_${targetClass}_Results.pdf`);
+        sandbox.innerHTML = ""; 
+        alert("Success! All student data compiled safely inside your local storage bundle.");
+    } catch(err) {
+        console.error(err);
+        alert("An extraction processing fault occurred within dynamic renderer engines.");
+    }
+};
   
 // --- ADMIN SYSTEM EXCEL INGEST DATA PIPELINE ---  
 window.processExcelUpload = () => {  
     const fileInput = document.getElementById("excel-file-input");  
-    const selectedExamType = document.getElementById("admin-upload-exam-type").value;
+    const selectedExamType = document.getElementById("admin-upload-exam-type").value;  
     const selectedAcademicYear = document.getElementById("admin-upload-academic-year").value; 
 
     if(!fileInput.files || fileInput.files.length === 0) { alert("Please select a valid excel .xlsx structure report card master first!"); return; }  
@@ -690,7 +906,7 @@ window.processExcelUpload = () => {
                 let scholarIdRaw = row.scholar_id ? row.scholar_id.toString().trim().toUpperCase() : null;  
                 if(!scholarIdRaw) continue;  
                   
-                let uniqueDocId = `${scholarIdRaw}_${selectedExamType}_${selectedAcademicYear}`;
+                let uniqueDocId = `${scholarIdRaw}_${selectedExamType}_${selectedAcademicYear}`;  
 
                 let subjects = [];  
                 const allColumns = Object.keys(row);  
@@ -739,7 +955,7 @@ window.processExcelUpload = () => {
                 let processedPayload = {  
                     scholar_id: scholarIdRaw,  
                     exam_type: selectedExamType,  
-                    academic_year: selectedAcademicYear, 
+                    academic_year: selectedAcademicYear,   
                     roll_no: row.roll_no ? row.roll_no.toString() : "---",  
                     name: row.name || "Unknown Student",  
                     mother: row.mother || "---",  
