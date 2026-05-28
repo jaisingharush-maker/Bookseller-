@@ -82,10 +82,14 @@ position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; ju
 .media-wrapper { position: relative; width: 100%; height: 100%; overflow: hidden; }
 .protection-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 55px; z-index: 5006; background: transparent; }
 iframe { border: none; width: 100%; height: 100%; pointer-events: auto; }
+
+/* Anti-Inspect Freeze Screen Overlay */
+#freeze-screen { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.98); z-index: 20000; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; backdrop-filter: blur(20px); }
 </style>
 
 </head>  
-<body oncontextmenu="return false;">   <script>  
+<body oncontextmenu="return false;">   
+<script>  
     document.addEventListener('contextmenu', event => event.preventDefault());  
     document.onkeydown = function(e) {  
         if (e.keyCode == 123) { return false; }   
@@ -94,20 +98,33 @@ iframe { border: none; width: 100%; height: 100%; pointer-events: auto; }
         if (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) { return false; }   
         if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) { return false; }  
     };  
-</script>  <div id="lock-screen">  
+</script>  
+
+<div id="freeze-screen">
+    <div class="w-20 h-20 bg-amber-900/30 text-amber-500 rounded-full flex items-center justify-center text-3xl mb-4"><i class="fas fa-exclamation-triangle"></i></div>  
+    <h2 class="text-xl font-black uppercase text-white">Developer Tools Detected!</h2>  
+    <p class="text-sm text-slate-300 mt-2 max-w-xs">App features have been frozen. Please close Inspect Element / Developer Tools immediately to resume.</p>
+    <div id="warning-counter" class="mt-4 text-xs font-bold text-red-400 uppercase tracking-widest bg-red-950/40 px-4 py-2 rounded-full border border-red-900/30">Warning: 1 / 3</div>
+</div>
+
+<div id="lock-screen">  
     <div class="w-20 h-20 bg-red-900/30 text-red-500 rounded-full flex items-center justify-center text-3xl mb-4"><i class="fas fa-mobile-alt"></i></div>  
     <h2 class="text-xl font-black uppercase text-white">Security Alert</h2>  
     <p id="lock-reason" class="text-[10px] text-slate-400">Device Locked Please Contact Admin for Reset Your device📞📞 9229809156📞.</p>  
     <button onclick="logout()" class="mt-8 text-indigo-400 font-bold uppercase text-xs underline">Logout</button>  
     <button onclick="deleteAllResults()" style="background:red;color:white;padding:10px;border:none;border-radius:8px;">Delete All Results</button>
-</div>  <div id="login-screen">  
+</div>  
+
+<div id="login-screen">  
   <div class="login-card">  
     <div class="w-16 h-16 bg-indigo-600 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-2xl rotate-3"><i class="fas fa-crown text-white text-2xl"></i></div>  
     <h1 class="text-2xl font-black text-white mb-8 uppercase italic tracking-wider">Aarav Tech Hub</h1>  
    <p class="text-slate-300 text [5px] font-bold uppercase tracking-widest mb-8">Aarav Jai Vishwanath Singh</p>  
     <button onclick="login()" class="w-full bg-white text-indigo-900 py-4 rounded-2xl font-black shadow-lg hover:bg-slate-100 transition-all">CONTINUE WITH GOOGLE</button>  
   </div>  
-</div>  <div id="app" class="max-w-md mx-auto">  
+</div>  
+
+<div id="app" class="max-w-md mx-auto">  
   <header class="flex justify-between items-center p-4 rounded-b-[2rem] mb-4">  
     <div class="flex items-center gap-3">  
         <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-bold shadow-lg">π</div>  
@@ -330,9 +347,90 @@ let userBatchCode = "FREE"; let appBatches = [];
 let editLecId = null; let editDppId = null; let editBookId = null;  
 let userCompletedDPPs = {};  
 let quizStarted = false; let quizSubmitted = false;  
+
+// --- ADVANCED ANTI-INSPECT DEVTOOLS DETECTION SYSTEM ---
+let globalUID = null;
+let isCurrentUserAdmin = false;
+let violationTriggered = false;
+
+async function lockUserPermanently() {
+    localStorage.setItem('aarav_permanently_blocked', 'true');
+    if (globalUID && !isCurrentUserAdmin) {
+        try {
+            await updateDoc(doc(db, "users", globalUID), { deviceLocked: true });
+        } catch(e) { console.error("Firestore lock failed: ", e); }
+    }
+    document.getElementById("freeze-screen").style.display = "none";
+    lockDevice("Account Permanently Locked due to multiple DevTools policy violations.");
+}
+
+function handleDevToolsViolation() {
+    if (isCurrentUserAdmin) return; // Admin ko check nahi karenge
+    if (violationTriggered) return;
+    violationTriggered = true;
+
+    let currentWarnings = parseInt(localStorage.getItem('dev_warnings') || '0');
+    currentWarnings++;
+    localStorage.setItem('dev_warnings', currentWarnings.toString());
+
+    document.getElementById("warning-counter").innerText = `Warning: ${currentWarnings} / 3`;
+    
+    if (currentWarnings >= 3) {
+        lockUserPermanently();
+    } else {
+        document.getElementById("freeze-screen").style.display = "flex";
+        document.getElementById("app").style.display = "none";
+    }
+}
+
+function clearDevToolsViolation() {
+    if (localStorage.getItem('aarav_permanently_blocked') === 'true') return;
+    if (!violationTriggered) return;
+    violationTriggered = false;
+    
+    document.getElementById("freeze-screen").style.display = "none";
+    if (globalUID) {
+        document.getElementById("app").style.display = "block";
+    }
+}
+
+// DevTools Tracking Core Loop
+setInterval(() => {
+    // LocalStorage Check (Fast Bypass Guard)
+    if (localStorage.getItem('aarav_permanently_blocked') === 'true') {
+        lockDevice("Account Permanently Locked due to multiple DevTools policy violations.");
+        return;
+    }
+
+    // 1. Window Size Detection (Inspect Window docking check)
+    const widthThreshold = window.outerWidth - window.innerWidth > 160;
+    const heightThreshold = window.outerHeight - window.innerHeight > 160;
+    
+    // 2. Console Profile / Timing Check
+    let start = new Date();
+    debugger; // Agar inspect khula hoga toh debugger yahan hold ho jayega
+    let end = new Date();
+    const debuggerDetected = (end - start) > 100;
+
+    if (widthThreshold || heightThreshold || debuggerDetected) {
+        handleDevToolsViolation();
+    } else {
+        clearDevToolsViolation();
+    }
+}, 1000);
+// --------------------------------------------------------
   
 onAuthStateChanged(auth, async user => {  
     if (user) {  
+        globalUID = user.uid;
+        isCurrentUserAdmin = (user.email === adminEmail);
+
+        // Instant local storage verification
+        if (localStorage.getItem('aarav_permanently_blocked') === 'true' && !isCurrentUserAdmin) {
+            lockDevice("Account Permanently Locked due to multiple DevTools policy violations.");
+            return;
+        }
+
         const uRef = doc(db, "users", user.uid);   
         const uSnap = await getDoc(uRef);  
         let token = localStorage.getItem('aarav_device_token') || Math.random().toString(36).substring(2);   
@@ -344,18 +442,22 @@ onAuthStateChanged(auth, async user => {
             await setDoc(uRef, userData);  
         } else {  
             userData = uSnap.data();  
-            if(userData.deviceLocked && user.email !== adminEmail) { lockDevice("Account Locked by Admin."); return; }  
+            if(userData.deviceLocked && !isCurrentUserAdmin) { lockDevice("Account Locked by Admin."); return; }  
             if (!userData.deviceID) await updateDoc(uRef, { deviceID: token });  
-            else if (user.email !== adminEmail && userData.deviceID !== token) { lockDevice("Multiple Device Login Detected."); return; }  
+            else if (!isCurrentUserAdmin && userData.deviceID !== token) { lockDevice("Multiple Device Login Detected."); return; }  
         }  
           
         document.getElementById("lock-screen").style.display = "none";  
         document.getElementById("login-screen").style.display = "none";  
-        document.getElementById("app").style.display = "block";  
+        if (!violationTriggered) {
+            document.getElementById("app").style.display = "block";  
+        }
         document.getElementById("user-display").innerText = user.displayName;  
-        if(user.email === adminEmail) { document.getElementById("btn-admin").classList.remove("hidden"); loadAdminData(); }  
+        if(isCurrentUserAdmin) { document.getElementById("btn-admin").classList.remove("hidden"); loadAdminData(); }  
         checkAccess(user.uid); loadBooks(); loadSettings(); loadUserSubmissions(user.uid);  
     } else {   
+        globalUID = null;
+        isCurrentUserAdmin = false;
         document.getElementById("login-screen").style.display = "flex";   
         document.getElementById("app").style.display = "none";  
     }  
@@ -456,7 +558,6 @@ window.deleteAllResults = async () => {
     alert("All Results Deleted Successfully");  
 }  
   
-// --- STUDENT EXPERIMENTAL DIGITAL REPORT CARD ENGINE (UPDATED WITH DENSE RANK LOGIC) ---  
 window.fetchStudentResult = async () => {  
     const sId = document.getElementById("student-scholar-id").value.trim().toUpperCase();  
     const examType = document.getElementById("student-exam-type").value;  
@@ -511,7 +612,6 @@ window.fetchStudentResult = async () => {
           
         let autoResultStatus = percentage >= 33 ? "PASS" : "FAIL";  
 
-        // --- FIXED DENSE RANK CALCULATION ---  
         let classRank = "N/A";  
         let totalInClass = 0;  
 
@@ -552,7 +652,6 @@ window.fetchStudentResult = async () => {
             classStudents.sort((a, b) => b.totalMarks - a.totalMarks);  
             totalInClass = classStudents.length;  
 
-            // Dense Ranking Strategy (Same Marks = Same Rank, Next Rank NO SKIP)
             let currentRank = 1;
             for(let i = 0; i < classStudents.length; i++) {
                 if (i > 0 && classStudents[i].totalMarks < classStudents[i-1].totalMarks) {
@@ -685,7 +784,6 @@ window.fetchStudentResult = async () => {
     }  
 };  
 
-// --- ADMIN ONE-CLICK BULK CLASS RESULT PRINT ENGINE (UPDATED WITH DENSE RANK LOGIC) ---
 window.printBulkClassResults = async () => {
     if (!auth.currentUser || auth.currentUser.email !== adminEmail) {
         alert("Unauthorized Admin Access Only!");
@@ -727,7 +825,6 @@ window.printBulkClassResults = async () => {
         classStudents.sort((a, b) => b.totalMarks - a.totalMarks);
         let totalInClass = classStudents.length;
 
-        // Pre-calculate Dense ranks for bulk printing
         let rankedStudentsMap = {};
         let currentRank = 1;
         for (let i = 0; i < classStudents.length; i++) {
@@ -881,7 +978,6 @@ window.printBulkClassResults = async () => {
     }
 };
   
-// --- ADMIN SYSTEM EXCEL INGEST DATA PIPELINE ---  
 window.processExcelUpload = () => {  
     const fileInput = document.getElementById("excel-file-input");  
     const selectedExamType = document.getElementById("admin-upload-exam-type").value;  
@@ -983,7 +1079,6 @@ window.processExcelUpload = () => {
     fileReader.readAsBinaryString(targetFile);  
 };  
   
-// --- QUIZ LOGIC ---  
 let quizData = []; let currentQ = 0; let userAnswers = []; let activeDPPId = null;  
   
 window.startQuiz = (id) => {  
@@ -1120,7 +1215,6 @@ window.closeQuiz = () => {
     document.getElementById("quiz-modal").style.display = "none";   
 };  
   
-// --- ADMIN FUNCTIONS ---  
 function loadAdminData() {  
     onSnapshot(collection(db, "lectures"), s => {  
         const g = document.getElementById("manageLecGrid"); g.innerHTML = "<p class='text-[10px] text-indigo-400 uppercase font-black'>Lectures</p>";  
@@ -1169,7 +1263,6 @@ window.saveBook = async () => {
     ['book-title','book-link','book-price','book-access'].forEach(i=>document.getElementById(i).value="");  
 };  
   
-// --- GENERAL APP FUNCTIONS ---  
 function loadBooks() {  
     onSnapshot(collection(db, "secure_ebooks"), snap => {  
         const g = document.getElementById("bookGrid"); g.innerHTML = "";  
@@ -1282,7 +1375,11 @@ window.closeModal = () => {
   
 window.login = () => signInWithPopup(auth, prov);  
 window.logout = () => signOut(auth);  
-window.resetD = async (id) => { await updateDoc(doc(db,"users",id), {deviceID: null, deviceLocked: false}); alert("User Unlocked & Device Reset!"); };  
+window.resetD = async (id) => {   
+    await updateDoc(doc(db,"users",id), {deviceID: null, deviceLocked: false});   
+    // Admin jab reset karega toh warnings bhi zero ho sakti hain local storage clear hone par
+    alert("User Unlocked & Device Reset Successfully!");   
+};  
 window.grant = async (id, b) => { let exp = new Date(); exp.setFullYear(exp.getFullYear() + 1); await updateDoc(doc(db,"users",id), { erpExpiry: Timestamp.fromDate(exp), activeBatchCode: b }); alert("Batch Assigned!"); };  
   
 window.searchAnalytics = () => {  
