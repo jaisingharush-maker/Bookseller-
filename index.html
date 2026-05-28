@@ -112,8 +112,7 @@ iframe { border: none; width: 100%; height: 100%; pointer-events: auto; }
     <h2 class="text-xl font-black uppercase text-white">Security Alert</h2>  
     <p id="lock-reason" class="text-[10px] text-slate-400">Device Locked Please Contact Admin for Reset Your device📞📞 9229809156📞.</p>  
     <button onclick="logout()" class="mt-8 text-indigo-400 font-bold uppercase text-xs underline">Logout</button>  
-    <button onclick="deleteAllResults()" style="background:red;color:white;padding:10px;border:none;border-radius:8px;">Delete All Results</button>
-</div>  
+    </div>  
 
 <div id="login-screen">  
   <div class="login-card">  
@@ -357,7 +356,7 @@ async function lockUserPermanently() {
     localStorage.setItem('aarav_permanently_blocked', 'true');
     if (globalUID && !isCurrentUserAdmin) {
         try {
-            await updateDoc(doc(db, "users", globalUID), { deviceLocked: true });
+            await updateDoc(doc(db, "users", globalUID), { deviceLocked: true, resetWarnings: false });
         } catch(e) { console.error("Firestore lock failed: ", e); }
     }
     document.getElementById("freeze-screen").style.display = "none";
@@ -425,12 +424,6 @@ onAuthStateChanged(auth, async user => {
         globalUID = user.uid;
         isCurrentUserAdmin = (user.email === adminEmail);
 
-        // Instant local storage verification
-        if (localStorage.getItem('aarav_permanently_blocked') === 'true' && !isCurrentUserAdmin) {
-            lockDevice("Account Permanently Locked due to multiple DevTools policy violations.");
-            return;
-        }
-
         const uRef = doc(db, "users", user.uid);   
         const uSnap = await getDoc(uRef);  
         let token = localStorage.getItem('aarav_device_token') || Math.random().toString(36).substring(2);   
@@ -438,10 +431,26 @@ onAuthStateChanged(auth, async user => {
   
         let userData;  
         if(!uSnap.exists()) {  
-            userData = { name: user.displayName, email: user.email, uid: user.uid, deviceID: token, activeBatchCode: "FREE", deviceLocked: false };  
+            userData = { name: user.displayName, email: user.email, uid: user.uid, deviceID: token, activeBatchCode: "FREE", deviceLocked: false, resetWarnings: false };  
             await setDoc(uRef, userData);  
         } else {  
             userData = uSnap.data();  
+
+            // Realtime Reset Check: Agar admin ne reset request bheji ho
+            if (userData.resetWarnings === true) {
+                localStorage.removeItem('aarav_permanently_blocked');
+                localStorage.removeItem('dev_warnings');
+                await updateDoc(uRef, { resetWarnings: false, deviceLocked: false, deviceID: token });
+                window.location.reload(); // App ko fresh load karo bina block screen ke
+                return;
+            }
+
+            // Instant local storage verification
+            if (localStorage.getItem('aarav_permanently_blocked') === 'true' && !isCurrentUserAdmin) {
+                lockDevice("Account Permanently Locked due to multiple DevTools policy violations.");
+                return;
+            }
+
             if(userData.deviceLocked && !isCurrentUserAdmin) { lockDevice("Account Locked by Admin."); return; }  
             if (!userData.deviceID) await updateDoc(uRef, { deviceID: token });  
             else if (!isCurrentUserAdmin && userData.deviceID !== token) { lockDevice("Multiple Device Login Detected."); return; }  
@@ -1375,11 +1384,18 @@ window.closeModal = () => {
   
 window.login = () => signInWithPopup(auth, prov);  
 window.logout = () => signOut(auth);  
+
+// Admin panel se user unblock aur warnings reset karne ka updated function
 window.resetD = async (id) => {   
-    await updateDoc(doc(db,"users",id), {deviceID: null, deviceLocked: false});   
-    // Admin jab reset karega toh warnings bhi zero ho sakti hain local storage clear hone par
-    alert("User Unlocked & Device Reset Successfully!");   
+    // resetWarnings flag lagaya taaki user jab next time app khole toh uski local storage clear ho sake
+    await updateDoc(doc(db, "users", id), {
+        deviceID: null, 
+        deviceLocked: false, 
+        resetWarnings: true
+    });   
+    alert("User Unlocked & Device Reset Signal Sent Successfully!");   
 };  
+
 window.grant = async (id, b) => { let exp = new Date(); exp.setFullYear(exp.getFullYear() + 1); await updateDoc(doc(db,"users",id), { erpExpiry: Timestamp.fromDate(exp), activeBatchCode: b }); alert("Batch Assigned!"); };  
   
 window.searchAnalytics = () => {  
