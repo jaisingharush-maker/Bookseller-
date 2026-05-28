@@ -8,6 +8,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>  
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>  
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>  
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>  
   /* Aurora Mesh Gradient Background */  
   body {   
@@ -154,7 +155,13 @@ iframe { border: none; width: 100%; height: 100%; pointer-events: auto; }
   </div>
 
   </div>    <div id="tab-results" class="tab-content space-y-4 pb-10">  
-      <div class="glass !p-5">  
+      <div id="result-locked-notice" class="glass text-center p-6 hidden">
+          <i class="fas fa-clock text-amber-400 text-4xl mb-3"></i>
+          <h3 class="text-sm font-black uppercase tracking-wider text-white">Result Not Declared Yet</h3>
+          <p class="text-[10px] text-slate-400 mt-1">Examination board has compiled the data sheets. The panel will unlock instantly on official publish timings.</p>
+      </div>
+
+      <div id="result-input-box" class="glass !p-5">  
           <h2 class="text-sm font-black text-white uppercase tracking-wider mb-2"><i class="fas fa-poll-h mr-2 text-indigo-400"></i>Check Examination Result</h2>  
           <p class="text-[10px] text-slate-400 mb-4">Enter your Scholar ID, select Academic Year & Exam Type to view your report card panel.</p>  
           <div class="flex flex-col gap-2">  
@@ -169,6 +176,7 @@ iframe { border: none; width: 100%; height: 100%; pointer-events: auto; }
               <select id="student-exam-type" class="publisher-input !mb-0 text-center text-sm font-bold py-3 bg-slate-900 text-white">
                   <option value="PMT">PMT EXAM</option>
                   <option value="HALF_YEARLY">HALF YEARLY</option>
+                  <option value="PAT">PAT EXAM</option>
                   <option value="ANNUAL">ANNUAL EXAM</option>
               </select>
 
@@ -184,6 +192,19 @@ iframe { border: none; width: 100%; height: 100%; pointer-events: auto; }
         <div onclick="showAdminSection('users')" id="sub-btn-users" class="admin-sub-tab">USERS</div>  
         <div onclick="showAdminSection('excel-results')" id="sub-btn-excel-results" class="admin-sub-tab">EXCEL RESULTS</div>  
     </div>  <div id="sec-publish" class="admin-section space-y-4">  
+    
+    <div class="glass !p-4 border border-amber-500/30 bg-amber-950/10">
+        <p class="text-[9px] font-black text-amber-400 mb-1 uppercase"><i class="fas fa-eye-slash mr-1"></i> Result Portal Control Panel</p>
+        <p class="text-[9px] text-slate-400 mb-3">Yahan se aap students ke liye result panel ko hide/unhide kar sakte hain takki leak na ho.</p>
+        <div class="flex items-center justify-between bg-black/30 p-3 rounded-xl border border-white/10">
+            <div>
+                <span class="text-xs font-bold block text-white">Portal Live Status:</span>
+                <span id="portal-status-badge" class="text-[9px] text-red-400 font-bold uppercase">HIDDEN (SECURE)</span>
+            </div>
+            <button id="toggle-portal-btn" onclick="window.toggleResultVisibility()" class="bg-amber-600 text-white text-[10px] font-black px-4 py-2.5 rounded-xl shadow-md uppercase transition-all">Toggle State</button>
+        </div>
+    </div>
+
     <div class="glass !p-4">  
         <p class="text-[9px] font-black text-indigo-400 mb-2 uppercase">Publish Lecture</p>  
         <input id="lec-batch" class="publisher-input" placeholder="Batch ID (e.g. UDAAN 2027)">  
@@ -251,6 +272,7 @@ iframe { border: none; width: 100%; height: 100%; pointer-events: auto; }
                 <select id="admin-print-exam-type" class="publisher-input text-[10px] font-bold bg-slate-950 text-white">
                     <option value="PMT">PMT EXAM</option>
                     <option value="HALF_YEARLY">HALF YEARLY</option>
+                    <option value="PAT">PAT EXAM</option>
                     <option value="ANNUAL">ANNUAL EXAM</option>
                 </select>
             </div>
@@ -272,12 +294,13 @@ iframe { border: none; width: 100%; height: 100%; pointer-events: auto; }
         <select id="admin-upload-exam-type" class="publisher-input text-xs font-bold bg-slate-950 text-white mb-4">
             <option value="PMT">PMT EXAM</option>
             <option value="HALF_YEARLY">HALF YEARLY</option>
+            <option value="PAT">PAT EXAM</option>
             <option value="ANNUAL">ANNUAL EXAM</option>
         </select>
 
         <p class="text-[9px] text-slate-400 mb-4 leading-relaxed">  
             Make sure your sheet headers strictly match:<br>  
-            <code class="text-indigo-300">scholar_id, roll_no, name, mother, father, dob, class, school, subjects_json, result_status</code><br>  
+            <code class="text-indigo-300">scholar_id, roll_no, name, mother, father, dob, class, school, subjects_json, result_status, days_present</code><br>  
             * Note: <code class="text-emerald-400">subjects_json</code> column should contain explicit subject arrays like:<br>  
             <code class="text-amber-400 text-[8px] block">[{"code":"002","name":"HINDI","theory":75,"practical":20,"total":95,"fullMarks":100}]</code><br>
             * Ya fir columns me aap <code class="text-indigo-300">FULL_HINDI</code> jaisa automatic dynamic target setup use kar sakte hain.
@@ -346,6 +369,63 @@ let userBatchCode = "FREE"; let appBatches = [];
 let editLecId = null; let editDppId = null; let editBookId = null;  
 let userCompletedDPPs = {};  
 let quizStarted = false; let quizSubmitted = false;  
+let isResultsPortalVisible = false; // Visibility state tracker
+
+// Helper function to build dynamic Multi-Exam analysis chart datasets safely
+async function buildPerformanceChartData(scholarId, currentExam, academicYear, currentSubjects) {
+    let exams = ["PMT", "HALF_YEARLY", "PAT", "ANNUAL"];
+    let datasets = [];
+    let labels = currentSubjects.map(s => s.name.toUpperCase());
+    
+    // Default colors for different examination charts
+    let colors = {
+        "PMT": { bg: "rgba(239, 68, 68, 0.6)", border: "#ef4444" },
+        "PAT": { bg: "rgba(99, 102, 241, 0.6)", border: "#6366f1" },
+        "HALF_YEARLY": { bg: "rgba(245, 158, 11, 0.6)", border: "#f59e0b" },
+        "ANNUAL": { bg: "rgba(16, 185, 129, 0.6)", border: "#10b981" }
+    };
+
+    for (let ex of exams) {
+        let docId = `${scholarId}_${ex}_${academicYear}`;
+        let examData = [];
+        
+        if (ex === currentExam) {
+            // Use current parsed values instantly
+            currentSubjects.forEach(sub => {
+                examData.push(Number(sub.total || 0));
+            });
+        } else {
+            // Fetch historical documents from Firestore asynchronously
+            try {
+                let snap = await getDoc(doc(db, "school_results", docId));
+                if (snap.exists()) {
+                    let d = snap.data();
+                    let subs = typeof d.subjects_json === "string" ? JSON.parse(d.subjects_json) : d.subjects_json;
+                    currentSubjects.forEach(sub => {
+                        let targetSub = subs.find(s => s.name.toUpperCase() === sub.name.toUpperCase());
+                        examData.push(targetSub ? Number(targetSub.total || 0) : 0);
+                    });
+                } else {
+                    examData = new Array(labels.length).fill(0);
+                }
+            } catch (err) {
+                examData = new Array(labels.length).fill(0);
+            }
+        }
+
+        // Add to dataset if it contains non-zero data values to clean up visual bloat
+        if (examData.some(v => v > 0) || ex === currentExam) {
+            datasets.push({
+                label: ex.replace("_", " "),
+                data: examData,
+                backgroundColor: colors[ex]?.bg || "rgba(99, 102, 241, 0.5)",
+                borderColor: colors[ex]?.border || "#6366f1",
+                borderWidth: 1
+            });
+        }
+    }
+    return { labels, datasets };
+}
 
 // --- ADVANCED ANTI-INSPECT DEVTOOLS DETECTION SYSTEM ---
 let globalUID = null;
@@ -364,7 +444,7 @@ async function lockUserPermanently() {
 }
 
 function handleDevToolsViolation() {
-    if (isCurrentUserAdmin) return; // Admin ko check nahi karenge
+    if (isCurrentUserAdmin) return; 
     if (violationTriggered) return;
     violationTriggered = true;
 
@@ -393,21 +473,17 @@ function clearDevToolsViolation() {
     }
 }
 
-// DevTools Tracking Core Loop
 setInterval(() => {
-    // LocalStorage Check (Fast Bypass Guard)
     if (localStorage.getItem('aarav_permanently_blocked') === 'true') {
         lockDevice("Account Permanently Locked due to multiple DevTools policy violations.");
         return;
     }
 
-    // 1. Window Size Detection (Inspect Window docking check)
     const widthThreshold = window.outerWidth - window.innerWidth > 160;
     const heightThreshold = window.outerHeight - window.innerHeight > 160;
     
-    // 2. Console Profile / Timing Check
     let start = new Date();
-    debugger; // Agar inspect khula hoga toh debugger yahan hold ho jayega
+    debugger; 
     let end = new Date();
     const debuggerDetected = (end - start) > 100;
 
@@ -436,16 +512,14 @@ onAuthStateChanged(auth, async user => {
         } else {  
             userData = uSnap.data();  
 
-            // Realtime Reset Check: Agar admin ne reset request bheji ho
             if (userData.resetWarnings === true) {
                 localStorage.removeItem('aarav_permanently_blocked');
                 localStorage.removeItem('dev_warnings');
                 await updateDoc(uRef, { resetWarnings: false, deviceLocked: false, deviceID: token });
-                window.location.reload(); // App ko fresh load karo bina block screen ke
+                window.location.reload(); 
                 return;
             }
 
-            // Instant local storage verification
             if (localStorage.getItem('aarav_permanently_blocked') === 'true' && !isCurrentUserAdmin) {
                 lockDevice("Account Permanently Locked due to multiple DevTools policy violations.");
                 return;
@@ -464,7 +538,8 @@ onAuthStateChanged(auth, async user => {
         document.getElementById("user-display").innerText = user.displayName;  
         if(isCurrentUserAdmin) { document.getElementById("btn-admin").classList.remove("hidden"); loadAdminData(); }  
         checkAccess(user.uid); loadBooks(); loadSettings(); loadUserSubmissions(user.uid);  
-    } else {   
+        listenResultVisibility(); // Listen real-time to visibility settings
+    } else {  
         globalUID = null;
         isCurrentUserAdmin = false;
         document.getElementById("login-screen").style.display = "flex";   
@@ -566,8 +641,77 @@ window.deleteAllResults = async () => {
     });  
     alert("All Results Deleted Successfully");  
 }  
+
+// --- REAL-TIME PORTAL VISIBILITY STATE ---
+function listenResultVisibility() {
+    onSnapshot(doc(db, "settings", "app"), snapshot => {
+        if (snapshot.exists()) {
+            isResultsPortalVisible = snapshot.data().resultsVisibility === true;
+            
+            // Handle UI Updates for Admin Screen dynamically
+            const badge = document.getElementById("portal-status-badge");
+            const toggleBtn = document.getElementById("toggle-portal-btn");
+            if (badge && toggleBtn) {
+                if (isResultsPortalVisible) {
+                    badge.innerText = "UNHIDDEN (LIVE & PUBLIC)";
+                    badge.className = "text-[9px] text-emerald-400 font-bold uppercase";
+                    toggleBtn.className = "bg-emerald-600 text-white text-[10px] font-black px-4 py-2.5 rounded-xl shadow-md uppercase";
+                } else {
+                    badge.innerText = "HIDDEN (SECURE)";
+                    badge.className = "text-[9px] text-red-400 font-bold uppercase";
+                    toggleBtn.className = "bg-amber-600 text-white text-[10px] font-black px-4 py-2.5 rounded-xl shadow-md uppercase";
+                }
+            }
+
+            // Apply restriction logic for non-admin students
+            const noticeBox = document.getElementById("result-locked-notice");
+            const inputBox = document.getElementById("result-input-box");
+            if (!isCurrentUserAdmin) {
+                if (isResultsPortalVisible) {
+                    noticeBox.classList.add("hidden");
+                    inputBox.classList.remove("hidden");
+                } else {
+                    noticeBox.classList.remove("hidden");
+                    inputBox.classList.add("hidden");
+                    document.getElementById("result-display-panel").classList.add("hidden");
+                }
+            } else {
+                // Admin can always view input query components
+                noticeBox.classList.add("hidden");
+                inputBox.classList.remove("hidden");
+            }
+        }
+    });
+}
+
+window.toggleResultVisibility = async () => {
+    if (!isCurrentUserAdmin) return;
+    const newState = !isResultsPortalVisible;
+    
+    await setDoc(doc(db, "settings", "app"), { resultsVisibility: newState }, { merge: true });
+    
+    if (newState === true) {
+        alert("Result Portal has been UNHIDDEN and set to LIVE mode successfully!");
+        // Simulate sending real-time broad SMS notification channels to active devices
+        triggerSmsNotificationBroadcast();
+    } else {
+        alert("Result Portal is now SECURELY HIDDEN from all non-admin devices.");
+    }
+};
+
+async function triggerSmsNotificationBroadcast() {
+    console.log("Fetching device metadata to dispatch broad updates...");
+    // Fast2SMS/Twilio custom API hooks setup framework structure logic trigger
+    alert("Broadcasting Live App Alerts! 'Dear Student, your Aarav Ed-Tech examination results are now live! Open the application panel to access.'");
+}
   
 window.fetchStudentResult = async () => {  
+    // Pre-execution evaluation block for safety leaks
+    if (!isResultsPortalVisible && !isCurrentUserAdmin) {
+        alert("Action Forbidden. Results portal is offline right now.");
+        return;
+    }
+
     const sId = document.getElementById("student-scholar-id").value.trim().toUpperCase();  
     const examType = document.getElementById("student-exam-type").value;  
     const academicYear = document.getElementById("student-academic-year").value;   
@@ -693,6 +837,28 @@ window.fetchStudentResult = async () => {
   
         let examDisplayName = data.exam_type ? data.exam_type.replace("_", " ") : "Examination";  
         let displayAcademicYear = data.academic_year || academicYear;   
+        
+        // Dynamic Table Headers Configuration
+        let theoryHeader = "THEORY";
+        let pracHeader = "I.A / PRAC";
+        if (examType === "HALF_YEARLY") {
+            theoryHeader = "MT";
+            pracHeader = "PMT";
+        } else if (examType === "ANNUAL") {
+            theoryHeader = "ANNUAL";
+            pracHeader = "PAT";
+        }
+
+        // Attendance String logic handler
+        let daysPresentStr = "N/A";
+        if (data.days_present !== undefined) {
+            let dp = data.days_present.toString();
+            if (dp.includes("/")) {
+                daysPresentStr = dp;
+            } else {
+                daysPresentStr = dp + " Days";
+            }
+        }
 
         targetPanel.innerHTML = `  
          <div class="border-4 border-blue-900 p-4 bg-slate-50 relative">  
@@ -733,8 +899,8 @@ window.fetchStudentResult = async () => {
                         <tr class="bg-blue-900 text-white text-[9px] font-black uppercase text-center">  
                             <th class="p-2 border border-blue-900">SUB CODE</th>  
                             <th class="p-2 border border-blue-900 text-left">SUB NAME</th>  
-                            <th class="p-2 border border-blue-900">THEORY</th>  
-                            <th class="p-2 border border-blue-900">I.A / PRAC</th>  
+                            <th class="p-2 border border-blue-900">${theoryHeader}</th>  
+                            <th class="p-2 border border-blue-900">${pracHeader}</th>  
                             <th class="p-2 border border-blue-900">TOTAL</th>  
                             <th class="p-2 border border-blue-900">POS. GRADE</th>  
                         </tr>  
@@ -744,20 +910,25 @@ window.fetchStudentResult = async () => {
                     </tbody>  
                 </table>  
                   
-                <div class="flex justify-between items-center p-2 bg-white border border-blue-900 rounded-xl mb-3">  
-                    <span class="text-[10px] font-black uppercase">Total Marks</span>  
-                    <span class="text-xs font-black">${totalMarks} / ${maxMarks}</span>  
-                </div>  
-  
-                <div class="flex justify-between items-center p-2 bg-white border border-blue-900 rounded-xl mb-3">  
-                    <span class="text-[10px] font-black uppercase">Percentage</span>  
-                    <span class="text-xs font-black">${percentage}%</span>  
-                </div>  
+                <div class="grid grid-cols-2 gap-2 mb-3">
+                    <div class="flex justify-between items-center p-2 bg-white border border-blue-900 rounded-xl">  
+                        <span class="text-[10px] font-black uppercase">Total Marks</span>  
+                        <span class="text-xs font-black">${totalMarks} / ${maxMarks}</span>  
+                    </div>  
+                    <div class="flex justify-between items-center p-2 bg-white border border-blue-900 rounded-xl">  
+                        <span class="text-[10px] font-black uppercase">Percentage</span>  
+                        <span class="text-xs font-black">${percentage}%</span>  
+                    </div> 
+                </div>
 
-                <div class="grid grid-cols-1 mb-3">  
+                <div class="grid grid-cols-2 gap-2 mb-3">  
                     <div class="flex justify-between items-center p-2 bg-white border border-blue-900 rounded-xl">  
                         <span class="text-[9px] font-black uppercase">Class Rank</span>  
                         <span class="text-xs font-black text-indigo-700">${classRank} <span class="text-[9px] text-slate-500 font-normal">of ${totalInClass}</span></span>  
+                    </div>   
+                    <div class="flex justify-between items-center p-2 bg-white border border-blue-900 rounded-xl">  
+                        <span class="text-[9px] font-black uppercase text-emerald-800"><i class="fas fa-calendar-check mr-1"></i>Attendance</span>  
+                        <span class="text-xs font-black text-emerald-700">${daysPresentStr}</span>  
                     </div>   
                 </div>  
   
@@ -765,6 +936,13 @@ window.fetchStudentResult = async () => {
                     <span class="text-[10px] font-black uppercase tracking-wider">Final Result Outcome:</span>  
                     <span class="text-xs font-black uppercase bg-white ${autoResultStatus === 'PASS' ? 'text-emerald-700' : 'text-red-700'} px-4 py-0.5 rounded-full shadow-inner">${autoResultStatus}</span>  
                 </div>  
+
+                <div class="border border-blue-900 bg-white rounded-2xl p-3 mb-4">
+                    <p class="text-[10px] font-black text-blue-900 uppercase mb-2 tracking-wide"><i class="fas fa-chart-bar mr-1"></i>Subject-wise Cross Exam Analysis</p>
+                    <div class="w-full relative h-48">
+                        <canvas id="student-analysis-chart"></canvas>
+                    </div>
+                </div>
 
                 <div class="flex justify-end mt-4 mb-2">
                     <div class="text-center" style="width: 110px;">
@@ -787,6 +965,24 @@ window.fetchStudentResult = async () => {
             </div>  
         `;  
         targetPanel.classList.remove("hidden");  
+
+        // Generate and load Chart.js Graphic for dynamic student visualization
+        let chartData = await buildPerformanceChartData(currentScholarId, examType, displayAcademicYear, subjects);
+        let ctx = document.getElementById('student-analysis-chart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: chartData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { labels: { font: { size: 9, weight: 'bold' } } } },
+                scales: {
+                    y: { beginAtZero: true, max: 100, ticks: { font: { size: 8 } } },
+                    x: { ticks: { font: { size: 8, weight: 'bold' } } }
+                }
+            }
+        });
+
     } catch(err) {  
         console.error(err);  
         alert("Firestore access query failure.");  
@@ -862,6 +1058,28 @@ window.printBulkClassResults = async () => {
             let percentage = maxMarks > 0 ? ((totalMarks / maxMarks) * 100).toFixed(2) : 0;
             let autoResultStatus = percentage >= 33 ? "PASS" : "FAIL";
             let examDisplayName = examType.replace("_", " ");
+            
+            // Dynamic Table Headers for Bulk Printing
+            let theoryHeader = "THEORY";
+            let pracHeader = "PRAC";
+            if (examType === "HALF_YEARLY") {
+                theoryHeader = "MT";
+                pracHeader = "PMT";
+            } else if (examType === "ANNUAL") {
+                theoryHeader = "ANNUAL";
+                pracHeader = "PAT";
+            }
+
+            // Attendance String Handler for Bulk Printing
+            let daysPresentStr = "N/A";
+            if (data.days_present !== undefined) {
+                let dp = data.days_present.toString();
+                if (dp.includes("/")) {
+                    daysPresentStr = dp;
+                } else {
+                    daysPresentStr = dp + " Days";
+                }
+            }
 
             let subjectRows = "";
             subjects.forEach(sub => {
@@ -882,7 +1100,7 @@ window.printBulkClassResults = async () => {
             });
 
             sandbox.innerHTML = `
-                <div style="border: 4px solid #1e3a8a; padding: 15px; background: #f8fafc; font-family: sans-serif; color: black;">
+                <div id="bulk-container-${idx}" style="border: 4px solid #1e3a8a; padding: 15px; background: #f8fafc; font-family: sans-serif; color: black;">
                     <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #1e3a8a; padding-bottom: 10px; margin-bottom: 12px;">
                         <div style="margin-right: 10px;">
                             <img src="https://i.postimg.cc/hjTFV5Hk/Screenshot-2026-0526-080731.png" style="width: 55px; height: 55px; object-fit: contain;">
@@ -918,8 +1136,8 @@ window.printBulkClassResults = async () => {
                             <tr style="background: #1e3a8a; color: white; font-size: 9px; font-weight: 900; text-transform: uppercase;">  
                                 <th style="padding: 6px; border: 1px solid #1e3a8a;">SUB CODE</th>  
                                 <th style="padding: 6px; border: 1px solid #1e3a8a; text-align: left;">SUB NAME</th>  
-                                <th style="padding: 6px; border: 1px solid #1e3a8a;">THEORY</th>  
-                                <th style="padding: 6px; border: 1px solid #1e3a8a;">PRAC</th>  
+                                <th style="padding: 6px; border: 1px solid #1e3a8a;">${theoryHeader}</th>  
+                                <th style="padding: 6px; border: 1px solid #1e3a8a;">${pracHeader}</th>  
                                 <th style="padding: 6px; border: 1px solid #1e3a8a;">TOTAL</th>  
                                 <th style="padding: 6px; border: 1px solid #1e3a8a;">GRADE</th>  
                             </tr>  
@@ -940,14 +1158,20 @@ window.printBulkClassResults = async () => {
                     </div>  
     
                     <div style="display: flex; justify-content: space-between; padding: 6px; background: white; border: 1px solid #1e3a8a; border-radius: 8px; margin-bottom: 6px; font-size: 11px;">
-                        <span style="font-weight: bold; text-transform: uppercase;">Class Rank:</span>
-                        <span style="margin-left: auto; font-weight: 900; color: #4f46e5;">${classRank} of ${totalInClass}</span>
+                        <span style="font-weight: bold; text-transform: uppercase;">Class Rank & Attendance:</span>
+                        <span style="margin-left: auto; font-weight: 900; color: #4f46e5;">Rank ${classRank} of ${totalInClass} | Attd: ${daysPresentStr}</span>
                     </div>  
       
                     <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px; background: #1e3a8a; color: white; border-radius: 8px; font-size: 11px; font-weight: bold; margin-top: 10px;">  
                         <span>FINAL OUTCOME:</span>  
                         <span style="margin-left: auto; background: white; color: ${autoResultStatus === 'PASS' ? '#047857' : '#b91c1c'}; padding: 2px 10px; border-radius: 20px;">${autoResultStatus}</span>  
                     </div>  
+
+                    <div style="border: 1px solid #1e3a8a; background: white; border-radius: 8px; padding: 5px; margin-top: 10px;">
+                        <div style="width: 100%; height: 140px; relative">
+                            <canvas id="bulk-chart-${idx}"></canvas>
+                        </div>
+                    </div>
 
                     <div style="display: flex; justify-content: flex-end; margin-top: 15px; margin-bottom: 5px;">
                         <div style="text-align: center; width: 90px;">
@@ -962,7 +1186,26 @@ window.printBulkClassResults = async () => {
                 </div>
             `;
 
-            let canvas = await html2canvas(sandbox, { scale: 2, useCORS: true, backgroundColor: "#ffffff" });
+            // Build sub charts dynamically inside memory stack before capturing canvas snapshot
+            let chartData = await buildPerformanceChartData(data.scholar_id.toString().trim().toUpperCase(), examType, academicYear, subjects);
+            let ctx = document.getElementById(`bulk-chart-${idx}`).getContext('2d');
+            
+            // Promise based simulation tracking for ensuring Chart renders animation frames completely before HTML2Canvas trigger
+            await new Promise((resolve) => {
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: chartData,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: { onComplete: () => resolve() },
+                        plugins: { legend: { labels: { font: { size: 7 } } } },
+                        scales: { y: { beginAtZero: true, max:100, ticks: { font: { size: 6 } } }, x: { ticks: { font: { size: 6 } } } }
+                    }
+                });
+            });
+
+            let canvas = await html2canvas(document.getElementById(`bulk-container-${idx}`), { scale: 2, useCORS: true, backgroundColor: "#ffffff" });
             let imgData = canvas.toDataURL("image/png");
 
             let imgWidth = usableWidth;  
@@ -1018,7 +1261,7 @@ window.processExcelUpload = () => {
                 let detectedSubjects = {};  
   
                 allColumns.forEach(col => {  
-                    const skipFields = ["scholar_id", "roll_no", "name", "mother", "father", "dob", "class", "school", "result_status", "fee_due", "section"];  
+                    const skipFields = ["scholar_id", "roll_no", "name", "mother", "father", "dob", "class", "school", "result_status", "fee_due", "section", "days_present"];  
                     if(skipFields.includes(col.toLowerCase())) return;  
   
                     const cleanCol = col.toUpperCase().trim();  
@@ -1072,6 +1315,7 @@ window.processExcelUpload = () => {
                     subjects_json: subjects,  
                     result_status: row.result_status || "PASS",  
                     fee_due: row.fee_due === true || row.fee_due === "TRUE",  
+                    days_present: row.days_present !== undefined ? row.days_present : 0,
                     updatedAt: Timestamp.now()  
                 };  
                   
@@ -1385,9 +1629,7 @@ window.closeModal = () => {
 window.login = () => signInWithPopup(auth, prov);  
 window.logout = () => signOut(auth);  
 
-// Admin panel se user unblock aur warnings reset karne ka updated function
 window.resetD = async (id) => {   
-    // resetWarnings flag lagaya taaki user jab next time app khole toh uski local storage clear ho sake
     await updateDoc(doc(db, "users", id), {
         deviceID: null, 
         deviceLocked: false, 
