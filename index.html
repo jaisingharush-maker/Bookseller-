@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>  <html lang="en">  
 <head>    
 <meta charset="UTF-8">  
@@ -349,12 +347,6 @@ iframe { border: none; width: 100%; height: 100%; pointer-events: auto; }
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";  
 import { getFirestore, collection, onSnapshot, doc, getDoc, setDoc, updateDoc, deleteDoc, Timestamp, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";  
 import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";  
-
-import {
-    getMessaging,
-    getToken
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js";
-
   
 // GLOBAL GRADING FUNCTION
 window.getGrade = function(percent) {  
@@ -370,52 +362,6 @@ window.getGrade = function(percent) {
   
 const fbCfg = { apiKey: "AIzaSyCrFbBhfWT6WlYAH_ZmopTfzrf47GEQe1k", authDomain: "book-swap-104b7.firebaseapp.com", projectId: "book-swap-104b7" };  
 const fbApp = initializeApp(fbCfg); const db = getFirestore(fbApp); const auth = getAuth(fbApp); const prov = new GoogleAuthProvider();  
-window.login = async () => {
-    
-    try {
-        
-        const result = await signInWithPopup(auth, prov);
-        
-        console.log(result.user);
-        
-    } catch (err) {
-        
-        console.error(err);
-        
-    }
-    
-};
-const messaging = getMessaging(fbApp);
-async function setupNotifications() {
-    
-    try {
-        
-        const permission = await Notification.requestPermission();
-        
-        if (permission !== "granted") {
-            
-            alert("Notification Permission Denied");
-            return;
-            
-        }
-        
-        const token = await getToken(messaging, {
-            
-            vapidKey: "BFa8cK2c0zdqqBRKs4Rd7GA_mmBhB_R9anvWBI0VdI5GzujMnRhrBTzYNSqE3-nQ4AaIOHd3S4oWx4fTprS0mro"
-            
-        });
-        
-        console.log("FCM TOKEN:", token);
-        
-    } catch (err) {
-        
-        console.error(err);
-        
-    }
-    
-}
-setupNotifications();
-
 const adminEmail = "mihirjaisingh@gmail.com";  
   
 let currentLectures = []; let currentDPPs = []; let allUsers = [];   
