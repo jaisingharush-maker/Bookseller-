@@ -370,22 +370,22 @@ window.getGrade = function(percent) {
   
 const fbCfg = { apiKey: "AIzaSyCrFbBhfWT6WlYAH_ZmopTfzrf47GEQe1k", authDomain: "book-swap-104b7.firebaseapp.com", projectId: "book-swap-104b7" };  
 const fbApp = initializeApp(fbCfg); const db = getFirestore(fbApp); const auth = getAuth(fbApp); const prov = new GoogleAuthProvider();  
-const messaging = getMessaging(fbApp);
-  window.login = async () => {
-
+window.login = async () => {
+    
     try {
-
+        
         const result = await signInWithPopup(auth, prov);
-
+        
         console.log(result.user);
-
+        
     } catch (err) {
-
+        
         console.error(err);
-
+        
     }
-
+    
 };
+const messaging = getMessaging(fbApp);
 async function setupNotifications() {
     
     try {
@@ -415,15 +415,7 @@ async function setupNotifications() {
     
 }
 setupNotifications();
-firebase.initializeApp({
-    
-    apiKey: "AIza....",
-    
-    authDomain: "book-swap-104b7.firebaseapp.com",
-    
-    projectId: "book-swap-104b7"
-    
-});
+
 const adminEmail = "mihirjaisingh@gmail.com";  
   
 let currentLectures = []; let currentDPPs = []; let allUsers = [];   
